@@ -148,7 +148,7 @@ if is_available "telescope.nvim" then
     function() require("telescope.builtin").find_files { hidden = true, no_ignore = true } end,
     desc = "Search all files",
   }
-  maps.n["<leader>fb"] = { function() require("telescope.builtin").buffers() end, desc = "Search buffers" }
+  maps.n["<leader>fb"] = { "<cmd>Telescope file_browser<cr>", desc = "File Browser" }
   maps.n["<leader>fh"] = { function() require("telescope.builtin").help_tags() end, desc = "Search help" }
   maps.n["<leader>fm"] = { function() require("telescope.builtin").marks() end, desc = "Search marks" }
   maps.n["<leader>fo"] = { function() require("telescope.builtin").oldfiles() end, desc = "Search history" }

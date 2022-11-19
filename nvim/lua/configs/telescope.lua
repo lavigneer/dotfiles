@@ -37,3 +37,4 @@ telescope.setup(astronvim.user_plugin_opts("plugins.telescope", {
 
 astronvim.conditional_func(telescope.load_extension, pcall(require, "notify"), "notify")
 astronvim.conditional_func(telescope.load_extension, pcall(require, "aerial"), "aerial")
+telescope.load_extension "file_browser"

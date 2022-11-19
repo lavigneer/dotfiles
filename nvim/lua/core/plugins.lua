@@ -63,15 +63,15 @@ local astro_plugins = {
   },
 
   -- File explorer
-  ["nvim-neo-tree/neo-tree.nvim"] = {
-    branch = "v2.x",
-    module = "neo-tree",
-    cmd = "Neotree",
-    requires = { { "MunifTanjim/nui.nvim", module = "nui" } },
-    setup = function() vim.g.neo_tree_remove_legacy_commands = true end,
-    config = function() require "configs.neo-tree" end,
-  },
-
+  -- ["nvim-neo-tree/neo-tree.nvim"] = {
+  --   branch = "v2.x",
+  --   module = "neo-tree",
+  --   cmd = "Neotree",
+  --   requires = { { "MunifTanjim/nui.nvim", module = "nui" } },
+  --   setup = function() vim.g.neo_tree_remove_legacy_commands = true end,
+  --   config = function() require "configs.neo-tree" end,
+  -- },
+  
   -- Statusline
   ["rebelot/heirline.nvim"] = { config = function() require "configs.heirline" end },
 
@@ -249,7 +249,9 @@ local astro_plugins = {
   ["ThePrimeagen/harpoon"] = {
     config = function() return { width = 120} end,
     
-  }
+  },
+
+  ["nvim-telescope/telescope-file-browser.nvim"] = {}
 }
 
 if astronvim.updater.snapshot then
