@@ -27,6 +27,7 @@ client.placeholder      #282A36 #282A36 #F8F8F2 #282A36   #282A36
 client.background       #F8F8F2
 
 bar {
+  position top
   status_command i3status
   colors {
     background #282A36
@@ -40,6 +41,7 @@ bar {
     binding_mode       #FF5555 #FF5555 #F8F8F2
   }
 }
+
 
 bindsym $mod+d exec "dmenu_run -nf '#F8F8F2' -nb '#282A36' -sb '#6272A4' -sf '#F8F8F2' -fn 'monospace-10' -p 'dmenu%'"
 
@@ -196,6 +198,20 @@ bindsym $mod+Shift+Mod2+KP_Home move container to workspace 7
 bindsym $mod+Shift+Mod2+KP_Up move container to workspace 8
 bindsym $mod+Shift+Mod2+KP_Prior move container to workspace 9
 
+# Screen layout changes
+mode "$mode_display" {
+  bindsym 1 exec --no-startup-id "/home/elavigne/.screenlayout/laptop-only.sh", mode "default"
+  bindsym 2 exec --no-startup-id "/home/elavigne/.screenlayout/living-room.sh", mode "default"
+  bindsym 3 exec --no-startup-id "/home/elavigne/.screenlayout/laptop-presentation.sh", mode "default"
+  bindsym 4 exec --no-startup-id "/home/elavigne/.screenlayout/basement.sh", mode "default"
+
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+Shift+x mode "$mode_display"
+bindsym $mod+Shift+greater move workspace to output right
+bindsym $mod+Shift+less move workspace to output left
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
