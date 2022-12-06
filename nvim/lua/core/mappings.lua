@@ -17,10 +17,10 @@ maps.n["Q"] = "<Nop>"
 
 -- Packer
 maps.n["<leader>pc"] = { "<cmd>PackerCompile<cr>", desc = "Packer Compile" }
-maps.n["<leader>pi"] = { "<cmd>PackerInstall<cr>", desc = "Packer Install" }
 maps.n["<leader>ps"] = { "<cmd>PackerSync<cr>", desc = "Packer Sync" }
 maps.n["<leader>pS"] = { "<cmd>PackerStatus<cr>", desc = "Packer Status" }
 maps.n["<leader>pu"] = { "<cmd>PackerUpdate<cr>", desc = "Packer Update" }
+maps.n["<leader>pi"] = { "<cmd>PackerInstall<cr>", desc = "Packer Install" }
 
 -- AstroNvim
 maps.n["<leader>pA"] = { "<cmd>AstroUpdate<cr>", desc = "AstroNvim Update" }
@@ -148,7 +148,7 @@ if is_available "telescope.nvim" then
     function() require("telescope.builtin").find_files { hidden = true, no_ignore = true } end,
     desc = "Search all files",
   }
-  maps.n["<leader>fb"] = { "<cmd>Telescope file_browser<cr>", desc = "File Browser" }
+  maps.n["<leader>fb"] = { "<cmd>Telescope file_browser path=%:p:h<cr>", desc = "File Browser" }
   maps.n["<leader>fh"] = { function() require("telescope.builtin").help_tags() end, desc = "Search help" }
   maps.n["<leader>fm"] = { function() require("telescope.builtin").marks() end, desc = "Search marks" }
   maps.n["<leader>fo"] = { function() require("telescope.builtin").oldfiles() end, desc = "Search history" }
@@ -224,10 +224,10 @@ maps.n["<leader>ug"] = { function() astronvim.ui.toggle_signcolumn() end, desc =
 maps.n["<leader>ui"] = { function() astronvim.ui.set_indent() end, desc = "Change indent setting" }
 maps.n["<leader>ul"] = { function() astronvim.ui.toggle_statusline() end, desc = "Toggle statusline" }
 maps.n["<leader>un"] = { function() astronvim.ui.change_number() end, desc = "Change line numbering" }
+maps.n["<leader>uu"] = { function() astronvim.ui.toggle_url_match() end, desc = "Toggle URL highlight" }
 maps.n["<leader>us"] = { function() astronvim.ui.toggle_spell() end, desc = "Toggle spellcheck" }
 maps.n["<leader>up"] = { function() astronvim.ui.toggle_paste() end, desc = "Toggle paste mode" }
 maps.n["<leader>ut"] = { function() astronvim.ui.toggle_tabline() end, desc = "Toggle tabline" }
-maps.n["<leader>uu"] = { function() astronvim.ui.toggle_url_match() end, desc = "Toggle URL highlight" }
 maps.n["<leader>uw"] = { function() astronvim.ui.toggle_wrap() end, desc = "Toggle wrap" }
 maps.n["<leader>uy"] = { function() astronvim.ui.toggle_syntax() end, desc = "Toggle syntax highlight" }
 maps.n["<leader>uN"] = { function() astronvim.ui.toggle_ui_notifications() end, desc = "Toggle UI notifications" }
@@ -235,18 +235,24 @@ maps.n["<leader>uN"] = { function() astronvim.ui.toggle_ui_notifications() end, 
 -- Harpoon
 maps.n["<leader>a"] = { function() require("harpoon.mark").add_file() end, silent }
 maps.n["<C-e>"] = { function() require("harpoon.ui").toggle_quick_menu() end, silent }
-maps.n["<C-k1>"] = { function() require("harpoon.ui").nav_file(1) end, silent }
+maps.n["<A-1>"] = { function() require("harpoon.ui").nav_file(1) end, silent }
+maps.n["<A-2>"] = { function() require("harpoon.ui").nav_file(2) end, silent }
+maps.n["<A-3>"] = { function() require("harpoon.ui").nav_file(3) end, silent }
+maps.n["<A-4>"] = { function() require("harpoon.ui").nav_file(4) end, silent }
+maps.n["<A-5>"] = { function() require("harpoon.ui").nav_file(5) end, silent }
 
 -- Moving Lines
-
 maps.n["<A-j>"] = { ":m .+1<CR>==" }
 maps.n["<A-k>"] = { ":m .-2<CR>==" }
 maps.i["<A-j>"] = { "<Esc>:m .+1<CR>==gi" }
 maps.i["<A-k>"] = { "<Esc>:m .-2<CR>==gi" }
-maps.v["<A-j>"] = { ":m '>+1<CR>gv=gv" }
-maps.v["<A-k>"] = { ":m '<-2<CR>gv=gv" }
+maps.v["<A-j>"] = { ":move '>+1<CR>gv-gv" }
+maps.v["<A-k>"] = { ":move '<-2<CR>gv-gv" }
 
---maps.v["J"] = {":m '>+1<CR>gv=gv", desc = "Move line down"}
---maps.v["K"] = {":m '<-2<CR>gv=gv", desc = "Move line up"}
+-- Centering Movement
+maps.n["<C-d>"] = { "<C-d>zz" }
+maps.n["<C-u>"] = { "<C-u>zz" }
+-- maps.v["J"] = {":m '>+1<CR>gv=gv", desc = "Move line down"}
+-- maps.v["K"] = {":m '<-2<CR>gv=gv", desc = "Move line up"}
 
 astronvim.set_mappings(astronvim.user_plugin_opts("mappings", maps))
