@@ -5,7 +5,7 @@ function bind(mode, outer_opts)
 	end
 end
 
-buf M = {}
+local M = {}
 
 M.nnoremap = bind("n")
 M.vnoremap = bind("v")
