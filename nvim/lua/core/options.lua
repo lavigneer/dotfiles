@@ -13,8 +13,8 @@ astronvim.vim_opts(astronvim.user_plugin_opts("options", {
     ignorecase = true, -- Case insensitive searching
     laststatus = 3, -- globalstatus
     lazyredraw = true, -- lazily redraw screen
-    mouse = "a", -- Enable mouse support
     number = true, -- Show numberline
+    mouse = "", -- Enable mouse support
     preserveindent = true, -- Preserve indent structure as much as possible
     pumheight = 10, -- Height of the pop up menu
     relativenumber = true, -- Show relative numberline
