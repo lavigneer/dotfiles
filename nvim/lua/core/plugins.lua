@@ -71,7 +71,7 @@ local astro_plugins = {
   --   setup = function() vim.g.neo_tree_remove_legacy_commands = true end,
   --   config = function() require "configs.neo-tree" end,
   -- },
-  
+
   -- Statusline
   ["rebelot/heirline.nvim"] = { config = function() require "configs.heirline" end },
 
@@ -86,7 +86,7 @@ local astro_plugins = {
 
   -- Syntax highlighting
   ["nvim-treesitter/nvim-treesitter"] = {
-    run = function() require("nvim-treesitter.install").update { with_sync = true }() end,
+    run = function() require("nvim-treesitter.install").update { with_sync = true } () end,
     event = "BufEnter",
     config = function() require "configs.treesitter" end,
   },
@@ -243,12 +243,11 @@ local astro_plugins = {
     event = "BufWritePost",
     config = function() require "configs.session_manager" end,
   },
-  
+
   -- Harpoon
-  ["nvim-lua/plenary.nvim"] = {},
   ["ThePrimeagen/harpoon"] = {
-    config = function() return { width = 120} end,
-    
+    config = function() return { width = 120 } end,
+
   },
 
   ["nvim-telescope/telescope-file-browser.nvim"] = {}
