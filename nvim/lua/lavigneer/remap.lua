@@ -47,3 +47,24 @@ vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 -- Quick replace word that you are on
 vim.keymap.set("n", "<leader>s", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>")
+
+
+-- Buffer
+vim.keymap.set("n", "<leader>c", "<cmd>bdelete<cr>", { desc = "Close buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", {desc = "Next buffer" })
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", {desc = "Previous buffer" })
+
+
+-- Windows
+vim.keymap.set("n", "<C-h>", "<C-w>h", {desc = "Move to left split" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", {desc = "Move to below split" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", {desc = "Move to above split" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", {desc = "Move to right split" })
+vim.keymap.set("n", "<C-Up>", "<cmd>resize -2<CR>", {desc = "Resize split up" })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize +2<CR>", {desc = "Resize split down" })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<CR>", {desc = "Resize split left" })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<CR>", {desc = "Resize split right" })
+
+-- Stay in indent mode
+vim.keymap.set("v", "<", "<gv", {desc = "unindent line" })
+vim.keymap.set("v", ">", ">gv", {desc = "indent line" })

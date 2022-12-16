@@ -12,6 +12,13 @@ return require('packer').startup(function(use)
         -- or                            , branch = '0.1.x',
         requires = { { 'nvim-lua/plenary.nvim' } }
     }
+    use {
+        'nvim-telescope/telescope-fzf-native.nvim',
+        after = "telescope.nvim",
+        disable = vim.fn.executable "make" == 0,
+        run = "make",
+        config = function() require("telescope").load_extension "fzf" end,
+    }
 
     use({
         'rose-pine/neovim',
