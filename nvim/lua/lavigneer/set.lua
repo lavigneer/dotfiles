@@ -25,3 +25,7 @@ vim.opt.isfname:append("@-@")
 vim.opt.colorcolumn = "100"
 
 vim.g.mapleader = " "
+
+vim.opt.mouse = ""
+
+vim.opt.updatetime = 300
