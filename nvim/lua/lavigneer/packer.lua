@@ -51,7 +51,7 @@ return require('packer').startup(function(use)
 
             -- Snippets
             { 'L3MON4D3/LuaSnip' },
---            { 'rafamadriz/friendly-snippets' },
+            --            { 'rafamadriz/friendly-snippets' },
         }
     }
 
@@ -65,4 +65,9 @@ return require('packer').startup(function(use)
 
     use('jose-elias-alvarez/null-ls.nvim')
     use('famiu/bufdelete.nvim')
+
+    use {
+        'nvim-lualine/lualine.nvim',
+        requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+    }
 end)
