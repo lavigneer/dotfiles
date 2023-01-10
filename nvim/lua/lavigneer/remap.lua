@@ -1,4 +1,4 @@
-vim.keymap.set("n", "<leader>fb", "<cmd>Lexplore<cr>", { desc = "File browser" })
+vim.keymap.set("n", "<leader>fb", vim.cmd.Ex, { desc = "File browser" })
 
 -- Moving Lines
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==")
