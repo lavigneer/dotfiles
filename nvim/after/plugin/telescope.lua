@@ -20,5 +20,12 @@ require('telescope').setup({
             height = 0.80,
             preview_cutoff = 120,
         }
+    },
+    extensions = {
+        ["ui-select"] = {
+            require("telescope.themes").get_cursor {}
+        }
     }
 })
+
+require("telescope").load_extension("ui-select")

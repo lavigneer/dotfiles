@@ -19,6 +19,7 @@ return require('packer').startup(function(use)
         run = "make",
         config = function() require("telescope").load_extension "fzf" end,
     }
+    use {'nvim-telescope/telescope-ui-select.nvim' }
 
     use({
         'rose-pine/neovim',
