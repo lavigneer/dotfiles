@@ -51,6 +51,7 @@ vim.keymap.set("n", "<leader>s", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left>
 
 -- Buffer
 vim.keymap.set("n", "<leader>c", "<cmd>Bdelete<cr>", { desc = "Close buffer" })
+vim.keymap.set("n", "<leader>C", "<cmd>Bdelete!<cr>", { desc = "Close buffer (Force)" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", {desc = "Next buffer" })
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", {desc = "Previous buffer" })
 
