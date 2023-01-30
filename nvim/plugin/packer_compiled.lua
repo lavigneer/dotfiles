@@ -204,6 +204,16 @@ _G.packer_plugins = {
     path = "/home/elavigne/.local/share/nvim/site/pack/packer/start/telescope.nvim",
     url = "https://github.com/nvim-telescope/telescope.nvim"
   },
+  ["todo-comments.nvim"] = {
+    loaded = true,
+    path = "/home/elavigne/.local/share/nvim/site/pack/packer/start/todo-comments.nvim",
+    url = "https://github.com/folke/todo-comments.nvim"
+  },
+  ["typescript.nvim"] = {
+    loaded = true,
+    path = "/home/elavigne/.local/share/nvim/site/pack/packer/start/typescript.nvim",
+    url = "https://github.com/jose-elias-alvarez/typescript.nvim"
+  },
   undotree = {
     loaded = true,
     path = "/home/elavigne/.local/share/nvim/site/pack/packer/start/undotree",

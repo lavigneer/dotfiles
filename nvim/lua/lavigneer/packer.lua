@@ -19,7 +19,7 @@ return require('packer').startup(function(use)
         run = "make",
         config = function() require("telescope").load_extension "fzf" end,
     }
-    use {'nvim-telescope/telescope-ui-select.nvim' }
+    use { 'nvim-telescope/telescope-ui-select.nvim' }
 
     use({
         'rose-pine/neovim',
@@ -35,6 +35,10 @@ return require('packer').startup(function(use)
     use('tpope/vim-fugitive')
     use('JoosepAlviste/nvim-ts-context-commentstring')
     use('echasnovski/mini.comment')
+    use {
+        "folke/todo-comments.nvim",
+        requires = "nvim-lua/plenary.nvim",
+    }
 
     use {
         'VonHeikemen/lsp-zero.nvim',
@@ -66,6 +70,7 @@ return require('packer').startup(function(use)
     }
 
 
+    use('jose-elias-alvarez/typescript.nvim')
     use('jose-elias-alvarez/null-ls.nvim')
     use('famiu/bufdelete.nvim')
 
