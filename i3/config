@@ -75,6 +75,12 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+# Turn off mouse focus following
+focus_follows_mouse no
+
+# Do not move mouse to other outputs when focus moved to another display
+mouse_warping none
+
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
