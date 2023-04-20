@@ -44,5 +44,41 @@ return {
         require("harpoon.ui").nav_file(4)
       end,
     },
+    {
+      "<A-5>",
+      function()
+        require("harpoon.ui").nav_file(5)
+      end,
+    },
+    {
+      "<A-6>",
+      function()
+        require("harpoon.ui").nav_file(6)
+      end,
+    },
+    {
+      "<A-7>",
+      function()
+        require("harpoon.ui").nav_file(7)
+      end,
+    },
+    {
+      "<leader>h1",
+      function()
+        require("harpoon.term").gotoTerminal(1)
+      end,
+    },
+    {
+      "<leader>h2",
+      function()
+        require("harpoon.term").gotoTerminal(2)
+      end,
+    },
+    {
+      "<leader>h3",
+      function()
+        require("harpoon.term").gotoTerminal(3)
+      end,
+    },
   },
 }
