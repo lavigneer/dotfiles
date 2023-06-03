@@ -107,3 +107,7 @@ source $ZSH/oh-my-zsh.sh
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
 setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
+. "$HOME/.cargo/env"
+
+# opam configuration
+[[ ! -r /home/elavigne/.opam/opam-init/init.zsh ]] || source /home/elavigne/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
