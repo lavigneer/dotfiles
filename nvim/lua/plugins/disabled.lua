@@ -12,4 +12,5 @@ return {
   { "tpope/vim-repeat", enabled = false },
   { "folke/neoconf.nvim", enabled = false },
   { "rcarriga/nvim-notify", enabled = false },
+  { "folke/flash.nvim", enabled = false },
 }
