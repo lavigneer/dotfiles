@@ -4,6 +4,11 @@ return {
     options = {
       use_as_default_explorer = true,
     },
+    windows = {
+      width_nofocus = 15,
+      width_focus = 50,
+      width_preview = 80,
+    },
   },
   keys = {
     {
