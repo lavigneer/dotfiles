@@ -142,6 +142,7 @@ return {
             local function setup(server)
                 local server_opts = vim.tbl_deep_extend("force", {
                     capabilities = vim.deepcopy(capabilities),
+                    on_attach = on_attach_custom,
                 }, servers[server] or {})
 
                 if opts.setup[server] then
@@ -188,6 +189,7 @@ return {
         dependencies = { "mason.nvim" },
         opts = function()
             local nls = require("null-ls")
+            local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
             return {
                 root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git"),
                 sources = {
@@ -195,10 +197,26 @@ return {
                     nls.builtins.formatting.shfmt,
                     nls.builtins.formatting.prettierd,
                 },
+                on_attach = function(client, bufnr)
+                    if client.supports_method("textDocument/formatting") then
+                        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            group = augroup,
+                            buffer = bufnr,
+                            callback = function()
+                                vim.lsp.buf.format({
+                                    async = false,
+                                    filter = function(fclient)
+                                        return fclient.name ~= "tsserver"
+                                    end,
+                                })
+                            end,
+                        })
+                    end
+                end,
             }
         end,
     },
-
     {
 
         "williamboman/mason.nvim",

@@ -21,6 +21,8 @@ vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
+vim.opt.pumblend = 0
+vim.opt.winblend = 0
 
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
