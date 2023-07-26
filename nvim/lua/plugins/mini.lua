@@ -80,8 +80,16 @@ return {
 			{
 				"<leader>e",
 				function()
-					require("mini.files").open(MiniFiles.get_latest_path())
-					require("mini.files").trim_left()
+					local function set_path()
+						require("mini.files").open(vim.api.nvim_buf_get_name(0), true)
+					end
+
+					local function fallback()
+						require("mini.files").open(MiniFiles.get_latest_path())
+						require("mini.files").trim_left()
+					end
+
+					xpcall(set_path, fallback)
 				end,
 				desc = "Open Mini Files",
 			},
