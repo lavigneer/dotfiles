@@ -50,6 +50,7 @@ vim.keymap.set("n", "gd", function()
 	require("telescope.builtin").lsp_definitions({ reuse_win = true })
 end, { desc = "Goto Definition" })
 vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", { desc = "References" })
+vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" })
 
 -- Lazy
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
