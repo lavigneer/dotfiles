@@ -35,3 +35,5 @@ vim.g.mapleader = " "
 vim.opt.mouse = ""
 
 vim.opt.updatetime = 300
+
+vim.opt.clipboard = "unnamedplus"
