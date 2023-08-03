@@ -6,7 +6,6 @@ return {
   { "ggandor/leap.nvim", enabled = false },
   { "RRethy/vim-illuminate", enabled = false },
   { "nvim-neo-tree/neo-tree.nvim", enabled = false },
-  { "akinsho/bufferline.nvim", enabled = false },
   { "SmiteshP/nvim-navic", enabled = false },
   { "echasnovski/mini.indentscope", enabled = false },
   { "tpope/vim-repeat", enabled = false },
