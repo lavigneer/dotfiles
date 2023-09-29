@@ -2,6 +2,9 @@ return {
   { "nvim-neotest/neotest-jest" },
   {
     "nvim-neotest/neotest",
-    opts = { adapters = { "neotest-jest" } },
+    opts = {
+      output = { open_on_run = false },
+      adapters = { "neotest-jest" },
+    },
   },
 }
