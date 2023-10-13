@@ -22,4 +22,11 @@ return {
       background_colour = "#000000",
     },
   },
+  { "rose-pine/neovim", name = "rose-pine" },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "rose-pine",
+    },
+  },
 }
