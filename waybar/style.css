@@ -2,7 +2,13 @@
   border: none;
   border-radius: 0px;
   /* `otf-font-awesome` is required to be installed for icons */
-  font-family: Material, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    JetBrainsMono Nerd Font,
+    Material,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 13px;
   min-height: 0;
   /*border-radius: 20px;*/
@@ -26,7 +32,7 @@ window#waybar.hidden {
 #workspaces button {
   background: #1f1f1f;
   color: #ffffff;
-  border-radius: 20px;
+  /* border-radius: 20px; */
 }
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
@@ -149,7 +155,6 @@ label:focus {
 
 #pulseaudio {
   color: #ffffff;
-  font-size: 18px;
 }
 
 #pulseaudio.muted {
