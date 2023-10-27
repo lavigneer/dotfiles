@@ -1,126 +1,127 @@
+/* =============================================================================
+ *
+ * Waybar configuration
+ *
+ * Configuration reference: https://github.com/Alexays/Waybar/wiki/Configuration
+ *
+ * =========================================================================== */
+
+/* -----------------------------------------------------------------------------
+ * Keyframes
+ * -------------------------------------------------------------------------- */
+
+/*
+Polar Night
+nord0  #2e3440
+nord1  #3b4252
+nord2  #434c5e
+nord3  #4c566a
+Snow Storm
+nord4  #d8dee9
+nord5  #e5e9f0
+nord6  #eceff4
+Frost
+nord7  #8fbcbb
+nord8  #88c0d0
+nord9  #81a1c1
+nord10 #5e81ac
+Aurora
+nord11 #bf616a
+nord12 #d08770
+nord13 #ebcb8b
+nord14 #a3be8c
+nord15 #b48ead
+*/
+
+/* -----------------------------------------------------------------------------
+ * Base styles
+ * -------------------------------------------------------------------------- */
+
+/* Reset all styles */
+
 * {
-  border: none;
-  border-radius: 0px;
-  /* `otf-font-awesome` is required to be installed for icons */
-  font-family:
-    JetBrainsMono Nerd Font,
-    Material,
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif;
-  font-size: 13px;
-  min-height: 0;
-}
-window#waybar {
-  background-image: linear-gradient(
-    to right,
-    #000000 0%,
-    #434343 51%,
-    #000000 100%
-  );
-  color: #ffffff;
-  transition-property: background-color;
-  transition-duration: 0.5s;
+  color: #eceff4;
+  border: 0;
+  border-radius: 0;
+  padding: 0 0;
+  font-size: 15px;
+  margin-right: 5px;
+  margin-left: 5px;
+  padding-bottom: 3px;
 }
 
-window#waybar.hidden {
-  opacity: 0.2;
+window#waybar {
+  background: rgba (0, 0, 0, 0.55);
 }
 
 #workspaces button {
-  background: #1f1f1f;
-  color: #ffffff;
-}
-
-#workspaces button:hover {
-  background: lightblue;
-  color: black;
+  padding: 2px 0px;
+  border-bottom: 2px;
+  color: #eceff4;
+  border-color: #d8dee9;
+  border-style: solid;
+  margin-top: 2px;
 }
 
 #workspaces button.focused {
-  background: #26a65b;
-}
-
-#workspaces button.focused:hover {
-  background: lightblue;
-  color: black;
-}
-
-#workspaces button.urgent {
-  background-color: #eb4d4b;
+  border-color: #81a1c1;
 }
 
 #mode {
-  background-color: #64727d;
-  border-bottom: 3px solid #ffffff;
+  color: #ebcb8b;
 }
 
 #clock,
 #battery,
 #cpu,
 #memory,
-#disk,
+#idle_inhibitor,
 #temperature,
+#custom-keyboard-layout,
 #backlight,
 #network,
 #pulseaudio,
-#custom-media,
+#mode,
+#tray,
+#window,
 #custom-launcher,
 #custom-power,
-#custom-wallpaper,
-#custom-updater,
-#custom-snip,
-#taskbar,
-#tray,
-#mode,
-#idle_inhibitor,
-#mpd {
-  padding: 0 10px;
-  color: #ffffff;
+#custom-pacman {
+  padding: 0 3px;
+  border-bottom: 2px;
+  border-style: solid;
 }
 
-#window,
-#workspaces {
-  margin: 0px 4px;
-}
-
-/* If workspaces is the leftmost module, omit left margin */
-.modules-left > widget:first-child > #workspaces {
-  margin-left: 0px;
-}
-
-/* If workspaces is the rightmost module, omit right margin */
-.modules-right > widget:last-child > #workspaces {
-  margin-right: 0px;
-}
+/* -----------------------------------------------------------------------------
+ * Module styles
+ * -------------------------------------------------------------------------- */
 
 #clock {
-  background-color: #090909;
-  color: #ffffff;
+  color: #a3be8c;
+}
+
+#backlight {
+  color: #ebcb8b;
 }
 
 #battery {
-  background-color: #ffffff;
-  color: #000000;
+  color: #d8dee9;
 }
 
-#battery.charging,
-#battery.plugged {
-  color: #ffffff;
-  background-color: #26a65b;
+#battery.charging {
+  color: #81a1c1;
 }
 
 @keyframes blink {
   to {
-    background-color: #ffffff;
-    color: #000000;
+    color: #4c566a;
+    background-color: #eceff4;
   }
 }
 
 #battery.critical:not(.charging) {
-  background-color: #f53c3c;
-  color: #ffffff;
+  background: #bf616a;
+  color: #eceff4;
   animation-name: blink;
   animation-duration: 0.5s;
   animation-timing-function: linear;
@@ -128,149 +129,63 @@ window#waybar.hidden {
   animation-direction: alternate;
 }
 
-label:focus {
-  background-color: #000000;
-}
-
 #cpu {
-  color: #ffffff;
+  color: #a3be8c;
 }
 
 #memory {
-  color: #ffffff;
+  color: #d3869b;
 }
 
-#disk {
-  color: #ffffff;
+#network.disabled {
+  color: #bf616a;
 }
 
-#backlight {
-  background-color: #90b1b1;
+#network {
+  color: #a3be8c;
+}
+
+#network.disconnected {
+  color: #bf616a;
 }
 
 #pulseaudio {
-  color: #ffffff;
+  color: #b48ead;
 }
 
 #pulseaudio.muted {
-  color: red;
-}
-
-#custom-media {
-  color: whitesmoke;
-  margin: 5px;
-  font-size: 13px;
-}
-
-#custom-media.custom-spotify {
-  background-color: #8ec5fc;
-  background-image: linear-gradient(
-    to right,
-    #434343 0%,
-    #000000 51%,
-    #434343 100%
-  );
-  color: whitesmoke;
-  margin-right: 5px;
-}
-
-#custom-media.custom-vlc {
-  background-color: #8ec5fc;
-  background-image: linear-gradient(
-    to right,
-    #434343 0%,
-    #000000 51%,
-    #434343 100%
-  );
-  color: whitesmoke;
-  margin-right: 5px;
-}
-
-#custom-power {
-  background-image: linear-gradient(
-    to left,
-    #000000 0%,
-    #000000 51%,
-    #434343 100%
-  );
-  font-size: 20px;
-  margin-right: 5px;
-}
-
-#custom-launcher {
-  background-image: linear-gradient(
-    to right,
-    #000000 0%,
-    #000000 51%,
-    #434343 100%
-  );
-  font-size: 20px;
-  margin-left: 5px;
-}
-
-#custom-wallpaper {
-  color: white;
-  font-size: 18px;
-}
-
-#custom-updater {
-  color: white;
-}
-
-#custom-snip {
-  color: white;
-  font-size: 20px;
-}
-
-#taskbar {
-  color: white;
+  color: #3b4252;
 }
 
 #temperature {
-  color: #ffffff;
+  color: #8fbcbb;
 }
 
 #temperature.critical {
-  background-color: #eb4d4b;
-}
-
-#tray {
-  color: #ffffff;
-}
-
-#tray > .passive {
-  -gtk-icon-effect: dim;
-  color: #ffffff;
-}
-
-#tray > .needs-attention {
-  -gtk-icon-effect: highlight;
-  color: #ffffff;
+  color: #bf616a;
 }
 
 #idle_inhibitor {
-  font-size: 18px;
+  color: #ebcb8b;
 }
 
-#idle_inhibitor.activated {
-  color: #ffffff;
+#tray {
 }
 
-#language {
-  color: #ffffff;
-  min-width: 16px;
+#custom-launcher,
+#custom-power {
+  border-style: hidden;
+  margin-top: 2px;
 }
 
-#keyboard-state {
-  background: #97e1ad;
-  color: #000000;
-  min-width: 16px;
+#window {
+  border-style: hidden;
+  margin-top: 1px;
+}
+#mode {
+  margin-bottom: 3px;
 }
 
-#keyboard-state > label {
-  padding: 0px 5px;
-}
-
-#keyboard-state > label.locked {
-  background: rgba(0, 0, 0, 0.2);
+#custom-keyboard-layout {
+  color: #d08770;
 }
