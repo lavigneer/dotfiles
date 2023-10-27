@@ -31,9 +31,6 @@ include /etc/sway/config-vars.d/*
 
 ### Output configuration
 #
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-#
 # Example configuration:
 #
 #   output HDMI-A-1 resolution 1920x1080 position 1920,0
@@ -52,6 +49,7 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 ### Notification Center
 exec swaync
 bindsym $mod+Shift+n exec swaync-client -t -sw
+
 
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
@@ -242,3 +240,5 @@ bar {
 
 include /etc/sway/config.d/*
 
+### Kanshi Display Configuration
+exec_always pkill kanshi; exec kanshi

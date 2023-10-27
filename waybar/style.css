@@ -36,7 +36,6 @@ window#waybar.hidden {
 #workspaces button:hover {
   background: lightblue;
   color: black;
-  border-bottom: 3px solid #ffffff;
 }
 
 #workspaces button.focused {
@@ -46,7 +45,6 @@ window#waybar.hidden {
 #workspaces button.focused:hover {
   background: lightblue;
   color: black;
-  border-bottom: 3px solid #ffffff;
 }
 
 #workspaces button.urgent {
