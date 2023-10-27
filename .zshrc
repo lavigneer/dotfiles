@@ -107,7 +107,14 @@ source $ZSH/oh-my-zsh.sh
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
 setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
-. "$HOME/.cargo/env"
+
+# cargo configuration
+[[ ! -r $HOME/.cargo/env ]] || source $HOME/.cargo/env  > /dev/null 2> /dev/null
 
 # opam configuration
-[[ ! -r /home/elavigne/.opam/opam-init/init.zsh ]] || source /home/elavigne/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+[[ ! -r $HOME/.opam/opam-init/init.zsh ]] || source /home/elavigne/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+
+# fzf configuration
+[[ ! -r /usr/share/doc/fzf/examples/key-bindings.zsh ]] || source /usr/share/doc/fzf/examples/key-bindings.zsh  > /dev/null 2> /dev/null
+[[ ! -r /usr/share/doc/fzf/examples/completion.zsh ]] || source /usr/share/doc/fzf/examples/completion.zsh  > /dev/null 2> /dev/null
+
