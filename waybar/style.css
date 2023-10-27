@@ -40,7 +40,7 @@ window#waybar.hidden {
 }
 
 #workspaces button.focused {
-  background: #1f1f1f;
+  background: #26a65b;
 }
 
 #workspaces button.focused:hover {
