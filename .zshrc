@@ -75,7 +75,7 @@ PROJECT_PATHS=(~/workspace)
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git pj jira tmux tmuxinator)
+plugins=(git pj jira tmux tmuxinator ssh-agent)
 
 
 # User configuration
