@@ -610,7 +610,7 @@ local on_attach = function(client, bufnr)
 	end, { desc = "Format current buffer with LSP" })
 
 	if client.server_capabilities.inlayHintProvider then
-		vim.lsp.buf.inlay_hint(bufnr, true)
+		vim.lsp.inlay_hint(bufnr, true)
 	end
 end
 
