@@ -454,6 +454,11 @@ vim.o.completeopt = "menuone,noselect"
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- Set folding behavior
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+vim.o.foldenable = false
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
