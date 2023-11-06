@@ -514,6 +514,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 -- See `:help telescope` and `:help telescope.setup()`
 require("telescope").setup({
   defaults = {
+    winblend = 10,
+    pumblend = 15,
     mappings = {
       i = {
         ["<C-u>"] = false,
