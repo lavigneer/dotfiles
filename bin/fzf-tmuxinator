@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+selected_tmuxinator=$(tmuxinator list -n | tail -n +2 | fzf)
+selected_host=$(sed -rn "s/^\s*Host\s+(.*)\s*/\1/ip" ~/.ssh/config | tail -n +2 | fzf)
+
+tmuxinator start $selected_tmuxinator $selected_host
