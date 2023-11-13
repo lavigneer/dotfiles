@@ -80,8 +80,9 @@ plugins=(git pj jira tmux tmuxinator ssh-agent)
 
 # User configuration
 ZSH_TMUX_AUTOSTART=true
-# ZSH_TMUX_AUTOCONNET=false
-# ZSH_TMUX_AUTOSTART_ONCE=false
+ZSH_TMUX_AUTOCONNET=false
+ZSH_TMUX_AUTOQUIT=false
+ZSH_TMUX_AUTOSTART_ONCE=false
 ZSH_TMUX_DEFAULT_SESSION_NAME=scratchpad
 
 # export MANPATH="/usr/local/man:$MANPATH"

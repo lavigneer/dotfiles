@@ -2,3 +2,4 @@ git:
   autofetch: false
 gui:
   mouseEvents: false
+  nerdFontsVersion: "3"
