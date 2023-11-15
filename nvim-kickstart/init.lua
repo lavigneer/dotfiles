@@ -183,40 +183,75 @@ require("lazy").setup({
 
   {
     "echasnovski/mini.bracketed",
-    opts = {}
+    opts = {},
+  },
+  {
+    "echasnovski/mini.bufremove",
+    opts = {},
+    keys = {
+      { "<leader>bd", "<cmd>lua MiniBufremove.delete()<CR>", { desc = "[B]uffer [D]elete" } },
+      { "<leader>bD", "<cmd>lua MiniBufremove.delete()<CR>", { desc = "Force [B]uffer [D]elete" } },
+    },
+  },
+  {
+    "echasnovski/mini.extra",
+    opts = {},
+  },
+  {
+    "echasnovski/mini.pick",
+    opts = {
+      mappings = {
+        choose_marked = "<C-q>",
+      },
+      options = {
+        content_from_bottom = true,
+      },
+    },
+    keys = {
+      { "<leader>?", "<cmd>Pick oldfiles<CR>", { desc = "[?] Find recently opened files" } },
+      { "<leader><space>", "<cmd>Pick buffers<CR>", { desc = "[ ] Find existing buffers" } },
+      { "<leader>/", "<cmd>Pick buf_lines scope='current'<CR>", { desc = "[/] Fuzzily search in current buffer" } },
+      { "<leader>gf", "<cmd>Pick git_files<CR>", { desc = "Search [G]it [F]iles" } },
+      { "<leader>gm", "<cmd>Pick git_files scope='modified'<CR>", { desc = "Search [G]it [M]odified" } },
+      { "<leader>sf", "<cmd>Pick files<CR>", { desc = "[S]earch [F]iles" } },
+      { "<leader>sh", "<cmd>Pick help<CR>", { desc = "[S]earch [H]elp" } },
+      { "<leader>sw", "<cmd>grep pattern='<cword><CR>", { desc = "[S]earch current [W]ord" } },
+      { "<leader>sg", "<cmd>Pick grep_live<CR>", { desc = "[S]earch by [G]rep" } },
+      { "<leader>sd", "<cmd>Pick diagnostic scope='all'<CR>", { desc = "[S]earch [D]iagnostics" } },
+      { "<leader>sr", "<cmd>Pick resume<CR>", { desc = "[S]earch [R]esume" } },
+    },
   },
   {
     "echasnovski/mini.statusline",
-    opts = {}
+    opts = {},
   },
   {
     "echasnovski/mini.tabline",
-    opts = {}
+    opts = {},
   },
   {
     "echasnovski/mini.basics",
     lazy = false,
     opts = {
       options = {
-        extra_ui = true
+        extra_ui = true,
       },
       mappings = {
         basic = false,
-        windows = true
-      }
+        windows = true,
+      },
     },
     config = function(_, opts)
-      require('mini.basics').setup(opts)
-    end
+      require("mini.basics").setup(opts)
+    end,
   },
   {
     "echasnovski/mini.completion",
-    opts = {}
+    opts = {},
   },
 
-
   -- Useful plugin to show you pending keybinds.
-  { "folke/which-key.nvim",  opts = {} },
+  { "folke/which-key.nvim", opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     "lewis6991/gitsigns.nvim",
@@ -295,7 +330,7 @@ require("lazy").setup({
 
   -- formatting
   {
-    'stevearc/conform.nvim',
+    "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
         ["javascript"] = { "prettier" },
@@ -315,7 +350,7 @@ require("lazy").setup({
         ["graphql"] = { "prettier" },
         ["handlebars"] = { "prettier" },
         ["lua"] = { "stylua" },
-      }
+      },
     },
     keys = {
       {
@@ -323,14 +358,13 @@ require("lazy").setup({
         function()
           require("conform").format({ async = true, lsp_fallback = true })
         end,
-        desc = "[C]ode [F]ormat"
+        desc = "[C]ode [F]ormat",
       },
     },
     config = function(_, opts)
-      require('conform').setup(opts)
-    end
+      require("conform").setup(opts)
+    end,
   },
-
 
   -- Testing
   { "nvim-neotest/neotest-jest" },
@@ -429,27 +463,6 @@ require("lazy").setup({
         "Toggle Output Panel"
       },
       { "<leader>tS", function() require("neotest").run.stop() end, desc = "Stop" },
-    },
-  },
-
-  -- Fuzzy Finder (files, lsp, etc)
-  {
-    "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
-        build = "make",
-        cond = function()
-          return vim.fn.executable("make") == 1
-        end,
-      },
     },
   },
 
@@ -582,45 +595,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if client and client.server_capabilities.inlayHintProvider then
       vim.lsp.inlay_hint(args.buf, true)
     end
-  end
+  end,
 })
-
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
-require("telescope").setup({
-  defaults = {
-    winblend = 10,
-    pumblend = 15,
-    mappings = {
-      i = {
-        ["<C-u>"] = false,
-        ["<C-d>"] = false,
-      },
-    },
-  },
-})
-
--- Enable telescope fzf native, if installed
-pcall(require("telescope").load_extension, "fzf")
-
--- See `:help telescope.builtin`
-vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-vim.keymap.set("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
-vim.keymap.set("n", "<leader>/", function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-    winblend = 10,
-    previewer = false,
-  }))
-end, { desc = "[/] Fuzzily search in current buffer" })
-
-vim.keymap.set("n", "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" })
-vim.keymap.set("n", "<leader>sf", require("telescope.builtin").find_files, { desc = "[S]earch [F]iles" })
-vim.keymap.set("n", "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" })
-vim.keymap.set("n", "<leader>sw", require("telescope.builtin").grep_string, { desc = "[S]earch current [W]ord" })
-vim.keymap.set("n", "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" })
-vim.keymap.set("n", "<leader>sd", require("telescope.builtin").diagnostics, { desc = "[S]earch [D]iagnostics" })
-vim.keymap.set("n", "<leader>sr", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -701,31 +677,30 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set("n", "<leader>f", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
-
 -- Completion keymaps
-vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
-vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+vim.keymap.set("i", "<Tab>", [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
+vim.keymap.set("i", "<S-Tab>", [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
 local keys = {
-  ['cr']        = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
-  ['ctrl-y']    = vim.api.nvim_replace_termcodes('<C-y>', true, true, true),
-  ['ctrl-y_cr'] = vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true),
+  ["cr"] = vim.api.nvim_replace_termcodes("<CR>", true, true, true),
+  ["ctrl-y"] = vim.api.nvim_replace_termcodes("<C-y>", true, true, true),
+  ["ctrl-y_cr"] = vim.api.nvim_replace_termcodes("<C-y><CR>", true, true, true),
 }
 
 _G.cr_action = function()
   if vim.fn.pumvisible() ~= 0 then
     -- If popup is visible, confirm selected item or add new line otherwise
-    local item_selected = vim.fn.complete_info()['selected'] ~= -1
-    return item_selected and keys['ctrl-y'] or keys['ctrl-y_cr']
+    local item_selected = vim.fn.complete_info()["selected"] ~= -1
+    return item_selected and keys["ctrl-y"] or keys["ctrl-y_cr"]
   else
     -- If popup is not visible, use plain `<CR>`. You might want to customize
     -- according to other plugins. For example, to use 'mini.pairs', replace
     -- next line with `return require('mini.pairs').cr()`
-    return keys['cr']
+    return keys["cr"]
   end
 end
 
-vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
+vim.keymap.set("i", "<CR>", "v:lua._G.cr_action()", { expr = true })
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
@@ -747,12 +722,12 @@ local on_attach = function(client, bufnr)
   nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
   nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 
-  nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-  nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-  nmap("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-  nmap("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-  nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-  nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+  nmap("gd", "<cmd>Pick lsp scope='definition'<CR>", "[G]oto [D]efinition")
+  nmap("gr", "<cmd>Pick lsp scope='references'<CR>", "[G]oto [R]eferences")
+  nmap("gI", "<cmd>Pick lsp scope='implementation'<CR>", "[G]oto [I]mplementation")
+  nmap("<leader>D", "<cmd>Pick lsp scope='definition'<CR>", "Type [D]efinition")
+  nmap("<leader>ds", "<cmd>Pick lsp scope='document_symbol'<CR>", "[D]ocument [S]ymbols")
+  nmap("<leader>ws", "<cmd>Pick lsp scope='workspace_symbol'<CR>", "[W]orkspace [S]ymbols")
 
   -- See `:help K` for why this keymap
   nmap("K", vim.lsp.buf.hover, "Hover Documentation")
@@ -838,7 +813,7 @@ mason_lspconfig.setup_handlers({
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
-      init_options = (servers[server_name] or {}).init_options
+      init_options = (servers[server_name] or {}).init_options,
     })
   end,
 })
