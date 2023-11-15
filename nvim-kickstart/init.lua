@@ -186,6 +186,10 @@ require("lazy").setup({
     opts = {}
   },
   {
+    "echasnovski/mini.statusline",
+    opts = {}
+  },
+  {
     "echasnovski/mini.tabline",
     opts = {}
   },
@@ -275,20 +279,6 @@ require("lazy").setup({
       require("nightfox").setup(opts)
       vim.cmd.colorscheme("nightfox")
     end,
-  },
-
-  {
-    -- Set lualine as statusline
-    "nvim-lualine/lualine.nvim",
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = "onedark",
-        component_separators = "|",
-        section_separators = "",
-      },
-    },
   },
 
   {
