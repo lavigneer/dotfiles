@@ -183,15 +183,11 @@ require("lazy").setup({
 
   {
     "echasnovski/mini.bracketed",
-    config = function(_, opts)
-      require('mini.bracketed').setup(opts)
-    end
+    opts = {}
   },
   {
     "echasnovski/mini.tabline",
-    config = function(_, opts)
-      require('mini.tabline').setup(opts)
-    end
+    opts = {}
   },
   {
     "echasnovski/mini.basics",
@@ -209,22 +205,9 @@ require("lazy").setup({
       require('mini.basics').setup(opts)
     end
   },
-
-
   {
-    -- Autocompletion
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      "L3MON4D3/LuaSnip",
-      "saadparwaiz1/cmp_luasnip",
-
-      -- Adds LSP completion capabilities
-      "hrsh7th/cmp-nvim-lsp",
-
-      -- Adds a number of user-friendly snippets
-      "rafamadriz/friendly-snippets",
-    },
+    "echasnovski/mini.completion",
+    opts = {}
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -547,7 +530,7 @@ vim.o.relativenumber = true
 vim.o.expandtab = true
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = "menuone,noselect"
+vim.o.completeopt = "menuone,noinsert,preview"
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
@@ -726,6 +709,32 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set("n", "<leader>f", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
+
+-- Completion keymaps
+vim.keymap.set('i', '<Tab>',   [[pumvisible() ? "\<C-n>" : "\<Tab>"]],   { expr = true })
+vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+
+local keys = {
+  ['cr']        = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
+  ['ctrl-y']    = vim.api.nvim_replace_termcodes('<C-y>', true, true, true),
+  ['ctrl-y_cr'] = vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true),
+}
+
+_G.cr_action = function()
+  if vim.fn.pumvisible() ~= 0 then
+    -- If popup is visible, confirm selected item or add new line otherwise
+    local item_selected = vim.fn.complete_info()['selected'] ~= -1
+    return item_selected and keys['ctrl-y'] or keys['ctrl-y_cr']
+  else
+    -- If popup is not visible, use plain `<CR>`. You might want to customize
+    -- according to other plugins. For example, to use 'mini.pairs', replace
+    -- next line with `return require('mini.pairs').cr()`
+    return keys['cr']
+  end
+end
+
+vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
+
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(client, bufnr)
@@ -817,7 +826,6 @@ require("neodev").setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require("mason-lspconfig")
@@ -835,54 +843,6 @@ mason_lspconfig.setup_handlers({
       filetypes = (servers[server_name] or {}).filetypes,
     })
   end,
-})
-
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
-local cmp = require("cmp")
-local luasnip = require("luasnip")
-require("luasnip.loaders.from_vscode").lazy_load()
-luasnip.config.setup({})
-
-cmp.setup({
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({
-    ["<C-n>"] = cmp.mapping.select_next_item(),
-    ["<C-p>"] = cmp.mapping.select_prev_item(),
-    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    ["<C-Space>"] = cmp.mapping.complete({}),
-    ["<CR>"] = cmp.mapping.confirm({
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    }),
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
-  }),
-  sources = {
-    { name = "nvim_lsp" },
-    { name = "luasnip" },
-  },
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
