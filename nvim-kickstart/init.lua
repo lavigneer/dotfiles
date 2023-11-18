@@ -315,6 +315,21 @@ require("lazy").setup({
     end,
   },
 
+  -- Find and Replace
+  {
+    "nvim-pack/nvim-spectre",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      {
+        "<leader>rs",
+        function()
+          require("spectre").open()
+        end,
+        desc = "Find/Replace in Spectre",
+      },
+    },
+  },
+
   -- Testing
   { "nvim-neotest/neotest-jest" },
   {
