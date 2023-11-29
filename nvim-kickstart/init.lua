@@ -222,6 +222,7 @@ require("lazy").setup({
       { "<leader>sw", "<cmd>grep pattern='<cword><CR>", { desc = "[S]earch current [W]ord" } },
       { "<leader>sg", "<cmd>Pick grep_live<CR>", { desc = "[S]earch by [G]rep" } },
       { "<leader>sd", "<cmd>Pick diagnostic scope='all'<CR>", { desc = "[S]earch [D]iagnostics" } },
+      { "<leader>sq", "<cmd>Pick list scope='quickfix'<CR>", { desc = "[S]earch [Q]uickfix" } },
       { "<leader>sr", "<cmd>Pick resume<CR>", { desc = "[S]earch [R]esume" } },
     },
   },
