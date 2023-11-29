@@ -70,6 +70,9 @@ require("lazy").setup({
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
+  -- Expose an undo tree
+  "mbbill/undotree",
+
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -564,6 +567,9 @@ vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
 vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
 vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
+
+-- Undotree bindings
+vim.keymap.set("n", "<leader>du", "<cmd>UndotreeToggle<cr>", { desc = "[D]ocument [U]ndotree" })
 
 -- [[ Lsp Inlay Hints ]]
 vim.api.nvim_create_autocmd("LspAttach", {
