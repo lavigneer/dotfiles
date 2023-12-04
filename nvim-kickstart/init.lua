@@ -94,69 +94,37 @@ require("lazy").setup({
 
   {
     "ThePrimeagen/harpoon",
+    branch = "harpoon2",
     opts = {
       lazy = false,
     },
     dependencies = { "nvim-lua/plenary.nvim" },
-    keys = {
-      {
-        "<leader>a",
-        function()
-          require("harpoon.mark").add_file()
-        end,
-        desc = "Harpoon Add File",
-      },
-      {
-        "<C-e>",
-        function()
-          require("harpoon.ui").toggle_quick_menu()
-        end,
-        desc = "Harpoon Quick Menu",
-      },
+    config = function()
+      local harpoon = require("harpoon")
+      harpoon:setup()
+      vim.keymap.set("n", "<leader>a", function()
+        harpoon:list():append()
+      end)
+      vim.keymap.set("n", "<C-e>", function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end)
 
-      {
-        "<A-1>",
-        function()
-          require("harpoon.ui").nav_file(1)
-        end,
-      },
-      {
-        "<A-2>",
-        function()
-          require("harpoon.ui").nav_file(2)
-        end,
-      },
-      {
-        "<A-3>",
-        function()
-          require("harpoon.ui").nav_file(3)
-        end,
-      },
-      {
-        "<A-4>",
-        function()
-          require("harpoon.ui").nav_file(4)
-        end,
-      },
-      {
-        "<A-5>",
-        function()
-          require("harpoon.ui").nav_file(5)
-        end,
-      },
-      {
-        "<A-6>",
-        function()
-          require("harpoon.ui").nav_file(6)
-        end,
-      },
-      {
-        "<A-7>",
-        function()
-          require("harpoon.ui").nav_file(7)
-        end,
-      },
-    },
+      vim.keymap.set("n", "<A-1>", function()
+        harpoon:list():select(1)
+      end)
+      vim.keymap.set("n", "<A-2>", function()
+        harpoon:list():select(2)
+      end)
+      vim.keymap.set("n", "<A-3>", function()
+        harpoon:list():select(3)
+      end)
+      vim.keymap.set("n", "<A-4>", function()
+        harpoon:list():select(4)
+      end)
+      vim.keymap.set("n", "<A-5>", function()
+        harpoon:list():select(5)
+      end)
+    end,
   },
 
   {
