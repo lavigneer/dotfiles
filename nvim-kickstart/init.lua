@@ -101,6 +101,7 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local harpoon = require("harpoon")
+      ---@diagnostic disable-next-line: missing-parameter
       harpoon:setup()
       vim.keymap.set("n", "<leader>a", function()
         harpoon:list():append()
@@ -203,7 +204,12 @@ require("lazy").setup({
   },
   {
     "echasnovski/mini.tabline",
-    opts = {},
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = {
+      show_icons = true,
+    },
   },
   {
     "echasnovski/mini.basics",
@@ -239,6 +245,23 @@ require("lazy").setup({
     },
   },
 
+  -- Gen
+  {
+    "David-Kunz/gen.nvim",
+    opts = {
+      display_mode = "split",
+      -- model = "codellama",
+      show_model = true,
+      no_auto_close = true,
+    },
+    keys = {
+      { "<leader>lg", "<cmd>Gen<CR>", { desc = "[L]lm [G]en" } },
+      { "<leader>lr", "ggVG:Gen Review_Code<CR>", { desc = "[L]lm [R]eview Code" } },
+      { "<leader>le", "<cmd>Gen Enhance_Code<CR>", mode = "v", { desc = "[L]lm [E]nhance Code" } },
+      { "<leader>lc", "<cmd>Gen Change_Code<CR>", mode = "v", { desc = "[L]lm [C]hange Code" } },
+    },
+  },
+
   -- Useful plugin to show you pending keybinds.
   { "folke/which-key.nvim", opts = {} },
 
@@ -247,7 +270,7 @@ require("lazy").setup({
     priority = 1000,
     opts = {
       options = {
-        transparent = true,
+        -- transparent = true,
         colorblind = {
           enable = true,
           severity = {
@@ -402,6 +425,7 @@ require("lazy").setup({
       },
       {
         "<leader>to",
+        ---@diagnostic disable-next-line: missing-fields
         function() require("neotest").output.open({ enter = true, auto_close = true }) end,
         desc =
         "Show Output"
@@ -549,7 +573,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client and client.server_capabilities.inlayHintProvider then
-      vim.lsp.inlay_hint(args.buf, true)
+      vim.lsp.inlay_hint.enable(args.buf, true)
     end
   end,
 })
@@ -558,6 +582,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 -- See `:help nvim-treesitter`
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
 vim.defer_fn(function()
+  ---@diagnostic disable-next-line: missing-fields
   require("nvim-treesitter.configs").setup({
     -- Add languages to be installed here that you want installed for treesitter
     ensure_installed = {
@@ -635,7 +660,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -684,6 +709,7 @@ require("which-key").register({
   ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
   ["<leader>g"] = { name = "[G]it", _ = "which_key_ignore" },
   ["<leader>h"] = { name = "More git", _ = "which_key_ignore" },
+  ["<leader>l"] = { name = "[L]lm", _ = "which_key_ignore" },
   ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
   ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
   ["<leader>t"] = { name = "[T]est", _ = "which_key_ignore" },
@@ -812,6 +838,7 @@ local luasnip = require("luasnip")
 require("luasnip.loaders.from_vscode").lazy_load()
 luasnip.config.setup({})
 
+---@diagnostic disable-next-line: missing-fields
 cmp.setup({
   snippet = {
     expand = function(args)
