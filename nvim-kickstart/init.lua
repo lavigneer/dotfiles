@@ -268,20 +268,9 @@ require("lazy").setup({
   {
     "EdenEast/nightfox.nvim",
     priority = 1000,
-    opts = {
-      options = {
-        -- transparent = true,
-        colorblind = {
-          enable = true,
-          severity = {
-            protan = 1.0,
-          },
-        },
-      },
-    },
     config = function(_, opts)
       require("nightfox").setup(opts)
-      vim.cmd.colorscheme("nightfox")
+      vim.cmd.colorscheme("carbonfox")
     end,
   },
 
