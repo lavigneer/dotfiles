@@ -178,9 +178,10 @@ require("lazy").setup({
     opts = {
       mappings = {
         choose_marked = "<C-q>",
+        choose_in_vsplit = "",
       },
       options = {
-        content_from_bottom = true,
+        -- content_from_bottom = true,
       },
     },
     keys = {
@@ -278,6 +279,11 @@ require("lazy").setup({
   {
     "stevearc/conform.nvim",
     opts = {
+      formatters = {
+        rustywind = {
+          prepend_args = { "--output-css-file", "web/static/styles.css" },
+        },
+      },
       formatters_by_ft = {
         ["javascript"] = { "prettier" },
         ["javascriptreact"] = { "prettier" },
@@ -287,10 +293,10 @@ require("lazy").setup({
         ["css"] = { "prettier" },
         ["scss"] = { "prettier" },
         ["less"] = { "prettier" },
-        ["html"] = { "prettier" },
-        ["htmldjango"] = { "prettier" },
-        ["json"] = { "prettier" },
-        ["jsonc"] = { "prettier" },
+        ["html"] = { "rustywind", "prettier" },
+        ["htmldjango"] = { "rustywind", "prettier" },
+        ["json"] = { "biome" },
+        ["jsonc"] = { "biome" },
         ["yaml"] = { "prettier" },
         ["markdown"] = { "prettier" },
         ["markdown.mdx"] = { "prettier" },
@@ -474,6 +480,9 @@ vim.o.clipboard = "unnamedplus"
 -- Enable break indent
 vim.o.breakindent = true
 
+-- Set shiftwidth
+vim.o.shiftwidth = 4
+
 -- Save undo history
 vim.o.undofile = true
 
@@ -557,15 +566,15 @@ vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and 
 vim.keymap.set("n", "<leader>du", "<cmd>UndotreeToggle<cr>", { desc = "[D]ocument [U]ndotree" })
 
 -- [[ Lsp Inlay Hints ]]
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client.server_capabilities.inlayHintProvider then
-      vim.lsp.inlay_hint.enable(args.buf, true)
-    end
-  end,
-})
+-- vim.api.nvim_create_autocmd("LspAttach", {
+--   group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+--   callback = function(args)
+--     local client = vim.lsp.get_client_by_id(args.data.client_id)
+--     if client and client.server_capabilities.inlayHintProvider then
+--       vim.lsp.inlay_hint.enable(args.buf, true)
+--     end
+--   end,
+-- })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -649,7 +658,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -686,10 +695,34 @@ local on_attach = function(_, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, "[W]orkspace [L]ist Folders")
 
+  -- local filename = vim.api.nvim_buf_get_name(bufnr)
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-    vim.lsp.buf.format()
+    vim.lsp.buf.format({
+      -- filter = function(cl)
+      --   if filename:sub(-#".tmpl.html") == ".tmpl.html" then
+      --     return cl.name == "gopls"
+      --   end
+      --   return true
+      -- end,
+    })
   end, { desc = "Format current buffer with LSP" })
+
+  -- workaround for gopls not supporting semanticTokensProvider, taken from LazyVim
+  -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
+  if client.name == "gopls" then
+    if not client.server_capabilities.semanticTokensProvider then
+      local semantic = client.config.capabilities.textDocument.semanticTokens
+      client.server_capabilities.semanticTokensProvider = {
+        full = true,
+        legend = {
+          tokenTypes = semantic.tokenTypes,
+          tokenModifiers = semantic.tokenModifiers,
+        },
+        range = true,
+      }
+    end
+  end
 end
 
 -- document existing key chains
@@ -720,6 +753,9 @@ require("mason-lspconfig").setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   rust_analyzer = {},
+  biome = {
+    cmd = { "biome", "lsp-proxy", "--config-path", "/home/elavigne/" },
+  },
   tsserver = {
     init_options = {
       preferences = {
@@ -730,6 +766,43 @@ local servers = {
     },
   },
   html = { filetypes = { "html", "twig", "hbs", "htmldjango" } },
+  gopls = {
+    filetypes = { "go", "gomod", "gowork", "gotmpl", "html" },
+    init_options = {
+      templateExtensions = { "html" },
+      codelenses = {
+        gc_details = false,
+        generate = true,
+        regenerate_cgo = true,
+        run_govulncheck = true,
+        test = true,
+        tidy = true,
+        upgrade_dependency = true,
+        vendor = true,
+      },
+      hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        compositeLiteralTypes = true,
+        constantValues = true,
+        functionTypeParameters = true,
+        parameterNames = true,
+        rangeVariableTypes = true,
+      },
+      analyses = {
+        fieldalignment = true,
+        nilness = true,
+        unusedparams = true,
+        unusedwrite = true,
+        useany = true,
+      },
+      usePlaceholders = true,
+      completeUnimported = true,
+      staticcheck = true,
+      directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+      semanticTokens = true,
+    },
+  },
   tailwindcss = {
     filetypes = {
       "aspnetcorerazor",
