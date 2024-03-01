@@ -413,6 +413,43 @@ require("lazy").setup({
     },
   },
 
+  -- Faster file navigation
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    opts = {
+      lazy = false,
+    },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local harpoon = require("harpoon")
+      ---@diagnostic disable-next-line: missing-parameter
+      harpoon:setup()
+      vim.keymap.set("n", "<leader>a", function()
+        harpoon:list():append()
+      end)
+      vim.keymap.set("n", "<C-e>", function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end)
+
+      vim.keymap.set("n", "<A-1>", function()
+        harpoon:list():select(1)
+      end)
+      vim.keymap.set("n", "<A-2>", function()
+        harpoon:list():select(2)
+      end)
+      vim.keymap.set("n", "<A-3>", function()
+        harpoon:list():select(3)
+      end)
+      vim.keymap.set("n", "<A-4>", function()
+        harpoon:list():select(4)
+      end)
+      vim.keymap.set("n", "<A-5>", function()
+        harpoon:list():select(5)
+      end)
+    end,
+  },
+
   { -- Collection of various small independent plugins/modules
     "echasnovski/mini.nvim",
     lazy = false,
@@ -433,6 +470,7 @@ require("lazy").setup({
       require("mini.surround").setup()
       require("mini.bracketed").setup()
       require("mini.comment").setup()
+      require("mini.cursorword").setup()
       require("mini.extra").setup()
       require("mini.tabline").setup()
       require("mini.notify").setup()
@@ -511,6 +549,41 @@ require("lazy").setup({
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            keymaps = {
+              -- You can use the capture groups defined in textobjects.scm
+              ["aa"] = "@parameter.outer",
+              ["ia"] = "@parameter.inner",
+              ["af"] = "@function.outer",
+              ["if"] = "@function.inner",
+              ["ac"] = "@class.outer",
+              ["ic"] = "@class.inner",
+            },
+          },
+          move = {
+            enable = true,
+            set_jumps = true, -- whether to set jumps in the jumplist
+            goto_next_start = {
+              ["]m"] = "@function.outer",
+              ["]]"] = "@class.outer",
+            },
+            goto_next_end = {
+              ["]M"] = "@function.outer",
+              ["]["] = "@class.outer",
+            },
+            goto_previous_start = {
+              ["[m"] = "@function.outer",
+              ["[["] = "@class.outer",
+            },
+            goto_previous_end = {
+              ["[M"] = "@function.outer",
+              ["[]"] = "@class.outer",
+            },
+          },
+        },
       })
     end,
   },
