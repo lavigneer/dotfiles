@@ -94,11 +94,6 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- [[ Basic Autocommands ]]
---  See :help lua-guide-autocommands
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
   group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
@@ -108,7 +103,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -118,9 +112,11 @@ vim.opt.rtp:prepend(lazypath)
 
 -- [[ Configure and install plugins ]]
 require("lazy").setup({
-  "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+  -- Detect tabstop and shiftwidth automatically
+  "tpope/vim-sleuth",
 
-  {                   -- Adds git related signs to the gutter, as well as utilities for managing changes
+  -- Adds git related signs to the gutter, as well as utilities for managing changes
+  {
     "lewis6991/gitsigns.nvim",
     opts = {
       signs = {
@@ -133,13 +129,12 @@ require("lazy").setup({
     },
   },
 
-  {                     -- Useful plugin to show you pending keybinds.
+  -- Useful plugin to show you pending keybinds.
+  {
     "folke/which-key.nvim",
-    event = "VeryLazy", -- Sets the loading event to 'VeryLazy'
-    config = function() -- This is the function that runs, AFTER loading
+    event = "VeryLazy",
+    config = function()
       require("which-key").setup()
-
-      -- Document existing key chains
       require("which-key").register({
         ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
         ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
@@ -150,10 +145,10 @@ require("lazy").setup({
     end,
   },
 
-  { -- LSP Configuration & Plugins
+  -- LSP Configuration & Plugins
+  {
     "neovim/nvim-lspconfig",
     dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for neovim
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
     },
@@ -344,7 +339,8 @@ require("lazy").setup({
     end,
   },
 
-  { -- Autoformat
+  -- Autoformat
+  {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
@@ -384,13 +380,10 @@ require("lazy").setup({
 
   {
     "EdenEast/nightfox.nvim",
-    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
+    lazy = false,
+    priority = 1000,
     config = function()
-      -- Load the colorscheme here
       vim.cmd.colorscheme("carbonfox")
-
-      -- You can configure highlights by doing something like
       vim.cmd.hi("Comment gui=none")
     end,
   },
@@ -450,7 +443,8 @@ require("lazy").setup({
     end,
   },
 
-  { -- Collection of various small independent plugins/modules
+  -- Mini ftw
+  {
     "echasnovski/mini.nvim",
     lazy = false,
     dependencies = {
@@ -533,28 +527,25 @@ require("lazy").setup({
     end,
   },
 
-  { -- Highlight, edit, and navigate code
+  -- Highlight, edit, and navigate code
+  {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
     build = ":TSUpdate",
     config = function()
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
       ---@diagnostic disable-next-line: missing-fields
       require("nvim-treesitter.configs").setup({
         ensure_installed = { "bash", "c", "html", "lua", "markdown", "vim", "vimdoc" },
-        -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
         textobjects = {
           select = {
             enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            lookahead = true,
             keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
               ["aa"] = "@parameter.outer",
               ["ia"] = "@parameter.inner",
               ["af"] = "@function.outer",
@@ -565,7 +556,7 @@ require("lazy").setup({
           },
           move = {
             enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
+            set_jumps = true,
             goto_next_start = {
               ["]m"] = "@function.outer",
               ["]]"] = "@class.outer",
