@@ -285,10 +285,10 @@ require("lazy").setup({
         },
       },
       formatters_by_ft = {
-        ["javascript"] = { "prettier" },
-        ["javascriptreact"] = { "prettier" },
-        ["typescript"] = { "prettier" },
-        ["typescriptreact"] = { "prettier" },
+        ["javascript"] = { { "biome", "prettier" } },
+        ["javascriptreact"] = { { "biome", "prettier" } },
+        ["typescript"] = { { "biome", "prettier" } },
+        ["typescriptreact"] = { { "biome", "prettier" } },
         ["vue"] = { "prettier" },
         ["css"] = { "prettier" },
         ["scss"] = { "prettier" },
@@ -753,9 +753,7 @@ require("mason-lspconfig").setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   rust_analyzer = {},
-  biome = {
-    cmd = { "biome", "lsp-proxy", "--config-path", "/home/elavigne/" },
-  },
+  biome = {},
   tsserver = {
     init_options = {
       preferences = {
@@ -803,6 +801,7 @@ local servers = {
       semanticTokens = true,
     },
   },
+  golangci_lint_ls = {},
   tailwindcss = {
     filetypes = {
       "aspnetcorerazor",
