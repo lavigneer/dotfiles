@@ -248,3 +248,4 @@ include /etc/sway/config.d/*
 
 ### Kanshi Display Configuration
 exec_always pkill kanshi; exec kanshi
+exec /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1
