@@ -506,6 +506,18 @@ require("lazy").setup({
 
       local pick = require("mini.pick")
       pick.setup()
+      local codeaction_format_item = function(action_tuple)
+        local title = action_tuple[2].title:gsub("\r\n", "\\r\\n")
+        local client = vim.lsp.get_client_by_id(action_tuple[1])
+          vim.api.nvim_echo({ { vim.inspect(action_tuple) } }, true, {})
+        return string.format("%s\t[%s]", title:gsub("\n", "\\n"), client.name)
+      end
+      vim.ui.select = function(items, opts, on_choice)
+        if opts.kind == 'codeaction' then
+          opts.format_item = codeaction_format_item
+        end
+        return pick.ui_select(items, opts, on_choice)
+      end
       vim.keymap.set("n", "<leader>?", "<cmd>Pick oldfiles<CR>", { desc = "[?] Find recently opened files" })
       vim.keymap.set("n", "<leader><space>", "<cmd>Pick buffers<CR>", { desc = "[ ] Find existing buffers" })
       vim.keymap.set(
