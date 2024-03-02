@@ -132,6 +132,14 @@ require("lazy").setup({
     },
   },
 
+  -- Nicer input ui
+  {
+    'stevearc/dressing.nvim',
+    opts = {
+      select = { enabled = false }
+    },
+  },
+
   -- Useful plugin to show you pending keybinds.
   {
     "folke/which-key.nvim",
