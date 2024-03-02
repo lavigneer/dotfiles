@@ -509,9 +509,9 @@ require("lazy").setup({
       local codeaction_format_item = function(action_tuple)
         local title = action_tuple[2].title:gsub("\r\n", "\\r\\n")
         local client = vim.lsp.get_client_by_id(action_tuple[1])
-          vim.api.nvim_echo({ { vim.inspect(action_tuple) } }, true, {})
         return string.format("%s\t[%s]", title:gsub("\n", "\\n"), client.name)
       end
+      ---@diagnostic disable-next-line: duplicate-set-field
       vim.ui.select = function(items, opts, on_choice)
         if opts.kind == 'codeaction' then
           opts.format_item = codeaction_format_item
