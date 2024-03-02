@@ -9,6 +9,9 @@ vim.opt.mouse = ""
 
 vim.opt.showmode = false
 
+-- Better completion support
+vim.opt.completeopt = 'menuone,noinsert'
+
 -- Use system clipboard
 vim.opt.clipboard = "unnamedplus"
 
@@ -468,6 +471,7 @@ require("lazy").setup({
       require("mini.extra").setup()
       require("mini.tabline").setup()
       require("mini.notify").setup()
+      require("mini.visits").setup()
 
       local bufremove = require("mini.bufremove")
       bufremove.setup()
@@ -498,7 +502,7 @@ require("lazy").setup({
       end, { desc = "Open mini.files (directory of current file)" })
 
       local completion = require("mini.completion")
-      completion.setup()
+      completion.setup({ set_vim_settings = false })
 
       local pick = require("mini.pick")
       pick.setup()
@@ -524,6 +528,8 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>sd", "<cmd>Pick diagnostic scope='all'<CR>", { desc = "[S]earch [D]iagnostics" })
       vim.keymap.set("n", "<leader>sq", "<cmd>Pick list scope='quickfix'<CR>", { desc = "[S]earch [Q]uickfix" })
       vim.keymap.set("n", "<leader>sr", "<cmd>Pick resume<CR>", { desc = "[S]earch [R]esume" })
+      vim.keymap.set("n", "<leader>se", "<cmd>Pick explorer<CR>", { desc = "[S]earch [E]xplorer" })
+      vim.keymap.set("n", "<leader>sv", "<cmd>Pick visit_paths<CR>", { desc = "[S]earch [V]isit Paths" })
     end,
   },
 
