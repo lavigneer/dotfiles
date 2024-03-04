@@ -513,7 +513,12 @@ require("lazy").setup({
       completion.setup({ set_vim_settings = false })
 
       local pick = require("mini.pick")
-      pick.setup()
+      pick.setup({
+        mappings = {
+          choose_marked = "<C-q>",
+          choose_in_vsplit = "",
+        }
+      })
       local codeaction_format_item = function(action_tuple)
         local title = action_tuple[2].title:gsub("\r\n", "\\r\\n")
         local client = vim.lsp.get_client_by_id(action_tuple[1])
