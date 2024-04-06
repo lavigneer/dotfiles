@@ -428,7 +428,7 @@ require("lazy").setup({
       ---@diagnostic disable-next-line: missing-parameter
       harpoon:setup()
       vim.keymap.set("n", "<leader>a", function()
-        harpoon:list():append()
+        harpoon:list():add()
       end)
       vim.keymap.set("n", "<C-e>", function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
@@ -522,6 +522,7 @@ require("lazy").setup({
           { name = "luasnip" },
           { name = "buffer" },
           { name = "path" },
+          { name = "neorg" },
         },
       }
     end,
@@ -678,6 +679,45 @@ require("lazy").setup({
         },
       })
     end,
+  },
+
+  -- Neorg for note taking
+  {
+    "vhyrro/luarocks.nvim",
+    priority = 1000,
+    config = true,
+  },
+  {
+    "nvim-neorg/neorg",
+    dependencies = { "luarocks.nvim" },
+    lazy = false,  -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = "*", -- Pin Neorg to the latest stable release
+    config = function()
+      require("neorg").setup({
+        load = {
+          ["core.defaults"] = {},
+          ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
+          ["core.integrations.nvim-cmp"] = {},
+          ["core.concealer"] = { config = { icon_preset = "diamond", folds = false } },
+          ["core.keybinds"] = {
+            -- https://github.com/nvim-neorg/neorg/blob/main/lua/neorg/modules/core/keybinds/keybinds.lua
+            config = {
+              default_keybinds = true,
+              neorg_leader = "<Leader>",
+            },
+          },
+          ["core.dirman"] = {
+            config = {
+              workspaces = {
+                work = "~/Documents/Neorg",
+              },
+              default_workspace = "work"
+            }
+          },
+        },
+      })
+      vim.keymap.set("n", "<leader>ni", "<cmd>Neorg index<CR>", { desc = "[N]eorg [I]ndex" })
+    end
   },
 })
 
