@@ -36,6 +36,9 @@ vim.opt.splitbelow = true
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
+-- Conceal level for neorg
+vim.opt.conceallevel = 2
+
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = "split"
 
@@ -341,6 +344,23 @@ require("lazy").setup({
           function(server_name)
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+            if server_name == "gopls" then
+              server.on_attach = function(client, _)
+                if client.name == "gopls" then
+                  if not client.server_capabilities.semanticTokensProvider then
+                    local semantic = client.config.capabilities.textDocument.semanticTokens
+                    client.server_capabilities.semanticTokensProvider = {
+                      full = true,
+                      legend = {
+                        tokenTypes = semantic.tokenTypes,
+                        tokenModifiers = semantic.tokenModifiers,
+                      },
+                      range = true,
+                    }
+                  end
+                end
+              end
+            end
             require("lspconfig")[server_name].setup(server)
           end,
         },
@@ -473,6 +493,7 @@ require("lazy").setup({
       'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      'hrsh7th/cmp-buffer',
     },
     config = function()
       local cmp = require 'cmp'
@@ -699,6 +720,7 @@ require("lazy").setup({
           ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
           ["core.integrations.nvim-cmp"] = {},
           ["core.concealer"] = { config = { icon_preset = "diamond", folds = false } },
+          ["core.summary"] = { },
           ["core.keybinds"] = {
             -- https://github.com/nvim-neorg/neorg/blob/main/lua/neorg/modules/core/keybinds/keybinds.lua
             config = {
@@ -717,6 +739,10 @@ require("lazy").setup({
         },
       })
       vim.keymap.set("n", "<leader>ni", "<cmd>Neorg index<CR>", { desc = "[N]eorg [I]ndex" })
+      vim.keymap.set("n", "<leader>nr", "<cmd>Neorg return<CR>", { desc = "[N]eorg [R]eturn" })
+      vim.keymap.set("n", "<leader>nj", "<cmd>Neorg journal<CR>", { desc = "[N]eorg [J]ournal" })
+      vim.keymap.set("n", "<leader>ns", "<cmd>Neorg generate-workspace-summary<CR>", { desc = "[N]eorg Generate Workspave [S]ummary" })
+      vim.keymap.set("n", "<leader>nm", "<cmd>Neorg inject-metadata<CR>", { desc = "[N]eorg Inject [M]etadata" })
     end
   },
 })
