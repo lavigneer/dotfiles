@@ -435,6 +435,45 @@ require("lazy").setup({
     },
   },
 
+  -- Trouble
+  {
+    "folke/trouble.nvim",
+    branch = "dev", -- IMPORTANT!
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+    },
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+  },
+
   -- Faster file navigation
   {
     "ThePrimeagen/harpoon",
@@ -660,7 +699,7 @@ require("lazy").setup({
     config = function()
       ---@diagnostic disable-next-line: missing-fields
       require("nvim-treesitter.configs").setup({
-        ensure_installed = { "bash", "c", "html", "lua", "markdown", "vim", "vimdoc" },
+        ensure_installed = { "bash", "c", "html", "lua", "markdown", "markdown_inline", "vim", "vimdoc" },
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
@@ -720,7 +759,7 @@ require("lazy").setup({
           ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
           ["core.integrations.nvim-cmp"] = {},
           ["core.concealer"] = { config = { icon_preset = "diamond", folds = false } },
-          ["core.summary"] = { },
+          ["core.summary"] = {},
           ["core.keybinds"] = {
             -- https://github.com/nvim-neorg/neorg/blob/main/lua/neorg/modules/core/keybinds/keybinds.lua
             config = {
@@ -741,7 +780,8 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>ni", "<cmd>Neorg index<CR>", { desc = "[N]eorg [I]ndex" })
       vim.keymap.set("n", "<leader>nr", "<cmd>Neorg return<CR>", { desc = "[N]eorg [R]eturn" })
       vim.keymap.set("n", "<leader>nj", "<cmd>Neorg journal<CR>", { desc = "[N]eorg [J]ournal" })
-      vim.keymap.set("n", "<leader>ns", "<cmd>Neorg generate-workspace-summary<CR>", { desc = "[N]eorg Generate Workspave [S]ummary" })
+      vim.keymap.set("n", "<leader>ns", "<cmd>Neorg generate-workspace-summary<CR>",
+        { desc = "[N]eorg Generate Workspave [S]ummary" })
       vim.keymap.set("n", "<leader>nm", "<cmd>Neorg inject-metadata<CR>", { desc = "[N]eorg Inject [M]etadata" })
     end
   },
