@@ -119,6 +119,11 @@ setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
 
 # cargo configuration
 [[ ! -r $HOME/.cargo/env ]] || source $HOME/.cargo/env  > /dev/null 2> /dev/null
+#
+# go configuration
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 # opam configuration
 [[ ! -r $HOME/.opam/opam-init/init.zsh ]] || source /home/elavigne/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
