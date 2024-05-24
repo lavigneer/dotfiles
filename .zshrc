@@ -4,6 +4,8 @@ export PATH=$HOME/.local/bin:$PATH
 
 export EDITOR=nvim
 
+export XDG_SCREENSHOTS_DIR=$HOME/Pictures/screenshots
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
