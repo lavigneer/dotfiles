@@ -36,7 +36,6 @@ vim.opt.splitbelow = true
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
--- Conceal level for neorg
 vim.opt.conceallevel = 2
 
 -- Preview substitutions live, as you type!
@@ -134,9 +133,9 @@ require("lazy").setup({
 
   -- Nicer input ui
   {
-    'stevearc/dressing.nvim',
+    "stevearc/dressing.nvim",
     opts = {
-      select = { enabled = false }
+      select = { enabled = false },
     },
   },
 
@@ -205,7 +204,7 @@ require("lazy").setup({
         end,
       })
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       local servers = {
         rust_analyzer = {},
@@ -438,7 +437,7 @@ require("lazy").setup({
   -- Trouble
   {
     "folke/trouble.nvim",
-    branch = "dev", -- IMPORTANT!
+    branch = "main", -- IMPORTANT!
     keys = {
       {
         "<leader>xx",
@@ -513,41 +512,41 @@ require("lazy").setup({
 
   -- Autocompletion
   {
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       {
-        'L3MON4D3/LuaSnip',
+        "L3MON4D3/LuaSnip",
         build = (function()
           -- Build Step is needed for regex support in snippets
           -- This step is not supported in many windows environments
           -- Remove the below condition to re-enable on windows
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+          if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
             return
           end
-          return 'make install_jsregexp'
+          return "make install_jsregexp"
         end)(),
       },
-      'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-      'hrsh7th/cmp-buffer',
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-buffer",
     },
     config = function()
-      local cmp = require 'cmp'
-      local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+      luasnip.config.setup({})
 
-      cmp.setup {
+      cmp.setup({
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
         },
-        completion = { completeopt = 'menu,menuone,noinsert' },
+        completion = { completeopt = "menu,menuone,noinsert" },
 
-        mapping = cmp.mapping.preset.insert {
+        mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping.select_next_item(),
           ["<C-p>"] = cmp.mapping.select_prev_item(),
           ["<C-d>"] = cmp.mapping.scroll_docs(-4),
@@ -575,16 +574,14 @@ require("lazy").setup({
               fallback()
             end
           end, { "i", "s" }),
-
-        },
+        }),
         sources = {
           { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "buffer" },
           { name = "path" },
-          { name = "neorg" },
         },
-      }
+      })
     end,
   },
 
@@ -648,7 +645,7 @@ require("lazy").setup({
         mappings = {
           choose_marked = "<C-q>",
           choose_in_vsplit = "",
-        }
+        },
       })
       local codeaction_format_item = function(action_tuple)
         local title = action_tuple[2].title:gsub("\r\n", "\\r\\n")
@@ -657,7 +654,7 @@ require("lazy").setup({
       end
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.ui.select = function(items, opts, on_choice)
-        if opts.kind == 'codeaction' then
+        if opts.kind == "codeaction" then
           opts.format_item = codeaction_format_item
         end
         return pick.ui_select(items, opts, on_choice)
@@ -739,51 +736,6 @@ require("lazy").setup({
         },
       })
     end,
-  },
-
-  -- Neorg for note taking
-  {
-    "vhyrro/luarocks.nvim",
-    priority = 1000,
-    config = true,
-  },
-  {
-    "nvim-neorg/neorg",
-    dependencies = { "luarocks.nvim" },
-    lazy = false,  -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
-    version = "*", -- Pin Neorg to the latest stable release
-    config = function()
-      require("neorg").setup({
-        load = {
-          ["core.defaults"] = {},
-          ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
-          ["core.integrations.nvim-cmp"] = {},
-          ["core.concealer"] = { config = { icon_preset = "diamond", folds = false } },
-          ["core.summary"] = {},
-          ["core.keybinds"] = {
-            -- https://github.com/nvim-neorg/neorg/blob/main/lua/neorg/modules/core/keybinds/keybinds.lua
-            config = {
-              default_keybinds = true,
-              neorg_leader = "<Leader>",
-            },
-          },
-          ["core.dirman"] = {
-            config = {
-              workspaces = {
-                work = "~/Documents/Neorg",
-              },
-              default_workspace = "work"
-            }
-          },
-        },
-      })
-      vim.keymap.set("n", "<leader>ni", "<cmd>Neorg index<CR>", { desc = "[N]eorg [I]ndex" })
-      vim.keymap.set("n", "<leader>nr", "<cmd>Neorg return<CR>", { desc = "[N]eorg [R]eturn" })
-      vim.keymap.set("n", "<leader>nj", "<cmd>Neorg journal<CR>", { desc = "[N]eorg [J]ournal" })
-      vim.keymap.set("n", "<leader>ns", "<cmd>Neorg generate-workspace-summary<CR>",
-        { desc = "[N]eorg Generate Workspave [S]ummary" })
-      vim.keymap.set("n", "<leader>nm", "<cmd>Neorg inject-metadata<CR>", { desc = "[N]eorg Inject [M]etadata" })
-    end
   },
 })
 
