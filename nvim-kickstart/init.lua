@@ -117,20 +117,6 @@ require("lazy").setup({
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
-  -- Adds git related signs to the gutter, as well as utilities for managing changes
-  {
-    "lewis6991/gitsigns.nvim",
-    opts = {
-      signs = {
-        add = { text = "+" },
-        change = { text = "~" },
-        delete = { text = "_" },
-        topdelete = { text = "‾" },
-        changedelete = { text = "~" },
-      },
-    },
-  },
-
   -- Nicer input ui
   {
     "stevearc/dressing.nvim",
@@ -605,6 +591,7 @@ require("lazy").setup({
       require("mini.bracketed").setup()
       require("mini.comment").setup()
       require("mini.cursorword").setup()
+      require("mini.diff").setup({view = {style = 'sign'}, mappings = { apply = '', reset = '', textobject = ''}})
       require("mini.extra").setup()
       require("mini.tabline").setup()
       require("mini.notify").setup()
