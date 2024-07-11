@@ -589,9 +589,7 @@ require("lazy").setup({
   {
     "echasnovski/mini.nvim",
     lazy = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
+    dependencies = {},
     config = function()
       require("mini.basics").setup({
         options = {
@@ -611,6 +609,7 @@ require("lazy").setup({
       require("mini.tabline").setup()
       require("mini.notify").setup()
       require("mini.visits").setup()
+      require("mini.icons").setup()
 
       local bufremove = require("mini.bufremove")
       bufremove.setup()
