@@ -627,7 +627,7 @@ require("lazy").setup({
         },
         window = {
           delay = 450,
-          config = { anchor = "SW", row = "auto", col = "auto" },
+          config = { anchor = "SW", row = "auto", col = "auto", width = "auto" },
         },
       })
 
