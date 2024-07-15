@@ -125,22 +125,6 @@ require("lazy").setup({
     },
   },
 
-  -- Useful plugin to show you pending keybinds.
-  {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
-    config = function()
-      require("which-key").setup()
-      require("which-key").register({
-        ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-        ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-        ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-        ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-        ["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-      })
-    end,
-  },
-
   -- LSP Configuration & Plugins
   {
     "neovim/nvim-lspconfig",
@@ -591,12 +575,61 @@ require("lazy").setup({
       require("mini.bracketed").setup()
       require("mini.comment").setup()
       require("mini.cursorword").setup()
-      require("mini.diff").setup({view = {style = 'sign'}, mappings = { apply = '', reset = '', textobject = ''}})
+      require("mini.diff").setup({ view = { style = "sign" }, mappings = { apply = "", reset = "", textobject = "" } })
       require("mini.extra").setup()
       require("mini.tabline").setup()
       require("mini.notify").setup()
       require("mini.visits").setup()
       require("mini.icons").setup()
+
+      local miniclue = require("mini.clue")
+      miniclue.setup({
+        triggers = {
+          -- Leader triggers
+          { mode = "n", keys = "<Leader>" },
+          { mode = "x", keys = "<Leader>" },
+
+          -- Built-in completion
+          { mode = "i", keys = "<C-x>" },
+
+          -- `g` key
+          { mode = "n", keys = "g" },
+          { mode = "x", keys = "g" },
+
+          -- Marks
+          { mode = "n", keys = "'" },
+          { mode = "n", keys = "`" },
+          { mode = "x", keys = "'" },
+          { mode = "x", keys = "`" },
+
+          -- Registers
+          { mode = "n", keys = '"' },
+          { mode = "x", keys = '"' },
+          { mode = "i", keys = "<C-r>" },
+          { mode = "c", keys = "<C-r>" },
+
+          -- Window commands
+          { mode = "n", keys = "<C-w>" },
+
+          -- `z` key
+          { mode = "n", keys = "z" },
+          { mode = "x", keys = "z" },
+        },
+
+        clues = {
+          -- Enhance this by adding descriptions for <Leader> mapping groups
+          miniclue.gen_clues.builtin_completion(),
+          miniclue.gen_clues.g(),
+          miniclue.gen_clues.marks(),
+          miniclue.gen_clues.registers(),
+          miniclue.gen_clues.windows(),
+          miniclue.gen_clues.z(),
+        },
+        window = {
+          delay = 450,
+          config = { anchor = "SW", row = "auto", col = "auto" },
+        },
+      })
 
       local bufremove = require("mini.bufremove")
       bufremove.setup()
