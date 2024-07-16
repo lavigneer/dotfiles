@@ -36,6 +36,9 @@ vim.opt.splitbelow = true
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
+-- Better completion behaviour
+vim.opt.completeopt = "menuone,noinsert"
+
 vim.opt.conceallevel = 2
 
 -- Preview substitutions live, as you type!
@@ -154,27 +157,9 @@ require("lazy").setup({
           vim.api.nvim_buf_create_user_command(0, "Format", function(_)
             vim.lsp.buf.format({})
           end, { desc = "Format current buffer" })
-
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.server_capabilities.documentHighlightProvider then
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.clear_references,
-            })
-          end
         end,
       })
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       local servers = {
         rust_analyzer = {},
@@ -314,7 +299,10 @@ require("lazy").setup({
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
             if server_name == "gopls" then
-              server.on_attach = function(client, _)
+              server.on_attach = function(client, buffer)
+                if client.supports_method("textDocument/inlayHint") then
+                  vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+                end
                 if client.name == "gopls" then
                   if not client.server_capabilities.semanticTokensProvider then
                     local semantic = client.config.capabilities.textDocument.semanticTokens
@@ -386,9 +374,6 @@ require("lazy").setup({
     end,
   },
 
-  -- Highlight todo, notes, etc in comments
-  { "folke/todo-comments.nvim", dependencies = { "nvim-lua/plenary.nvim" }, opts = { signs = false } },
-
   -- Find and replace
   {
     "nvim-pack/nvim-spectre",
@@ -440,119 +425,7 @@ require("lazy").setup({
         desc = "LSP Definitions / references / ... (Trouble)",
       },
     },
-    opts = {}, -- for default options, refer to the configuration section for custom setup.
-  },
-
-  -- Faster file navigation
-  {
-    "ThePrimeagen/harpoon",
-    branch = "harpoon2",
-    opts = {
-      lazy = false,
-    },
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      local harpoon = require("harpoon")
-      ---@diagnostic disable-next-line: missing-parameter
-      harpoon:setup()
-      vim.keymap.set("n", "<leader>a", function()
-        harpoon:list():add()
-      end)
-      vim.keymap.set("n", "<C-e>", function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
-
-      vim.keymap.set("n", "<A-1>", function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set("n", "<A-2>", function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set("n", "<A-3>", function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set("n", "<A-4>", function()
-        harpoon:list():select(4)
-      end)
-      vim.keymap.set("n", "<A-5>", function()
-        harpoon:list():select(5)
-      end)
-    end,
-  },
-
-  -- Autocompletion
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      {
-        "L3MON4D3/LuaSnip",
-        build = (function()
-          -- Build Step is needed for regex support in snippets
-          -- This step is not supported in many windows environments
-          -- Remove the below condition to re-enable on windows
-          if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-            return
-          end
-          return "make install_jsregexp"
-        end)(),
-      },
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-buffer",
-    },
-    config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-      luasnip.config.setup({})
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        completion = { completeopt = "menu,menuone,noinsert" },
-
-        mapping = cmp.mapping.preset.insert({
-          ["<C-n>"] = cmp.mapping.select_next_item(),
-          ["<C-p>"] = cmp.mapping.select_prev_item(),
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete({}),
-          ["<CR>"] = cmp.mapping.confirm({
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = true,
-          }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-        }),
-        sources = {
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
-        },
-      })
-    end,
+    opts = {},
   },
 
   -- Mini ftw
@@ -581,6 +454,20 @@ require("lazy").setup({
       require("mini.notify").setup()
       require("mini.visits").setup()
       require("mini.icons").setup()
+
+      local hipatterns = require("mini.hipatterns")
+      hipatterns.setup({
+        highlighters = {
+          -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
+          fixme = { pattern = "%f[%w]()FIXME()%f[%W]", group = "MiniHipatternsFixme" },
+          hack = { pattern = "%f[%w]()HACK()%f[%W]", group = "MiniHipatternsHack" },
+          todo = { pattern = "%f[%w]()TODO()%f[%W]", group = "MiniHipatternsTodo" },
+          note = { pattern = "%f[%w]()NOTE()%f[%W]", group = "MiniHipatternsNote" },
+
+          -- Highlight hex color strings (`#rrggbb`) using that color
+          hex_color = hipatterns.gen_highlighter.hex_color(),
+        },
+      })
 
       local miniclue = require("mini.clue")
       miniclue.setup({
@@ -614,6 +501,12 @@ require("lazy").setup({
           -- `z` key
           { mode = "n", keys = "z" },
           { mode = "x", keys = "z" },
+
+          -- `[]` keys
+          { mode = "n", keys = "[" },
+          { mode = "x", keys = "[" },
+          { mode = "n", keys = "]" },
+          { mode = "x", keys = "]" },
         },
 
         clues = {
@@ -643,6 +536,8 @@ require("lazy").setup({
       local statusline = require("mini.statusline")
       statusline.setup()
 
+      require("mini.completion").setup({ set_vim_settings = false })
+
       local files = require("mini.files")
       files.setup({
         options = {
@@ -666,9 +561,17 @@ require("lazy").setup({
           choose_in_vsplit = "",
         },
       })
-      local codeaction_format_item = function(action_tuple)
-        local title = action_tuple[2].title:gsub("\r\n", "\\r\\n")
-        local client = vim.lsp.get_client_by_id(action_tuple[1])
+      local codeaction_format_item = function(item)
+        local client_id, title
+        if vim.version and vim.version.cmp(vim.version(), vim.version.parse("0.10-dev")) >= 0 then
+          client_id = item.ctx.client_id
+          title = item.action.title
+        else
+          client_id = item[1]
+          title = item[2].title
+        end
+
+        local client = vim.lsp.get_client_by_id(client_id)
         return string.format("%s\t[%s]", title:gsub("\n", "\\n"), client.name)
       end
       ---@diagnostic disable-next-line: duplicate-set-field
