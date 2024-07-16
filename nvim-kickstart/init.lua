@@ -151,6 +151,9 @@ require("lazy").setup({
           map("<leader>ws", "<cmd>Pick lsp scope='workspace_symbol'<CR>", "[W]orkspace [S]ymbols")
           map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
           map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+          map("<leader>lh", function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }), { bufnr = 0 })
+          end, "[L]sp [H]int Toggle")
           map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
