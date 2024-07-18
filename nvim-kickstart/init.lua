@@ -215,6 +215,7 @@ require("lazy").setup({
             semanticTokens = true,
           },
         },
+        gdscript = {},
         golangci_lint_ls = {},
         tailwindcss = {
           filetypes = {
@@ -351,6 +352,7 @@ require("lazy").setup({
         ["graphql"] = { "prettier" },
         ["handlebars"] = { "prettier" },
         ["lua"] = { "stylua" },
+        ["gdscript"] = { "gdformat" },
       },
     },
     keys = {
