@@ -247,6 +247,7 @@ bindsym $mod+r mode "resize"
 exec --no-startup-id /usr/libexec/gsd-xsettings
 exec_always --no-startup-id xset dpms 0 0 300 &
 exec_always --no-startup-id $HOME/.config/i3/polybar.sh
+exec_always feh --bg-scale $HOME/.config/i3/wallpaper
 
 # Floating windows for specific programs
 for_window [instance="Godot_Engine"] floating enable
