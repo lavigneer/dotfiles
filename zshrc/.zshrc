@@ -121,7 +121,7 @@ setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
 [[ ! -r $HOME/.cargo/env ]] || source $HOME/.cargo/env  > /dev/null 2> /dev/null
 #
 # go configuration
-export GOROOT=/usr/local/go
+[[ ! -r /usr/local/go ]] || export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
