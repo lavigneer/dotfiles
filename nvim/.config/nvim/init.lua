@@ -223,6 +223,7 @@ require("lazy").setup({
               unusedwrite = true,
               useany = true,
             },
+            gofumpt = true,
             usePlaceholders = true,
             completeUnimported = true,
             staticcheck = true,
@@ -231,7 +232,11 @@ require("lazy").setup({
           },
         },
         gdscript = {},
-        golangci_lint_ls = {},
+        golangci_lint_ls = {
+          init_options = {
+            command = { "golangci-lint", "run", "--out-format", "json", "--fast", "--fix", "false" },
+          },
+        },
         tailwindcss = {
           filetypes = {
             "aspnetcorerazor",
