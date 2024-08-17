@@ -373,6 +373,7 @@ require("lazy").setup({
         ["handlebars"] = { "prettier" },
         ["lua"] = { "stylua" },
         ["gdscript"] = { "gdformat" },
+        ["groovy"] = { "npm-groovy-lint" },
       },
     },
     keys = {
