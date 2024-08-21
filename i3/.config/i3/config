@@ -188,18 +188,6 @@ bindsym $mod+Shift+Mod2+KP_Home move container to workspace 7
 bindsym $mod+Shift+Mod2+KP_Up move container to workspace 8
 bindsym $mod+Shift+Mod2+KP_Prior move container to workspace 9
 
-# Screen layout changes
-mode "$mode_display" {
-  bindsym 1 exec --no-startup-id "/home/elavigne/.screenlayout/laptop-only.sh", mode "default"
-  bindsym 2 exec --no-startup-id "/home/elavigne/.screenlayout/living-room.sh", mode "default"
-  bindsym 3 exec --no-startup-id "/home/elavigne/.screenlayout/laptop-presentation.sh", mode "default"
-  bindsym 4 exec --no-startup-id "/home/elavigne/.screenlayout/basement.sh", mode "default"
-  bindsym 5 exec --no-startup-id "/home/elavigne/.screenlayout/office.sh", mode "default"
-
-  bindsym Return mode "default"
-  bindsym Escape mode "default"
-}
-
 bindsym $mod+Shift+x mode "$mode_display"
 bindsym $mod+Shift+greater move workspace to output right
 bindsym $mod+Shift+less move workspace to output left
@@ -251,3 +239,8 @@ exec_always --no-startup-id $HOME/.local/bin/autotiling
 
 # Floating windows for specific programs
 for_window [instance="Godot_Engine"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="bubble"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [window_role="Preferences"] floating enable
+for_window [window_type="dialog"] floating enable
