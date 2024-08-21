@@ -3,6 +3,7 @@
 export PATH=$HOME/.local/bin:$PATH
 
 export EDITOR=nvim
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 export XDG_SCREENSHOTS_DIR=$HOME/Pictures/screenshots
 
