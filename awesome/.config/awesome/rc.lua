@@ -196,31 +196,35 @@ awful.screen.connect_for_each_screen(function(s)
   -- Create the wibox
   s.mywibox = awful.wibar({ position = "top", screen = s })
 
-  -- Add widgets to the wibox
   s.mywibox:setup({
-    layout = wibox.layout.align.horizontal,
-    { -- Left widgets
-      layout = wibox.layout.fixed.horizontal,
-      -- mylauncher,
-      s.mytaglist,
+    layout = wibox.layout.stack,
+    {
+      layout = wibox.layout.align.horizontal,
+      { -- Left widgets
+        layout = wibox.layout.fixed.horizontal,
+        s.mytaglist,
+      },
+      nil,
+      { -- Right widgets
+        layout = wibox.layout.fixed.horizontal,
+        wibox.widget.systray(),
+        wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
+        volume_widget(),
+        wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
+        cpu_widget({ timeout = 5 }),
+        ram_widget({ widget_height = 40, width_width = 40, timeout = 5 }),
+        battery_widget(),
+        wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
+        logout_menu_widget(),
+        wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
+        s.mylayoutbox,
+      },
     },
     {
-      layout = wibox.layout.flex.horizontal,
-    },
-    { -- Right widgets
-      layout = wibox.layout.fixed.horizontal,
-      wibox.widget.systray(),
-      wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
-      volume_widget(),
-      wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
-      cpu_widget({ timeout = 5 }),
-      ram_widget({ widget_height = 40, width_width = 40, timeout = 5 }),
-      battery_widget(),
-      wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
       text_clock,
-      wibox.widget({ widget = wibox.widget.separator, orientation = "vertical", forced_width = 30 }),
-      logout_menu_widget(),
-      s.mylayoutbox,
+      valign = "center",
+      halign = "center",
+      layout = wibox.container.place,
     },
   })
 end)
