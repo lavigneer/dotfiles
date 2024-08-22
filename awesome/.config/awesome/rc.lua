@@ -509,7 +509,7 @@ local auto_start = {
   "dex --autostart --environment Awesome",
   "xss-lock --transfer-sleep-lock -- i3lock --nofork",
   "nm-applet",
-  "/usr/bin/variety",
+  "variety",
 }
 
 local function run_once(cmd)
