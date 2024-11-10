@@ -125,6 +125,13 @@ require("lazy").setup({
     },
   },
 
+  -- Move inlay hints to end of line
+  {
+    "chrisgrieser/nvim-lsp-endhints",
+    event = "LspAttach",
+    opts = {},
+  },
+
   -- LSP Configuration & Plugins
   {
     "neovim/nvim-lspconfig",
@@ -180,7 +187,17 @@ require("lazy").setup({
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       local servers = {
-        rust_analyzer = {},
+        rust_analyzer = {
+          init_options = {
+            cargo = {
+              allFeatures = true,
+            },
+            check = {
+              command = "clippy",
+            },
+            checkOnSave = true,
+          },
+        },
         biome = {},
         tsserver = {
           init_options = {
@@ -191,8 +208,8 @@ require("lazy").setup({
             },
           },
         },
-        html = { filetypes = { "html", "twig", "hbs", "htmldjango" } },
-        htmx = { filetypes = { "html", "twig", "hbs", "htmldjango" } },
+        html = { filetypes = { "html", "twig", "hbs", "htmldjango", "templ" } },
+        htmx = { filetypes = { "html", "twig", "hbs", "htmldjango", "templ" } },
         gopls = {
           filetypes = { "go", "gomod", "gowork", "gotmpl", "html" },
           init_options = {
@@ -224,7 +241,7 @@ require("lazy").setup({
               useany = true,
             },
             gofumpt = true,
-            usePlaceholders = true,
+            usePlaceholders = false,
             completeUnimported = true,
             staticcheck = true,
             directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
@@ -254,6 +271,7 @@ require("lazy").setup({
             "eruby",
             "gohtml",
             "gohtmltmpl",
+            "templ",
             "haml",
             "handlebars",
             "hbs",
@@ -358,6 +376,7 @@ require("lazy").setup({
         ["javascriptreact"] = { "prettier", "biome" },
         ["typescript"] = { "prettier", "biome" },
         ["typescriptreact"] = { "prettier", "biome" },
+        ["astro"] = { "prettier" },
         ["vue"] = { "prettier" },
         ["css"] = { "prettier" },
         ["scss"] = { "prettier" },
@@ -374,6 +393,8 @@ require("lazy").setup({
         ["lua"] = { "stylua" },
         ["gdscript"] = { "gdformat" },
         ["groovy"] = { "npm-groovy-lint" },
+        ["templ"] = { "templ" },
+        ["go"] = { "gopls" },
       },
     },
     keys = {
