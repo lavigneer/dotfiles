@@ -78,7 +78,7 @@ PROJECT_PATHS=(~/workspace)
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git pj jira tmux tmuxinator ssh-agent)
+plugins=(git pj jira tmux tmuxinator ssh-agent direnv)
 
 
 # User configuration
@@ -134,3 +134,13 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 [[ ! -r /usr/share/doc/fzf/examples/key-bindings.zsh ]] || source /usr/share/doc/fzf/examples/key-bindings.zsh  > /dev/null 2> /dev/null
 [[ ! -r /usr/share/doc/fzf/examples/completion.zsh ]] || source /usr/share/doc/fzf/examples/completion.zsh  > /dev/null 2> /dev/null
 
+
+# pnpm
+export PNPM_HOME="/home/elavigne/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+if [ -e /home/elavigne/.nix-profile/etc/profile.d/nix.sh ]; then . /home/elavigne/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
