@@ -261,6 +261,7 @@ require("lazy").setup({
             command = { "golangci-lint", "run", "--out-format", "json", "--fast", "--fix", "false" },
           },
         },
+        nil_ls = {},
         tailwindcss = {
           filetypes = {
             "aspnetcorerazor",
@@ -313,6 +314,39 @@ require("lazy").setup({
             "vue",
             "svelte",
             "rust",
+          },
+        },
+
+        ocamllsp = {
+          filetypes = {
+            "ocaml",
+            "ocaml.menhir",
+            "ocaml.interface",
+            "ocaml.ocamllex",
+            "reason",
+            "dune",
+          },
+          root_dir = function(fname)
+            return require("lspconfig.util").root_pattern(
+              "*.opam",
+              "esy.json",
+              "package.json",
+              ".git",
+              "dune-project",
+              "dune-workspace",
+              "*.ml"
+            )(fname)
+          end,
+        },
+
+        helm_ls = {
+          init_options = {
+            valuesFiles = {
+              additionalValuesFilesGlobPattern = "*.values.yaml",
+            },
+            yamlls = {
+              path = "yaml-language-server",
+            },
           },
         },
 
@@ -402,6 +436,8 @@ require("lazy").setup({
         ["groovy"] = { "npm-groovy-lint" },
         ["templ"] = { "templ" },
         ["go"] = { "gopls" },
+        ["nix"] = { "nixfmt" },
+        ["ocaml"] = { "ocamlformat" },
       },
     },
     keys = {
