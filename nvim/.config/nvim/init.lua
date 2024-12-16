@@ -1,3 +1,4 @@
+---@diagnostic disable: missing-fields
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -74,14 +75,6 @@ vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, si
 vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-
--- Move Lines
-vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
-vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
-vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
-vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
-vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
-vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
@@ -548,10 +541,14 @@ require("lazy").setup({
           auto_show = true,
           auto_show_delay_ms = 200,
         },
+        trigger = {
+          show_on_blocked_trigger_characters = { ' ', '\n', '\t', '(', '{', '[' },
+        }
       },
 
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
+        min_keyword_length = 1,
       },
 
       signature = { enabled = true },
@@ -580,13 +577,26 @@ require("lazy").setup({
       require("mini.surround").setup()
       require("mini.bracketed").setup()
       require("mini.comment").setup()
+      require("mini.git").setup()
       require("mini.cursorword").setup()
       require("mini.diff").setup({ view = { style = "sign" }, mappings = { apply = "", reset = "", textobject = "" } })
       require("mini.extra").setup()
+      require("mini.move").setup()
       require("mini.tabline").setup()
       require("mini.notify").setup()
+      require("mini.statusline").setup()
       require("mini.visits").setup()
       require("mini.icons").setup()
+
+      local indentscope = require("mini.indentscope")
+      indentscope.setup({
+        draw = {
+          animation = indentscope.gen_animation.none(),
+        },
+        options = {
+          indent_at_cursor = false,
+        },
+      })
 
       local hipatterns = require("mini.hipatterns")
       hipatterns.setup({
@@ -666,9 +676,6 @@ require("lazy").setup({
         bufremove.delete(0, true)
       end, { desc = "Force [B]uffer [D]elete" })
 
-      local statusline = require("mini.statusline")
-      statusline.setup()
-
       local files = require("mini.files")
       files.setup({
         options = {
@@ -721,6 +728,8 @@ require("lazy").setup({
         { desc = "[/] Fuzzily search in current buffer" }
       )
       vim.keymap.set("n", "<leader>gf", "<cmd>Pick git_files<CR>", { desc = "Search [G]it [F]iles" })
+      vim.keymap.set("n", "<leader>gc", "<cmd>Pick git_hunks<CR>", { desc = "Search [G]it [H]unks" })
+      vim.keymap.set("n", "<leader>gc", "<cmd>Pick git_commits<CR>", { desc = "Search [G]it [C]ommits" })
       vim.keymap.set(
         "n",
         "<leader>gm",
@@ -729,7 +738,7 @@ require("lazy").setup({
       )
       vim.keymap.set("n", "<leader>sf", "<cmd>Pick files<CR>", { desc = "[S]earch [F]iles" })
       vim.keymap.set("n", "<leader>sh", "<cmd>Pick help<CR>", { desc = "[S]earch [H]elp" })
-      vim.keymap.set("n", "<leader>sw", "<cmd>grep pattern='<cword><CR>", { desc = "[S]earch current [W]ord" })
+      vim.keymap.set("n", "<leader>sw", "<cmd>Pick grep pattern=<cword><CR>", { desc = "[S]earch current [W]ord" })
       vim.keymap.set("n", "<leader>sg", "<cmd>Pick grep_live<CR>", { desc = "[S]earch by [G]rep" })
       vim.keymap.set("n", "<leader>sd", "<cmd>Pick diagnostic scope='all'<CR>", { desc = "[S]earch [D]iagnostics" })
       vim.keymap.set("n", "<leader>sq", "<cmd>Pick list scope='quickfix'<CR>", { desc = "[S]earch [Q]uickfix" })
