@@ -423,6 +423,7 @@ require("lazy").setup({
         ["yaml"] = { "prettier" },
         ["markdown"] = { "prettier" },
         ["markdown.mdx"] = { "prettier" },
+        ["cucumber"] = { "prettier" },
         ["graphql"] = { "prettier" },
         ["handlebars"] = { "prettier" },
         ["lua"] = { "stylua" },
