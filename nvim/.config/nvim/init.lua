@@ -543,8 +543,8 @@ require("lazy").setup({
           auto_show_delay_ms = 200,
         },
         trigger = {
-          show_on_blocked_trigger_characters = { ' ', '\n', '\t', '(', '{', '[' },
-        }
+          show_on_blocked_trigger_characters = { " ", "\n", "\t", "(", "{", "[" },
+        },
       },
 
       sources = {
@@ -597,6 +597,30 @@ require("lazy").setup({
         options = {
           indent_at_cursor = false,
         },
+      })
+
+      -- Turn off indentscope for special file types
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "Trouble",
+          "alpha",
+          "dashboard",
+          "fzf",
+          "help",
+          "lazy",
+          "mason",
+          "neo-tree",
+          "notify",
+          "snacks_dashboard",
+          "snacks_notif",
+          "snacks_terminal",
+          "snacks_win",
+          "toggleterm",
+          "trouble",
+        },
+        callback = function()
+          vim.b.miniindentscope_disable = true
+        end,
       })
 
       local hipatterns = require("mini.hipatterns")
