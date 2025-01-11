@@ -95,6 +95,13 @@ vim.filetype.add({
   },
 })
 
+-- Set tf files as terraform
+vim.filetype.add({
+  extension = {
+    tf = "terraform",
+  },
+})
+
 -- [[ Basic Autocommands ]]
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
@@ -859,7 +866,7 @@ require("lazy").setup({
       })
     end,
   },
-  { "nvim-treesitter/nvim-treesitter-context" },
+  { "nvim-treesitter/nvim-treesitter-context", opts = { separator = "-" } },
 
   -- Testing
   { "nvim-neotest/neotest-jest" },
