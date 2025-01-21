@@ -89,6 +89,9 @@ ZSH_TMUX_AUTOSTART_ONCE=false
 ZSH_TMUX_DEFAULT_SESSION_NAME=scratchpad
 ZSH_TMUX_CONFIG=$HOME/.tmux.conf
 
+# SSH Keys
+zstyle :omz:plugins:ssh-agent identities github gitea id_ed25519 remote_servers/azure-dc-dev-test.pem 
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -135,6 +138,9 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 [[ ! -r /usr/share/doc/fzf/examples/completion.zsh ]] || source /usr/share/doc/fzf/examples/completion.zsh  > /dev/null 2> /dev/null
 
 
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
+
 # pnpm
 export PNPM_HOME="/home/elavigne/.local/share/pnpm"
 case ":$PATH:" in
@@ -144,3 +150,12 @@ esac
 # pnpm end
 
 if [ -e /home/elavigne/.nix-profile/etc/profile.d/nix.sh ]; then . /home/elavigne/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+# Fix ls colors
+export LS_COLORS="$LS_COLORS:ow=1;34:tw=1;34:"
+
+PATH="/home/elavigne/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/home/elavigne/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/elavigne/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/elavigne/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/elavigne/perl5"; export PERL_MM_OPT;

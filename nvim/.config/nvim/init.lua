@@ -178,17 +178,17 @@ require("lazy").setup({
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.server_capabilities.documentHighlightProvider then
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.document_highlight,
-            })
+          -- if client and client.server_capabilities.documentHighlightProvider then
+          -- vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+          --   buffer = event.buf,
+          --   callback = vim.lsp.buf.document_highlight,
+          -- })
 
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.clear_references,
-            })
-          end
+          -- vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+          --   buffer = event.buf,
+          --   callback = vim.lsp.buf.clear_references,
+          -- })
+          -- end
         end,
       })
       local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -206,6 +206,7 @@ require("lazy").setup({
           },
         },
         biome = {},
+        cspell = {},
         tsserver = {
           init_options = {
             preferences = {
@@ -241,7 +242,6 @@ require("lazy").setup({
               rangeVariableTypes = true,
             },
             analyses = {
-              fieldalignment = true,
               nilness = true,
               unusedparams = true,
               unusedwrite = true,
@@ -257,9 +257,7 @@ require("lazy").setup({
         },
         gdscript = {},
         golangci_lint_ls = {
-          init_options = {
-            command = { "golangci-lint", "run", "--out-format", "json", "--fast", "--fix", "false" },
-          },
+          init_options = {},
         },
         nil_ls = {},
         tailwindcss = {
@@ -446,7 +444,12 @@ require("lazy").setup({
       {
         "<leader>cf",
         function()
-          require("conform").format({ async = true, lsp_fallback = true })
+          require("conform").format({
+            timeout_ms = 5000,
+            async = false, -- not recommended to change
+            quiet = false, -- not recommended to change
+            lsp_format = "fallback",
+          })
         end,
         desc = "[C]ode [F]ormat",
       },
@@ -455,6 +458,12 @@ require("lazy").setup({
       require("conform").setup(opts)
     end,
   },
+
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+  { "rose-pine/neovim", name = "rose-pine", priority = 1000 },
+  { "navarasu/onedark.nvim", name = "onedark", priority = 1000, opts = {
+    style = "warmer",
+  } },
 
   {
     "EdenEast/nightfox.nvim",
@@ -574,9 +583,11 @@ require("lazy").setup({
           },
         },
         list = {
-          selection = function(ctx)
-            return ctx.mode == "cmdline" and "auto_insert" or "preselect"
-          end,
+          selection = {
+            auto_insert = function(ctx)
+              return ctx.mode == "cmdline" and "auto_insert" or "preselect"
+            end,
+          },
         },
       },
 
