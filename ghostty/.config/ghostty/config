@@ -2,3 +2,7 @@ theme="carbonfox"
 window-decoration=false
 confirm-close-surface=false
 gtk-single-instance = true
+
+macos-secure-input-indication=true
+macos-option-as-alt=true
+macos-non-native-fullscreen=true
