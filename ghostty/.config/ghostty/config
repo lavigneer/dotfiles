@@ -1,7 +1,9 @@
 theme="carbonfox"
 window-decoration=false
 confirm-close-surface=false
-gtk-single-instance = true
+gtk-single-instance=true
+
+mouse-scroll-multiplier=0.1
 
 macos-secure-input-indication=true
 macos-option-as-alt=true
