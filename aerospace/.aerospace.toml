@@ -10,6 +10,8 @@ enable-normalization-opposite-orientation-for-nested-containers = false
 # Mouse follows focus when focused monitor changes
 # on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
+automatically-unhide-macos-hidden-apps = false
+
 start-at-login = true
 
 [mode.main.binding]
@@ -90,3 +92,8 @@ start-at-login = true
     l = 'resize width +50'
     enter = 'mode main'
     esc = 'mode main'
+
+[workspace-to-monitor-force-assignment]
+    1 = ['LS32R75', 'main']
+    2 = ['^BenQ', 'main']
+    3 = 'built-in'
