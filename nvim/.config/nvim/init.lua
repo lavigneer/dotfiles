@@ -144,8 +144,7 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      "saghen/blink.cmp",
+      "williamboman/mason-lspconfig.nvim"
     },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -192,6 +191,7 @@ require("lazy").setup({
         end,
       })
       local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       local servers = {
         rust_analyzer = {
@@ -257,7 +257,7 @@ require("lazy").setup({
         gdscript = {},
         golangci_lint_ls = {
           init_options = {
-            command = { "golangci-lint", "run", "--out-format", "json", "--fast", "--fix", "false" },
+            command = { "golangci-lint", "run", "--out-format", "json" },
           },
         },
         nil_ls = {},
@@ -379,7 +379,6 @@ require("lazy").setup({
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
-            server.capabilities = require("blink.cmp").get_lsp_capabilities(server.capabilities)
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
             if server_name == "gopls" then
               server.on_attach = function(client, buffer)
@@ -439,6 +438,7 @@ require("lazy").setup({
         ["go"] = { "gopls" },
         ["nix"] = { "nixfmt" },
         ["ocaml"] = { "ocamlformat" },
+        ["starlark"] = { "buildifier" },
       },
     },
     keys = {
@@ -519,81 +519,81 @@ require("lazy").setup({
     opts = {},
   },
 
+  -- Autocompletion
   {
-    "saghen/blink.cmp",
-    lazy = false, -- lazy loading handled internally
-    -- optional: provides snippets for the snippet source
-    dependencies = "rafamadriz/friendly-snippets",
-    version = "v0.*",
-    opts = {
-      -- 'default' for mappings similar to built-in completion
-      -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
-      -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
-      -- see the "default configuration" section below for full documentation on how to define
-      -- your own keymap.
-      keymap = { preset = "enter" },
-
-      appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- will be removed in a future release
-        use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = "mono",
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      -- Snippet Engine & its associated nvim-cmp source
+      {
+        "L3MON4D3/LuaSnip",
+        build = (function()
+          -- Build Step is needed for regex support in snippets
+          -- This step is not supported in many windows environments
+          -- Remove the below condition to re-enable on windows
+          if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
+            return
+          end
+          return "make install_jsregexp"
+        end)(),
       },
-
-      completion = {
-        documentation = {
-          auto_show = true,
-          auto_show_delay_ms = 200,
-        },
-        trigger = {
-          show_on_blocked_trigger_characters = { " ", "\n", "\t", "(", "{", "[" },
-        },
-        menu = {
-          auto_show = function(ctx)
-            return ctx.mode ~= "cmdline"
-          end,
-          draw = {
-            components = {
-              kind_icon = {
-                ellipsis = false,
-                text = function(ctx)
-                  local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
-                  return kind_icon
-                end,
-                -- Optionally, you may also use the highlights from mini.icons
-                highlight = function(ctx)
-                  local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
-                  return hl
-                end,
-              },
-            },
-          },
-        },
-        list = {
-          selection = {
-            auto_insert = function(ctx)
-              return ctx.mode == "cmdline"
-            end,
-            preselect = function(ctx)
-              return ctx.mode ~= "cmdline"
-            end,
-          },
-        },
-      },
-
-      sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
-        min_keyword_length = 1,
-      },
-
-      signature = { enabled = true },
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-buffer",
     },
-    -- allows extending the providers array elsewhere in your config
-    -- without having to redefine it
-    opts_extend = { "sources.default" },
+    config = function()
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+      luasnip.config.setup({})
+
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        completion = { completeopt = "menu,menuone,noinsert" },
+
+        mapping = cmp.mapping.preset.insert({
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete({}),
+          ["<CR>"] = cmp.mapping.confirm({
+            behavior = cmp.ConfirmBehavior.Insert,
+            select = true,
+          }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_locally_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        }),
+        sources = {
+          { name = "nvim_lsp_signature_help" },
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+          { name = "buffer" },
+          { name = "path" },
+        },
+      })
+    end,
   },
 
   -- Mini ftw
