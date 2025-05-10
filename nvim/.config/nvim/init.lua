@@ -48,10 +48,32 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- views can only be fully collapsed with the global statusline
+vim.opt.laststatus = 3
+-- Default splitting will cause your main splits to jump when opening an edgebar.
+-- To prevent this, set `splitkeep` to either `screen` or `topline`.
+vim.opt.splitkeep = "screen"
+
+vim.opt.completeopt = "menu,noinsert,popup,fuzzy,menuone"
+
 -- [[ Basic Keymaps ]]
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 vim.keymap.set("i", "<S-Up>", "<Nop>", { silent = true })
 vim.keymap.set("i", "<S-Down>", "<Nop>", { silent = true })
+
+-- [[ Completion Keymaps ]]
+vim.keymap.set('i', '<C-Space>', function()
+  vim.lsp.completion.get()
+end)
+vim.keymap.set('i', '<C-]>', '<')
+vim.keymap.set('i', '<C-]>', '<C-X><C-]>')
+vim.keymap.set('i', '<C-F>', '<C-X><C-F>')
+vim.keymap.set('i', '<C-D>', '<C-X><C-D>')
+vim.keymap.set('i', '<C-L>', '<C-X><C-L>')
+vim.keymap.set('i', '<CR>', function()
+  -- autocomplete enter should do the full accept like CTRL-Y
+  return vim.fn.pumvisible() == 1 and '<C-y>' or '<CR>'
+end, { expr = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -81,8 +103,6 @@ vim.opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
@@ -109,6 +129,13 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()
     vim.highlight.on_yank()
   end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Hide quickfix buffers from buffer list",
+  group = vim.api.nvim_create_augroup("qf", { clear = false }),
+  pattern = "qf",
+  command = "set nobuflisted",
 })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
@@ -139,6 +166,10 @@ require("lazy").setup({
     opts = {},
   },
 
+  { "williamboman/mason.nvim",           branch = "v1.x" },
+  { "williamboman/mason-lspconfig.nvim", branch = "v1.x" },
+
+
   -- LSP Configuration & Plugins
   {
     "neovim/nvim-lspconfig",
@@ -154,14 +185,13 @@ require("lazy").setup({
             vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
 
-          map("gd", "<cmd>Pick lsp scope='definition'<CR>", "[G]oto [D]efinition")
-          map("gr", "<cmd>Pick lsp scope='references'<CR>", "[G]oto [R]eferences")
-          map("gI", "<cmd>Pick lsp scope='implementation'<CR>", "[G]oto [I]mplementation")
-          map("<leader>D", "<cmd>Pick lsp scope='definition'<CR>", "Type [D]efinition")
-          map("<leader>ds", "<cmd>Pick lsp scope='document_symbol'<CR>", "[D]ocument [S]ymbols")
+          map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
+          map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+          map("grt", vim.lsp.buf.type_definition, "Type [D]efinition")
+          map("grX", vim.diagnostic.setqflist, "Workspace Diagnostics")
+          map("grx", vim.diagnostic.setloclist, "Buffer Diagnostics")
+          map("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
           map("<leader>ws", "<cmd>Pick lsp scope='workspace_symbol'<CR>", "[W]orkspace [S]ymbols")
-          map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-          map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
           map("<leader>lh", function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }), { bufnr = 0 })
           end, "[L]sp [H]int Toggle")
@@ -191,7 +221,7 @@ require("lazy").setup({
         end,
       })
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      -- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       local servers = {
         rust_analyzer = {
@@ -225,7 +255,7 @@ require("lazy").setup({
               gc_details = false,
               generate = true,
               regenerate_cgo = true,
-              run_govulncheck = true,
+              vulncheck = true,
               test = true,
               tidy = true,
               upgrade_dependency = true,
@@ -246,6 +276,7 @@ require("lazy").setup({
               unusedwrite = true,
               useany = true,
             },
+            -- annotations = { bounds = false, escape = false, inline = false },
             gofumpt = true,
             usePlaceholders = false,
             completeUnimported = true,
@@ -259,6 +290,18 @@ require("lazy").setup({
           init_options = {
             command = { "golangci-lint", "run", "--out-format", "json" },
           },
+        },
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                typeCheckingMode = "off",
+                autoSearchPaths = true,
+                diagnosticMode = "openFilesOnly",
+                useLibraryCodeForTypes = true
+              }
+            }
+          }
         },
         nil_ls = {},
         tailwindcss = {
@@ -380,23 +423,28 @@ require("lazy").setup({
           function(server_name)
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-            if server_name == "gopls" then
-              server.on_attach = function(client, buffer)
-                if client.supports_method("textDocument/inlayHint") then
-                  vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
-                end
-                if client.name == "gopls" then
-                  if not client.server_capabilities.semanticTokensProvider then
-                    local semantic = client.config.capabilities.textDocument.semanticTokens
-                    client.server_capabilities.semanticTokensProvider = {
-                      full = true,
-                      legend = {
-                        tokenTypes = semantic.tokenTypes,
-                        tokenModifiers = semantic.tokenModifiers,
-                      },
-                      range = true,
-                    }
-                  end
+            server.on_attach = function(client, buffer)
+              client.server_capabilities.completionProvider.triggerCharacters = vim.split(
+                "qwertyuiopasdfghjklzxcvbnm. ", "")
+              if client:supports_method("textDocumentation/completion") then
+                vim.lsp.completion.enable(true, client.id, buffer, {
+                  autotrigger = true,
+                })
+              end
+              if client.supports_method("textDocument/inlayHint") then
+                vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+              end
+              if client.name == "gopls" then
+                if not client.server_capabilities.semanticTokensProvider then
+                  local semantic = client.config.capabilities.textDocument.semanticTokens
+                  client.server_capabilities.semanticTokensProvider = {
+                    full = true,
+                    legend = {
+                      tokenTypes = semantic.tokenTypes,
+                      tokenModifiers = semantic.tokenModifiers,
+                    },
+                    range = true,
+                  }
                 end
               end
             end
@@ -456,11 +504,25 @@ require("lazy").setup({
   },
 
   {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme("kanagawa")
+    end,
+  },
+  {
+    "dgox16/oldworld.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+    end,
+  },
+  {
     "EdenEast/nightfox.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme("carbonfox")
       vim.cmd.hi("Comment gui=none")
     end,
   },
@@ -478,122 +540,6 @@ require("lazy").setup({
         desc = "Find/Replace in Spectre",
       },
     },
-  },
-
-  -- Trouble
-  {
-    "folke/trouble.nvim",
-    branch = "main", -- IMPORTANT!
-    keys = {
-      {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>xX",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>xL",
-        "<cmd>Trouble loclist toggle<cr>",
-        desc = "Location List (Trouble)",
-      },
-      {
-        "<leader>xQ",
-        "<cmd>Trouble qflist toggle<cr>",
-        desc = "Quickfix List (Trouble)",
-      },
-      {
-        "<leader>cs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
-      },
-      {
-        "<leader>cl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-        desc = "LSP Definitions / references / ... (Trouble)",
-      },
-    },
-    opts = {},
-  },
-
-  -- Autocompletion
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      {
-        "L3MON4D3/LuaSnip",
-        build = (function()
-          -- Build Step is needed for regex support in snippets
-          -- This step is not supported in many windows environments
-          -- Remove the below condition to re-enable on windows
-          if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-            return
-          end
-          return "make install_jsregexp"
-        end)(),
-      },
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-buffer",
-    },
-    config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-      luasnip.config.setup({})
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        completion = { completeopt = "menu,menuone,noinsert" },
-
-        mapping = cmp.mapping.preset.insert({
-          ["<C-n>"] = cmp.mapping.select_next_item(),
-          ["<C-p>"] = cmp.mapping.select_prev_item(),
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete({}),
-          ["<CR>"] = cmp.mapping.confirm({
-            behavior = cmp.ConfirmBehavior.Insert,
-            select = true,
-          }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-        }),
-        sources = {
-          { name = "nvim_lsp_signature_help" },
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
-        },
-      })
-    end,
   },
 
   -- Mini ftw
@@ -624,7 +570,10 @@ require("lazy").setup({
       require("mini.notify").setup()
       require("mini.statusline").setup()
       require("mini.visits").setup()
-      require("mini.icons").setup()
+
+      local icons = require("mini.icons")
+      icons.setup()
+      icons.tweak_lsp_kind()
 
       local indentscope = require("mini.indentscope")
       indentscope.setup({
@@ -800,7 +749,7 @@ require("lazy").setup({
       )
       vim.keymap.set("n", "<leader>sf", "<cmd>Pick files<CR>", { desc = "[S]earch [F]iles" })
       vim.keymap.set("n", "<leader>sh", "<cmd>Pick help<CR>", { desc = "[S]earch [H]elp" })
-      vim.keymap.set("n", "<leader>sw", "<cmd>Pick grep pattern=<cword><CR>", { desc = "[S]earch current [W]ord" })
+      vim.keymap.set("n", "<leader>sw", "<cmd>Pick grep pattern='<cword>'<CR>", { desc = "[S]earch current [W]ord" })
       vim.keymap.set("n", "<leader>sg", "<cmd>Pick grep_live<CR>", { desc = "[S]earch by [G]rep" })
       vim.keymap.set("n", "<leader>sd", "<cmd>Pick diagnostic scope='all'<CR>", { desc = "[S]earch [D]iagnostics" })
       vim.keymap.set("n", "<leader>sq", "<cmd>Pick list scope='quickfix'<CR>", { desc = "[S]earch [Q]uickfix" })
@@ -873,18 +822,19 @@ require("lazy").setup({
   { "nvim-treesitter/nvim-treesitter-context", opts = { separator = "-" } },
 
   -- Testing
-  { "nvim-neotest/neotest-jest" },
   {
     "nvim-neotest/neotest",
     dependencies = {
       { "nvim-neotest/nvim-nio" },
+      { "nvim-neotest/neotest-jest" },
+      { "fredrikaverpil/neotest-golang" },
     },
     opts = {
       -- Can be a list of adapters like what neotest expects,
       -- or a list of adapter names,
       -- or a table of adapter names, mapped to adapter configs.
       -- The adapter will then be automatically loaded with the config.
-      adapters = { "neotest-jest" },
+      adapters = { "neotest-jest", "neotest-golang" },
       status = { virtual_text = true },
       output = { open_on_run = false },
       quickfix = {
@@ -975,6 +925,80 @@ require("lazy").setup({
       { "<leader>tS", function() require("neotest").run.stop() end, desc = "Stop" },
     },
   },
+
+
+
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+      'rcarriga/nvim-dap-ui',
+      'nvim-neotest/nvim-nio',
+      'williamboman/mason.nvim',
+      'jay-babu/mason-nvim-dap.nvim',
+      'leoluz/nvim-dap-go',
+    },
+    keys = {
+      { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
+      { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "Toggle Breakpoint" },
+      { "<leader>dc", function() require("dap").continue() end,                                             desc = "Run/Continue" },
+      { "<leader>da", function() require("dap").continue({ before = get_args }) end,                        desc = "Run with Args" },
+      { "<leader>dC", function() require("dap").run_to_cursor() end,                                        desc = "Run to Cursor" },
+      { "<leader>dg", function() require("dap").goto_() end,                                                desc = "Go to Line (No Execute)" },
+      { "<leader>di", function() require("dap").step_into() end,                                            desc = "Step Into" },
+      { "<leader>dj", function() require("dap").down() end,                                                 desc = "Down" },
+      { "<leader>dk", function() require("dap").up() end,                                                   desc = "Up" },
+      { "<leader>dl", function() require("dap").run_last() end,                                             desc = "Run Last" },
+      { "<leader>do", function() require("dap").step_out() end,                                             desc = "Step Out" },
+      { "<leader>dO", function() require("dap").step_over() end,                                            desc = "Step Over" },
+      { "<leader>dP", function() require("dap").pause() end,                                                desc = "Pause" },
+      { "<leader>dr", function() require("dap").repl.toggle() end,                                          desc = "Toggle REPL" },
+      { "<leader>ds", function() require("dap").session() end,                                              desc = "Session" },
+      { "<leader>dt", function() require("dap").terminate() end,                                            desc = "Terminate" },
+      { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "Widgets" },
+    },
+    config = function()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
+
+
+      require('mason-nvim-dap').setup {
+        automatic_installation = true,
+        handlers = {},
+        ensure_installed = {
+          'delve',
+        },
+      }
+
+      dapui.setup {
+        icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
+        controls = {
+          icons = {
+            pause = '⏸',
+            play = '▶',
+            step_into = '⏎',
+            step_over = '⏭',
+            step_out = '⏮',
+            step_back = 'b',
+            run_last = '▶▶',
+            terminate = '⏹',
+            disconnect = '⏏',
+          },
+        },
+      }
+
+      vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
+
+      dap.listeners.after.event_initialized['dapui_config'] = dapui.open
+      dap.listeners.before.event_terminated['dapui_config'] = dapui.close
+      dap.listeners.before.event_exited['dapui_config'] = dapui.close
+
+      require('dap-go').setup {
+        delve = {
+          detached = vim.fn.has 'win32' == 0,
+        },
+      }
+    end,
+  }
 })
 
 -- vim: ts=2 sts=2 sw=2 et
