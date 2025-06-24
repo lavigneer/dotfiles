@@ -7,6 +7,11 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 export XDG_SCREENSHOTS_DIR=$HOME/Pictures/screenshots
 
+
+if test -f ~/.profile; then
+  source ~/.profile
+fi
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
