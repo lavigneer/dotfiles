@@ -1,9 +1,9 @@
-theme="carbonfox"
+theme="Kanagawa Wave"
 window-decoration=false
 confirm-close-surface=false
 gtk-single-instance=true
 
-mouse-scroll-multiplier=0.1
+mouse-scroll-multiplier=0.5
 
 macos-secure-input-indication=true
 macos-option-as-alt=true

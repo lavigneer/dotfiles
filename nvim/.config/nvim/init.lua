@@ -424,8 +424,10 @@ require("lazy").setup({
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
             server.on_attach = function(client, buffer)
-              client.server_capabilities.completionProvider.triggerCharacters = vim.split(
-                "qwertyuiopasdfghjklzxcvbnm. ", "")
+              if client.server_capabilities.completionProvider ~= nil then
+                client.server_capabilities.completionProvider.triggerCharacters = vim.split(
+                  "qwertyuiopasdfghjklzxcvbnm. ", "")
+              end
               if client:supports_method("textDocumentation/completion") then
                 vim.lsp.completion.enable(true, client.id, buffer, {
                   autotrigger = true,
@@ -452,6 +454,8 @@ require("lazy").setup({
           end,
         },
       })
+
+      vim.lsp.enable("evergreenlsp")
     end,
   },
 
@@ -926,6 +930,7 @@ require("lazy").setup({
     },
   },
 
+  { 'github/copilot.vim' },
 
 
   {
