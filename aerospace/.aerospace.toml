@@ -94,6 +94,6 @@ start-at-login = true
     esc = 'mode main'
 
 [workspace-to-monitor-force-assignment]
-    1 = ['LS32R75', 'main']
-    2 = ['^BenQ', 'main']
+    1 = ['LS32R75', 'SAMSUNG', 'main']
+    2 = ['^BenQ', 'SAMSUNG', 'main']
     3 = 'built-in'
