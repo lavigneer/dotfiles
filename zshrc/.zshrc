@@ -83,8 +83,27 @@ PROJECT_PATHS=(~/workspace)
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew git pj jira tmux tmuxinator ssh-agent direnv starship)
+plugins=(pj jira ssh-agent git)
+if (( $+commands[brew] )); then
+  plugins+=(brew)
+fi
 
+if (( $+commands[asdf] )); then
+  plugins+=(asdf)
+fi
+
+if (( $+commands[tmux] )); then
+  plugins+=(tmux)
+  plugins+=(tmuxinator)
+fi
+
+if (( $+commands[direnv] )); then
+  plugins+=(direnv)
+fi
+
+if (( $+commands[bazel] )); then
+  plugins+=(bazel)
+fi
 
 # User configuration
 ZSH_TMUX_AUTOSTART=true
@@ -149,3 +168,5 @@ esac
 # pnpm end
 
 if [ -e /home/elavigne/.nix-profile/etc/profile.d/nix.sh ]; then . /home/elavigne/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+#[ "$ASDF_DATA_DIR" != "" ] && [[ ! -r $ASDF_DATA_DIR/plugins/java/set-java-home.zsh ]] || source $ASDF_DATA_DIR/plugins/java/set-java-home.zsh
