@@ -115,6 +115,12 @@ vim.filetype.add({
   },
 })
 
+vim.filetype.add({
+  pattern = {
+    ['.*Tiltfile'] = "starlark",
+  },
+})
+
 -- Set tf files as terraform
 vim.filetype.add({
   extension = {
@@ -930,7 +936,65 @@ require("lazy").setup({
     },
   },
 
+  {
+    'Exafunction/windsurf.vim',
+    event = 'BufEnter'
+  },
   { 'github/copilot.vim' },
+  {
+    "ravitemer/mcphub.nvim",
+    lazy = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    build = "npm install -g mcp-hub@latest",
+    config = function()
+      require("mcphub").setup()
+    end
+  },
+  {
+    "olimorris/codecompanion.nvim",
+    lazy = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "ravitemer/mcphub.nvim",
+    },
+    config = function()
+      require("codecompanion").setup({
+        extensions = {
+          mcphub = {
+            callback = "mcphub.extensions.codecompanion",
+            opts = {
+              show_result_in_chat = true, -- Show mcp tool results in chat
+              make_vars = true,           -- Convert resources to #variables
+              make_slash_commands = true, -- Add prompts as /slash commands
+            }
+          }
+        }
+      })
+    end,
+    keys = {
+      {
+        "<C-a>",
+        "<cmd>CodeCompanionActions<CR>",
+        mode = { "n", "v" },
+        desc = "Open Code Companion Actions",
+      },
+      {
+        "<LocalLeader>a",
+        "<cmd>CodeCompanionChat Toggle<CR>",
+        mode = { "n", "v" },
+        desc = "Toggle Code Companion Chat",
+      },
+      {
+        "ga",
+        "<cmd>CodeCompanionChat Add<CR>",
+        mode = { "v" },
+        desc = "Add to Code Companion Chat",
+      },
+    }
+  },
 
 
   {
