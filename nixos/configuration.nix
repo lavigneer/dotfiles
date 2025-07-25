@@ -5,7 +5,10 @@
 { config, pkgs, ... }:
 
 let
-  home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz;
+  home-manager = builtins.fetchTarball {
+    url = https://github.com/nix-community/home-manager/archive/master.tar.gz;
+    sha256 = "1qp170x37yd4h81bz8b9qfjgb0wrpzmhsxl0fl09y7b59ymy0dyl";
+  };
 in
 {
   imports =
@@ -90,10 +93,15 @@ in
   };
   home-manager.users.elavigne = { pkgs, ... }: {
     home.packages = [];
+    home.sessionVariables = {
+      TERMINAL = "ghostty";
+    };
     programs.bash.enable = true;
 
     home.stateVersion = "25.05";
   };
+
+  programs.zsh.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -114,6 +122,7 @@ in
      rofi
      xclip
      zsh
+     stow
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
