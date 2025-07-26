@@ -44,6 +44,7 @@ start-at-login = true
 
     alt-f = 'fullscreen'
 
+    alt-w = 'layout h_accordion' # 'layout tabbed' in i3
     alt-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3
 
     alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
