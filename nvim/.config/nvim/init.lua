@@ -54,7 +54,7 @@ vim.opt.laststatus = 3
 -- To prevent this, set `splitkeep` to either `screen` or `topline`.
 vim.opt.splitkeep = "screen"
 
-vim.opt.completeopt = "menu,noinsert,popup,fuzzy,menuone"
+-- vim.opt.completeopt = "menu,noinsert,popup,fuzzy,menuone,noselect"
 
 -- [[ Basic Keymaps ]]
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
@@ -62,18 +62,18 @@ vim.keymap.set("i", "<S-Up>", "<Nop>", { silent = true })
 vim.keymap.set("i", "<S-Down>", "<Nop>", { silent = true })
 
 -- [[ Completion Keymaps ]]
-vim.keymap.set('i', '<C-Space>', function()
-  vim.lsp.completion.get()
-end)
-vim.keymap.set('i', '<C-]>', '<')
-vim.keymap.set('i', '<C-]>', '<C-X><C-]>')
-vim.keymap.set('i', '<C-F>', '<C-X><C-F>')
-vim.keymap.set('i', '<C-D>', '<C-X><C-D>')
-vim.keymap.set('i', '<C-L>', '<C-X><C-L>')
-vim.keymap.set('i', '<CR>', function()
-  -- autocomplete enter should do the full accept like CTRL-Y
-  return vim.fn.pumvisible() == 1 and '<C-y>' or '<CR>'
-end, { expr = true })
+-- vim.keymap.set("i", "<C-Space>", function()
+--   vim.lsp.completion.get()
+-- end)
+vim.keymap.set("i", "<C-]>", "<")
+vim.keymap.set("i", "<C-]>", "<C-X><C-]>")
+vim.keymap.set("i", "<C-F>", "<C-X><C-F>")
+vim.keymap.set("i", "<C-D>", "<C-X><C-D>")
+vim.keymap.set("i", "<C-L>", "<C-X><C-L>")
+-- vim.keymap.set("i", "<CR>", function()
+--   -- autocomplete enter should do the full accept like CTRL-Y
+--   return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
+-- end, { expr = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -117,7 +117,7 @@ vim.filetype.add({
 
 vim.filetype.add({
   pattern = {
-    ['.*Tiltfile'] = "starlark",
+    [".*Tiltfile"] = "starlark",
   },
 })
 
@@ -157,6 +157,9 @@ require("lazy").setup({
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
+  -- Helm support
+  { "towolf/vim-helm", ft = "helm" },
+
   -- Nicer input ui
   {
     "stevearc/dressing.nvim",
@@ -172,16 +175,15 @@ require("lazy").setup({
     opts = {},
   },
 
-  { "williamboman/mason.nvim",           branch = "v1.x" },
+  { "williamboman/mason.nvim", branch = "v1.x" },
   { "williamboman/mason-lspconfig.nvim", branch = "v1.x" },
-
 
   -- LSP Configuration & Plugins
   {
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim"
+      "williamboman/mason-lspconfig.nvim",
     },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -292,11 +294,7 @@ require("lazy").setup({
           },
         },
         gdscript = {},
-        golangci_lint_ls = {
-          init_options = {
-            command = { "golangci-lint", "run", "--out-format", "json" },
-          },
-        },
+        golangci_lint_ls = {},
         basedpyright = {
           settings = {
             basedpyright = {
@@ -304,10 +302,10 @@ require("lazy").setup({
                 typeCheckingMode = "off",
                 autoSearchPaths = true,
                 diagnosticMode = "openFilesOnly",
-                useLibraryCodeForTypes = true
-              }
-            }
-          }
+                useLibraryCodeForTypes = true,
+              },
+            },
+          },
         },
         nil_ls = {},
         tailwindcss = {
@@ -430,15 +428,24 @@ require("lazy").setup({
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
             server.on_attach = function(client, buffer)
+              -- Disable yamlls for helm
+              if server_name == "yamlls" then
+                if vim.bo[buffer].filetype == "helm" then
+                  vim.schedule(function()
+                    vim.cmd("LspStop ++force yamlls")
+                  end)
+                end
+              end
+
               if client.server_capabilities.completionProvider ~= nil then
-                client.server_capabilities.completionProvider.triggerCharacters = vim.split(
-                  "qwertyuiopasdfghjklzxcvbnm. ", "")
+                client.server_capabilities.completionProvider.triggerCharacters =
+                  vim.split("qwertyuiopasdfghjklzxcvbnm. ", "")
               end
-              if client:supports_method("textDocumentation/completion") then
-                vim.lsp.completion.enable(true, client.id, buffer, {
-                  autotrigger = true,
-                })
-              end
+              -- if client:supports_method("textDocumentation/completion") then
+              --   vim.lsp.completion.enable(true, client.id, buffer, {
+              --     autotrigger = true,
+              --   })
+              -- end
               if client.supports_method("textDocument/inlayHint") then
                 vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
               end
@@ -525,8 +532,7 @@ require("lazy").setup({
     "dgox16/oldworld.nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-    end,
+    config = function() end,
   },
   {
     "EdenEast/nightfox.nvim",
@@ -937,137 +943,274 @@ require("lazy").setup({
   },
 
   {
-    'Exafunction/windsurf.vim',
-    event = 'BufEnter'
-  },
-  { 'github/copilot.vim' },
-  {
-    "ravitemer/mcphub.nvim",
-    lazy = false,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+    "saghen/blink.cmp",
+    dependencies = { "rafamadriz/friendly-snippets" },
+    version = "1.*",
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      keymap = { preset = "enter" },
+      appearance = {
+        nerd_font_variant = "mono",
+      },
+      completion = {
+        -- keyword = { range = "full" },
+        documentation = { auto_show = false },
+        list = {
+          selection = {
+            -- preselect = false,
+            auto_insert = false,
+          },
+        },
+        accept = {
+          auto_brackets = {
+            enabled = false,
+          },
+        },
+      },
+      cmdline = {
+        enabled = false,
+      },
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+      },
+      fuzzy = { implementation = "prefer_rust_with_warning" },
     },
-    build = "npm install -g mcp-hub@latest",
-    config = function()
-      require("mcphub").setup()
-    end
+    opts_extend = { "sources.default" },
   },
+
   {
-    "olimorris/codecompanion.nvim",
-    lazy = false,
+    "Exafunction/windsurf.vim",
+    event = "BufEnter",
+  },
+  -- { "github/copilot.vim" },
+  -- {
+  --   "ravitemer/mcphub.nvim",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --   },
+  --   build = "npm install -g mcp-hub@latest",
+  --   config = function()
+  --     require("mcphub").setup()
+  --   end,
+  -- },
+  -- {
+  --   "olimorris/codecompanion.nvim",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-treesitter/nvim-treesitter",
+  --     "ravitemer/mcphub.nvim",
+  --   },
+  --   config = function()
+  --     require("codecompanion").setup({
+  --       extensions = {
+  --         mcphub = {
+  --           callback = "mcphub.extensions.codecompanion",
+  --           opts = {
+  --             show_result_in_chat = true, -- Show mcp tool results in chat
+  --             make_vars = true, -- Convert resources to #variables
+  --             make_slash_commands = true, -- Add prompts as /slash commands
+  --           },
+  --         },
+  --       },
+  --     })
+  --   end,
+  --   keys = {
+  --     {
+  --       "<C-a>",
+  --       "<cmd>CodeCompanionActions<CR>",
+  --       mode = { "n", "v" },
+  --       desc = "Open Code Companion Actions",
+  --     },
+  --     {
+  --       "<LocalLeader>a",
+  --       "<cmd>CodeCompanionChat Toggle<CR>",
+  --       mode = { "n", "v" },
+  --       desc = "Toggle Code Companion Chat",
+  --     },
+  --     {
+  --       "ga",
+  --       "<cmd>CodeCompanionChat Add<CR>",
+  --       mode = { "v" },
+  --       desc = "Add to Code Companion Chat",
+  --     },
+  --   },
+  -- },
+
+  {
+    "mfussenegger/nvim-dap",
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "ravitemer/mcphub.nvim",
+      "rcarriga/nvim-dap-ui",
+      "nvim-neotest/nvim-nio",
+      "williamboman/mason.nvim",
+      "jay-babu/mason-nvim-dap.nvim",
+      "leoluz/nvim-dap-go",
     },
-    config = function()
-      require("codecompanion").setup({
-        extensions = {
-          mcphub = {
-            callback = "mcphub.extensions.codecompanion",
-            opts = {
-              show_result_in_chat = true, -- Show mcp tool results in chat
-              make_vars = true,           -- Convert resources to #variables
-              make_slash_commands = true, -- Add prompts as /slash commands
-            }
-          }
-        }
-      })
-    end,
     keys = {
       {
-        "<C-a>",
-        "<cmd>CodeCompanionActions<CR>",
-        mode = { "n", "v" },
-        desc = "Open Code Companion Actions",
+        "<leader>dB",
+        function()
+          require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+        end,
+        desc = "Breakpoint Condition",
       },
       {
-        "<LocalLeader>a",
-        "<cmd>CodeCompanionChat Toggle<CR>",
-        mode = { "n", "v" },
-        desc = "Toggle Code Companion Chat",
+        "<leader>db",
+        function()
+          require("dap").toggle_breakpoint()
+        end,
+        desc = "Toggle Breakpoint",
       },
       {
-        "ga",
-        "<cmd>CodeCompanionChat Add<CR>",
-        mode = { "v" },
-        desc = "Add to Code Companion Chat",
+        "<leader>dc",
+        function()
+          require("dap").continue()
+        end,
+        desc = "Run/Continue",
       },
-    }
-  },
-
-
-  {
-    'mfussenegger/nvim-dap',
-    dependencies = {
-      'rcarriga/nvim-dap-ui',
-      'nvim-neotest/nvim-nio',
-      'williamboman/mason.nvim',
-      'jay-babu/mason-nvim-dap.nvim',
-      'leoluz/nvim-dap-go',
-    },
-    keys = {
-      { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
-      { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "Toggle Breakpoint" },
-      { "<leader>dc", function() require("dap").continue() end,                                             desc = "Run/Continue" },
-      { "<leader>da", function() require("dap").continue({ before = get_args }) end,                        desc = "Run with Args" },
-      { "<leader>dC", function() require("dap").run_to_cursor() end,                                        desc = "Run to Cursor" },
-      { "<leader>dg", function() require("dap").goto_() end,                                                desc = "Go to Line (No Execute)" },
-      { "<leader>di", function() require("dap").step_into() end,                                            desc = "Step Into" },
-      { "<leader>dj", function() require("dap").down() end,                                                 desc = "Down" },
-      { "<leader>dk", function() require("dap").up() end,                                                   desc = "Up" },
-      { "<leader>dl", function() require("dap").run_last() end,                                             desc = "Run Last" },
-      { "<leader>do", function() require("dap").step_out() end,                                             desc = "Step Out" },
-      { "<leader>dO", function() require("dap").step_over() end,                                            desc = "Step Over" },
-      { "<leader>dP", function() require("dap").pause() end,                                                desc = "Pause" },
-      { "<leader>dr", function() require("dap").repl.toggle() end,                                          desc = "Toggle REPL" },
-      { "<leader>ds", function() require("dap").session() end,                                              desc = "Session" },
-      { "<leader>dt", function() require("dap").terminate() end,                                            desc = "Terminate" },
-      { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "Widgets" },
+      {
+        "<leader>da",
+        function()
+          require("dap").continue({ before = get_args })
+        end,
+        desc = "Run with Args",
+      },
+      {
+        "<leader>dC",
+        function()
+          require("dap").run_to_cursor()
+        end,
+        desc = "Run to Cursor",
+      },
+      {
+        "<leader>dg",
+        function()
+          require("dap").goto_()
+        end,
+        desc = "Go to Line (No Execute)",
+      },
+      {
+        "<leader>di",
+        function()
+          require("dap").step_into()
+        end,
+        desc = "Step Into",
+      },
+      {
+        "<leader>dj",
+        function()
+          require("dap").down()
+        end,
+        desc = "Down",
+      },
+      {
+        "<leader>dk",
+        function()
+          require("dap").up()
+        end,
+        desc = "Up",
+      },
+      {
+        "<leader>dl",
+        function()
+          require("dap").run_last()
+        end,
+        desc = "Run Last",
+      },
+      {
+        "<leader>do",
+        function()
+          require("dap").step_out()
+        end,
+        desc = "Step Out",
+      },
+      {
+        "<leader>dO",
+        function()
+          require("dap").step_over()
+        end,
+        desc = "Step Over",
+      },
+      {
+        "<leader>dP",
+        function()
+          require("dap").pause()
+        end,
+        desc = "Pause",
+      },
+      {
+        "<leader>dr",
+        function()
+          require("dap").repl.toggle()
+        end,
+        desc = "Toggle REPL",
+      },
+      {
+        "<leader>ds",
+        function()
+          require("dap").session()
+        end,
+        desc = "Session",
+      },
+      {
+        "<leader>dt",
+        function()
+          require("dap").terminate()
+        end,
+        desc = "Terminate",
+      },
+      {
+        "<leader>dw",
+        function()
+          require("dap.ui.widgets").hover()
+        end,
+        desc = "Widgets",
+      },
     },
     config = function()
-      local dap = require 'dap'
-      local dapui = require 'dapui'
+      local dap = require("dap")
+      local dapui = require("dapui")
 
-
-      require('mason-nvim-dap').setup {
+      require("mason-nvim-dap").setup({
         automatic_installation = true,
         handlers = {},
         ensure_installed = {
-          'delve',
+          "delve",
         },
-      }
+      })
 
-      dapui.setup {
-        icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
+      dapui.setup({
+        icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
         controls = {
           icons = {
-            pause = '⏸',
-            play = '▶',
-            step_into = '⏎',
-            step_over = '⏭',
-            step_out = '⏮',
-            step_back = 'b',
-            run_last = '▶▶',
-            terminate = '⏹',
-            disconnect = '⏏',
+            pause = "⏸",
+            play = "▶",
+            step_into = "⏎",
+            step_over = "⏭",
+            step_out = "⏮",
+            step_back = "b",
+            run_last = "▶▶",
+            terminate = "⏹",
+            disconnect = "⏏",
           },
         },
-      }
+      })
 
       vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
 
-      dap.listeners.after.event_initialized['dapui_config'] = dapui.open
-      dap.listeners.before.event_terminated['dapui_config'] = dapui.close
-      dap.listeners.before.event_exited['dapui_config'] = dapui.close
+      dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+      dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+      dap.listeners.before.event_exited["dapui_config"] = dapui.close
 
-      require('dap-go').setup {
+      require("dap-go").setup({
         delve = {
-          detached = vim.fn.has 'win32' == 0,
+          detached = vim.fn.has("win32") == 0,
         },
-      }
+      })
     end,
-  }
+  },
 })
 
 -- vim: ts=2 sts=2 sw=2 et
