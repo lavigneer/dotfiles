@@ -130,6 +130,7 @@ in {
     gcc
     ghostty
     git
+    go
     google-chrome
     lazygit
     lutris
@@ -144,6 +145,7 @@ in {
     steam-unwrapped
     stow
     tmux
+    unzip
     wget
     xclip
     zig

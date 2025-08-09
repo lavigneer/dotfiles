@@ -8,9 +8,8 @@
   };
   outputs = inputs@{ self, nixpkgs, ... }: {
     # NOTE: 'nixos' is the default hostname
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      modules = [ ./configuration.nix ];
-    };
+    nixosConfigurations.nixos =
+      nixpkgs.lib.nixosSystem { modules = [ ./configuration.nix ]; };
   };
 }
 
