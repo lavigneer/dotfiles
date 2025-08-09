@@ -6,16 +6,21 @@
 
 let
   home-manager = builtins.fetchTarball {
-    url = https://github.com/nix-community/home-manager/archive/master.tar.gz;
+    url = "https://github.com/nix-community/home-manager/archive/master.tar.gz";
     sha256 = "1qp170x37yd4h81bz8b9qfjgb0wrpzmhsxl0fl09y7b59ymy0dyl";
   };
-in
-{
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      (import "${home-manager}/nixos")
-    ];
+in {
+  imports = [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    (import "${home-manager}/nixos")
+  ];
+
+  # Automatic garbage collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 60d";
+  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -41,18 +46,17 @@ in
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
   services.xserver.windowManager.i3 = {
     enable = true;
-    extraPackages = with pkgs; [
-      dmenu
-      i3status
-      i3lock
-    ];
+    extraPackages = with pkgs; [ dmenu i3status i3lock ];
   };
   services.displayManager.defaultSession = "none+i3";
   security.pam.services.i3lock.enable = true;
+
+  # Enable bluetooth
+  services.blueman.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -87,15 +91,14 @@ in
     isNormalUser = true;
     description = "Eric Lavigne";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+    packages = with pkgs;
+      [
+        #  thunderbird
+      ];
   };
   home-manager.users.elavigne = { pkgs, ... }: {
-    home.packages = [];
-    home.sessionVariables = {
-      TERMINAL = "ghostty";
-    };
+    home.packages = [ ];
+    home.sessionVariables = { TERMINAL = "ghostty"; };
     programs.bash.enable = true;
 
     home.stateVersion = "25.05";
@@ -109,20 +112,42 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall =
+      true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall =
+      true; # Open ports in the firewall for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall =
+      true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-     neovim
-     git
-     lazygit
-     ghostty
-     polybar
-     rofi
-     xclip
-     zsh
-     stow
+    cargo
+    discord
+    gcc
+    ghostty
+    git
+    google-chrome
+    lazygit
+    lutris
+    neovim
+    nil
+    nodejs_24
+    polybar
+    rofi
+    rustup
+    steam
+    steam-run
+    steam-unwrapped
+    stow
+    tmux
+    wget
+    xclip
+    zig
+    zsh
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
