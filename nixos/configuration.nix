@@ -6,9 +6,11 @@
 
 let
   home-manager = builtins.fetchTarball {
-    url = "https://github.com/nix-community/home-manager/archive/master.tar.gz";
-    sha256 = "1qp170x37yd4h81bz8b9qfjgb0wrpzmhsxl0fl09y7b59ymy0dyl";
+    url =
+      "https://github.com/nix-community/home-manager/archive/2a749f4790a14f7168be67cdf6e548ef1c944e10.tar.gz";
+    sha256 = "0mddsj0497nz6cicbhmnlpx8bn3mscm5199c8q31d5r8sxngn1m5";
   };
+  inherit (pkgs.lib) mkOrder;
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -91,20 +93,67 @@ in {
     isNormalUser = true;
     description = "Eric Lavigne";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.zsh;
     packages = with pkgs;
       [
         #  thunderbird
       ];
   };
-  home-manager.users.elavigne = { pkgs, ... }: {
-    home.packages = [ ];
-    home.sessionVariables = { TERMINAL = "ghostty"; };
-    programs.bash.enable = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
 
-    home.stateVersion = "25.05";
+    users.elavigne = { pkgs, config, ... }: {
+      home.packages = [ ];
+      home.sessionVariables = { TERMINAL = "ghostty"; };
+      programs = {
+
+        zsh = {
+          enable = true;
+          initContent = mkOrder 500 ''
+            source ~/.zshrc.manual
+          '';
+          oh-my-zsh = {
+            enable = true;
+            # custom = "$HOME/.oh-my-zsh/";
+          };
+        };
+
+        ghostty = {
+          enable = true;
+          enableZshIntegration = true;
+        };
+
+        ripgrep = { enable = true; };
+      };
+
+      services = {
+        polybar = {
+          enable = true;
+          config = config.lib.file.mkOutOfStoreSymlink
+            "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/config.ini";
+          script =
+            "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
+        };
+      };
+
+      home.stateVersion = "25.05";
+
+      home.file.".ripgreprc".source = config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/ripgrep/.ripgreprc";
+
+      home.file.".config/rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
+
+      home.file.".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/zshrc/.zshrc";
+
+      home.file.".tmux.conf".source = config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/tmux/.tmux.conf";
+    };
   };
 
-  programs.zsh.enable = true;
+  programs.zsh = { enable = true; };
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -127,6 +176,7 @@ in {
   environment.systemPackages = with pkgs; [
     cargo
     discord
+    fzf
     gcc
     ghostty
     git
@@ -137,9 +187,9 @@ in {
     neovim
     nil
     nodejs_24
-    polybar
     rofi
     rustup
+    solaar
     steam
     steam-run
     steam-unwrapped
@@ -148,9 +198,12 @@ in {
     unzip
     wget
     xclip
+    xss-lock
     zig
     zsh
   ];
+
+  environment.shells = with pkgs; [ zsh ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
