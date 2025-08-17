@@ -105,18 +105,26 @@ in {
 
     users.elavigne = { pkgs, config, ... }: {
       home.packages = [ ];
-      home.sessionVariables = { TERMINAL = "ghostty"; };
+      home.sessionVariables = {
+        EDITOR = "nvim";
+        TERMINAL = "ghostty";
+      };
+      dconf.settings = {
+        "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
+      };
+      xsession = {
+        enable = true;
+        profileExtra = "export TERMINAL=ghostty";
+      };
       programs = {
 
         zsh = {
           enable = true;
           initContent = mkOrder 500 ''
             source ~/.zshrc.manual
+            ZSH_TMUX_CONFIG="${config.home.homeDirectory}/.config/tmux/tmux.conf";
           '';
-          oh-my-zsh = {
-            enable = true;
-            # custom = "$HOME/.oh-my-zsh/";
-          };
+          oh-my-zsh = { enable = true; };
         };
 
         ghostty = {
@@ -124,7 +132,48 @@ in {
           enableZshIntegration = true;
         };
 
+        tmux = {
+          enable = true;
+          plugins = [
+            pkgs.tmuxPlugins.sensible
+            pkgs.tmuxPlugins.pain-control
+            pkgs.tmuxPlugins.kanagawa
+          ];
+          mouse = true;
+          extraConfig = ''bind-key -r f display-popup -E "tmux-sessionizer"'';
+        };
+
         ripgrep = { enable = true; };
+
+        zed-editor = {
+          enable = true;
+          userSettings = {
+            features = { edit_prediction_provider = "copilot"; };
+            vim_mode = true;
+            theme = {
+              mode = "system";
+              light = "One Light";
+              dark = "One Dark";
+            };
+          };
+          extensions = [
+            "biome"
+            "css"
+            "dockerfile"
+            "go"
+            "golangci-lint"
+            "html"
+            "javascript"
+            "json"
+            "lua"
+            "make"
+            "nix"
+            "ruff"
+            "toml"
+            "typescript"
+            "yaml"
+          ];
+        };
       };
 
       services = {
@@ -142,14 +191,24 @@ in {
       home.file.".ripgreprc".source = config.lib.file.mkOutOfStoreSymlink
         "${config.home.homeDirectory}/workspace/dotfiles/ripgrep/.ripgreprc";
 
-      home.file.".config/rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
+      home.file.".config/polybar/start.sh".source =
+        config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
+
+      home.file.".config/ghostty/config".source =
+        config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
+
+      home.file.".local/bin/tmux-sessionizer".source =
+        config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/workspace/dotfiles/tmux/.local/bin/tmux-sessionizer";
+
+      home.file.".config/rofi/config.rasi".source =
+        config.lib.file.mkOutOfStoreSymlink
         "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
 
       home.file.".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink
         "${config.home.homeDirectory}/workspace/dotfiles/zshrc/.zshrc";
-
-      home.file.".tmux.conf".source = config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/tmux/.tmux.conf";
     };
   };
 
