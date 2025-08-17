@@ -23,6 +23,7 @@ in {
     dates = "weekly";
     options = "--delete-older-than 60d";
   };
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -234,6 +235,7 @@ in {
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     cargo
+    crush
     discord
     fzf
     gcc
