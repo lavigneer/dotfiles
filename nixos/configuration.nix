@@ -12,7 +12,8 @@ let
   };
   inherit (pkgs.lib) mkOrder;
 in {
-  imports = [ # Include the results of the hardware scan.
+  imports = [
+    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     (import "${home-manager}/nixos")
   ];
@@ -106,10 +107,7 @@ in {
 
     users.elavigne = { pkgs, config, ... }: {
       home.packages = [ ];
-      home.sessionVariables = {
-        EDITOR = "nvim";
-        TERMINAL = "ghostty";
-      };
+      home.sessionVariables = { TERMINAL = "ghostty"; };
       dconf.settings = {
         "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
       };
@@ -118,6 +116,16 @@ in {
         profileExtra = "export TERMINAL=ghostty";
       };
       programs = {
+        fzf = { enable = true; };
+
+        lazygit = { enable = true; };
+
+        neovim = {
+          enable = true;
+          defaultEditor = true;
+          vimAlias = true;
+          vimdiffAlias = true;
+        };
 
         zsh = {
           enable = true;
@@ -189,34 +197,35 @@ in {
 
       home.stateVersion = "25.05";
 
-      home.file.".ripgreprc".source = config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/ripgrep/.ripgreprc";
+      home.file = {
+        ".ripgreprc".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/ripgrep/.ripgreprc";
 
-      home.file.".config/polybar/start.sh".source =
-        config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
+        ".local/bin/tmux-sessionizer".source =
+          config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/tmux/.local/bin/tmux-sessionizer";
 
-      home.file.".config/ghostty/config".source =
-        config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
+        ".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/zshrc/.zshrc";
+      };
+      xdg.configFile = {
+        "polybar/start.sh".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
 
-      home.file.".local/bin/tmux-sessionizer".source =
-        config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/tmux/.local/bin/tmux-sessionizer";
+        "ghostty/config".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
 
-      home.file.".config/rofi/config.rasi".source =
-        config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
+        "nvim".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim";
 
-      home.file.".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/workspace/dotfiles/zshrc/.zshrc";
+        "rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
+      };
+
     };
   };
 
   programs.zsh = { enable = true; };
-
-  # Install firefox.
-  programs.firefox.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -235,17 +244,12 @@ in {
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     cargo
-    crush
     discord
-    fzf
     gcc
-    ghostty
     git
     go
     google-chrome
-    lazygit
     lutris
-    neovim
     nil
     nodejs_24
     rofi
@@ -254,8 +258,6 @@ in {
     steam
     steam-run
     steam-unwrapped
-    stow
-    tmux
     unzip
     wget
     xclip
