@@ -16,6 +16,9 @@ fi
 [[ -f "$HOME/.oh-my-zsh" ]] && export ZSH="$HOME/.oh-my-zsh"
 
 
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME

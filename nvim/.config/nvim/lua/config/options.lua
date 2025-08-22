@@ -4,3 +4,11 @@
 vim.opt.mouse = ""
 vim.g.autoformat = false
 vim.g.snacks_animate = false
+
+vim.filetype.add({
+  pattern = {
+    [".*Tiltfile"] = "tiltfile",
+  },
+})
+
+vim.treesitter.language.register("starlark", "tiltfile")
