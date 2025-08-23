@@ -4,18 +4,12 @@
 
 { config, pkgs, ... }:
 
-let
-  home-manager = builtins.fetchTarball {
-    url =
-      "https://github.com/nix-community/home-manager/archive/2a749f4790a14f7168be67cdf6e548ef1c944e10.tar.gz";
-    sha256 = "0mddsj0497nz6cicbhmnlpx8bn3mscm5199c8q31d5r8sxngn1m5";
-  };
-  inherit (pkgs.lib) mkOrder;
+let inherit (pkgs.lib) mkOrder;
 in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    (import "${home-manager}/nixos")
+    ./home.nix
   ];
 
   # Automatic garbage collection
@@ -31,11 +25,6 @@ in {
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -52,6 +41,7 @@ in {
   # Enable the GNOME Desktop Environment.
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  services.gnome.gnome-keyring.enable = true;
   services.xserver.windowManager.i3 = {
     enable = true;
     extraPackages = with pkgs; [ dmenu i3status i3lock ];
@@ -85,10 +75,25 @@ in {
     # use the example session manager (no others are packaged yet so this is enabled by default,
     # no need to redefine it in your config for now)
     #media-session.enable = true;
+
+    wireplumber.extraConfig."10-bluez" = {
+      "monitor.bluez.properties" = {
+        "bluez5.enable-sbc-xq" = true;
+        "bluez5.enable-msbc" = true;
+        "bluez5.enable-hw-volume" = true;
+        "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+      };
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
+
+  services.ollama = {
+    enable = true;
+    loadModels = [ "gpt-oss:20b" ];
+    acceleration = "cuda";
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.elavigne = {
@@ -101,130 +106,6 @@ in {
         #  thunderbird
       ];
   };
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-
-    users.elavigne = { pkgs, config, ... }: {
-      home.packages = [ ];
-      home.sessionVariables = { TERMINAL = "ghostty"; };
-      dconf.settings = {
-        "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
-      };
-      xsession = {
-        enable = true;
-        profileExtra = "export TERMINAL=ghostty";
-      };
-      programs = {
-        fzf = { enable = true; };
-
-        lazygit = { enable = true; };
-
-        neovim = {
-          enable = true;
-          defaultEditor = true;
-          vimAlias = true;
-          vimdiffAlias = true;
-        };
-
-        zsh = {
-          enable = true;
-          initContent = mkOrder 500 ''
-            source ~/.zshrc.manual
-            ZSH_TMUX_CONFIG="${config.home.homeDirectory}/.config/tmux/tmux.conf";
-          '';
-          oh-my-zsh = { enable = true; };
-        };
-
-        ghostty = {
-          enable = true;
-          enableZshIntegration = true;
-        };
-
-        tmux = {
-          enable = true;
-          plugins = [
-            pkgs.tmuxPlugins.sensible
-            pkgs.tmuxPlugins.pain-control
-            pkgs.tmuxPlugins.kanagawa
-          ];
-          mouse = true;
-          extraConfig = ''bind-key -r f display-popup -E "tmux-sessionizer"'';
-        };
-
-        ripgrep = { enable = true; };
-
-        zed-editor = {
-          enable = true;
-          userSettings = {
-            features = { edit_prediction_provider = "copilot"; };
-            vim_mode = true;
-            theme = {
-              mode = "system";
-              light = "One Light";
-              dark = "One Dark";
-            };
-          };
-          extensions = [
-            "biome"
-            "css"
-            "dockerfile"
-            "go"
-            "golangci-lint"
-            "html"
-            "javascript"
-            "json"
-            "lua"
-            "make"
-            "nix"
-            "ruff"
-            "toml"
-            "typescript"
-            "yaml"
-          ];
-        };
-      };
-
-      services = {
-        polybar = {
-          enable = true;
-          config = config.lib.file.mkOutOfStoreSymlink
-            "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/config.ini";
-          script =
-            "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
-        };
-      };
-
-      home.stateVersion = "25.05";
-
-      home.file = {
-        ".ripgreprc".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/ripgrep/.ripgreprc";
-
-        ".local/bin/tmux-sessionizer".source =
-          config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/tmux/.local/bin/tmux-sessionizer";
-
-        ".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/zshrc/.zshrc";
-      };
-      xdg.configFile = {
-        "polybar/start.sh".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
-
-        "ghostty/config".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
-
-        "nvim".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim";
-
-        "rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
-      };
-
-    };
-  };
-
   programs.zsh = { enable = true; };
 
   # Allow unfree packages
@@ -243,8 +124,10 @@ in {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    btop
     cargo
     discord
+    dunst
     gcc
     git
     go
@@ -252,6 +135,7 @@ in {
     lutris
     nil
     nodejs_24
+    pavucontrol
     rofi
     rustup
     solaar
@@ -267,6 +151,16 @@ in {
   ];
 
   environment.shells = with pkgs; [ zsh ];
+
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-emoji
+    noto-fonts-cjk-sans
+    noto-fonts-extra
+    nerd-fonts.go-mono
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.heavy-data
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
