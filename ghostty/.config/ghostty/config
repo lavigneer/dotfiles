@@ -8,3 +8,10 @@ mouse-scroll-multiplier=0.5
 macos-secure-input-indication=true
 macos-option-as-alt=true
 macos-non-native-fullscreen=true
+
+font-family="GoMono Nerd Font"
+font-size=14
+adjust-cell-height=4
+
+cursor-style=block
+shell-integration-features=no-cursor

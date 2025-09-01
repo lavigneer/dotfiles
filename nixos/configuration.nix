@@ -138,6 +138,7 @@ in {
     pavucontrol
     rofi
     rustup
+    rustc
     solaar
     steam
     steam-run

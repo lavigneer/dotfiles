@@ -113,7 +113,10 @@ in {
             pkgs.tmuxPlugins.kanagawa
           ];
           mouse = true;
-          extraConfig = ''bind-key -r f display-popup -E "tmux-sessionizer"'';
+          extraConfig = ''
+            bind-key -r f display-popup -E "tmux-sessionizer"
+            set -g renumber-windows on
+          '';
         };
 
         ripgrep = { enable = true; };
