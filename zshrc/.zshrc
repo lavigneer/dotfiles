@@ -13,7 +13,7 @@ if test -f ~/.profile; then
 fi
 
 # Path to your oh-my-zsh installation.
-[[ -f "$HOME/.oh-my-zsh" ]] && export ZSH="$HOME/.oh-my-zsh"
+[[ -d "$HOME/.oh-my-zsh" ]] && export ZSH="$HOME/.oh-my-zsh"
 
 
 zstyle ':completion:*' use-cache on
