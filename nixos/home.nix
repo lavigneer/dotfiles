@@ -4,15 +4,15 @@
 
 { config, pkgs, ... }:
 
-let
-  home-manager = builtins.fetchTarball {
-    url =
-      "https://github.com/nix-community/home-manager/archive/2a749f4790a14f7168be67cdf6e548ef1c944e10.tar.gz";
-    sha256 = "0mddsj0497nz6cicbhmnlpx8bn3mscm5199c8q31d5r8sxngn1m5";
-  };
-  inherit (pkgs.lib) mkOrder;
+let inherit (pkgs.lib) mkOrder;
 in {
-  imports = [ (import "${home-manager}/nixos") ];
+
+  stylix = {
+    enable = true;
+    autoEnable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+  };
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -20,12 +20,28 @@ in {
     users.elavigne = { pkgs, config, ... }: {
       home.packages = [ ];
       home.sessionVariables = { TERMINAL = "ghostty"; };
-      dconf.settings = {
-        "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
-      };
+      # dconf.settings = {
+      #   "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
+      # };
       xsession = {
         enable = true;
         profileExtra = "export TERMINAL=ghostty";
+        windowManager.i3 = { 
+          enable = true;
+          config.bars = [];
+          extraConfig = ''
+            include ~/.config/i3/config.user
+          '';
+        };
+      };
+
+      stylix = {
+        autoEnable = true;
+        # targets = {
+        #   gnome.enable = true;
+        #   tmux.enable = true;
+        #   rofi.enable = true;
+        # };
       };
 
       accounts.email.accounts = {
@@ -69,26 +85,16 @@ in {
 
         lazygit = { enable = true; };
 
-        opencode = {
-          enable = true;
-          settings = {
-            provider = {
-              ollama = {
-                npm = "@ai-sdk/openai-compatible";
-                name = "Ollama (local)";
-                options = { baseURL = "http://localhost:11434/v1"; };
-                models = { gpt-oss = { name = "Code Llama"; }; };
-              };
-            };
-          };
-
-        };
+        rofi = { enable = true; };
 
         neovim = {
           enable = true;
           defaultEditor = true;
           vimAlias = true;
           vimdiffAlias = true;
+          extraLuaConfig = ''
+            require('config.lazy')
+          '';
         };
 
         zsh = {
@@ -103,15 +109,15 @@ in {
         ghostty = {
           enable = true;
           enableZshIntegration = true;
+          settings = {
+            config-file =
+              "${config.home.homeDirectory}/.config/ghostty/config.user";
+          };
         };
 
         tmux = {
           enable = true;
-          plugins = [
-            pkgs.tmuxPlugins.sensible
-            pkgs.tmuxPlugins.pain-control
-            pkgs.tmuxPlugins.kanagawa
-          ];
+          plugins = [ pkgs.tmuxPlugins.sensible pkgs.tmuxPlugins.pain-control ];
           mouse = true;
           extraConfig = ''
             bind-key -r f display-popup -E "tmux-sessionizer"
@@ -126,11 +132,11 @@ in {
           userSettings = {
             features = { edit_prediction_provider = "copilot"; };
             vim_mode = true;
-            theme = {
-              mode = "system";
-              light = "One Light";
-              dark = "One Dark";
-            };
+            # theme = {
+            #   mode = "system";
+            #   light = "One Light";
+            #   dark = "One Dark";
+            # };
           };
           extensions = [
             "biome"
@@ -179,14 +185,25 @@ in {
         "polybar/start.sh".source = config.lib.file.mkOutOfStoreSymlink
           "${config.home.homeDirectory}/workspace/dotfiles/polybar/.config/polybar/start.sh";
 
-        "ghostty/config".source = config.lib.file.mkOutOfStoreSymlink
+        "ghostty/config.user".source = config.lib.file.mkOutOfStoreSymlink
           "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
 
-        "nvim".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim";
+        "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lazy-lock.json";
 
-        "rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
+        "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lazyvim.json";
+
+        "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lua";
+
+        "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/stylua.toml";
+
+        "i3/config.user".source = config.lib.file.mkOutOfStoreSymlink
+          "${config.home.homeDirectory}/workspace/dotfiles/i3/.config/i3/config";
+        # "rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink
+        #   "${config.home.homeDirectory}/workspace/dotfiles/rofi/.config/rofi/config.rasi";
       };
 
     };

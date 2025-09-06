@@ -18,4 +18,7 @@ return {
       colorscheme = "catppuccin",
     },
   },
+  {
+    "nvim-mini/mini.base16"
+  }
 }

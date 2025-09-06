@@ -9,7 +9,6 @@ in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./home.nix
   ];
 
   # Automatic garbage collection
@@ -89,12 +88,6 @@ in {
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  services.ollama = {
-    enable = true;
-    loadModels = [ "gpt-oss:20b" ];
-    acceleration = "cuda";
-  };
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.elavigne = {
     isNormalUser = true;
@@ -136,7 +129,6 @@ in {
     nil
     nodejs_24
     pavucontrol
-    rofi
     rustup
     rustc
     solaar
@@ -150,6 +142,11 @@ in {
     zig
     zsh
   ];
+
+  stylix = {
+    enable = true;
+    autoEnable = true;
+  };
 
   environment.shells = with pkgs; [ zsh ];
 
