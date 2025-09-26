@@ -68,56 +68,8 @@ in
     # LazyGit
     lazygit.enable = true;
 
-    # Zed editor (if available)
-    zed-editor = pkgs.lib.mkIf (!isDarwin) {
-      enable = true;
-      userSettings = {
-        features = { edit_prediction_provider = "copilot"; };
-        vim_mode = true;
-      };
-      extensions = [
-        "biome"
-        "css"
-        "dockerfile"
-        "go"
-        "golangci-lint"
-        "html"
-        "javascript"
-        "json"
-        "lua"
-        "make"
-        "nix"
-        "ruff"
-        "toml"
-        "typescript"
-        "yaml"
-      ];
-    };
-
-    # Email (Thunderbird)
-    thunderbird = pkgs.lib.mkIf (!isDarwin) {
-      enable = true;
-      profiles = {
-        gmail.isDefault = true;
-        hotmail.isDefault = false;
-      };
-    };
-
-    # Rofi (Linux only)
-    rofi = pkgs.lib.mkIf (!isDarwin) {
-      enable = true;
-    };
+    # Platform-specific programs are now in platform files
   };
 
-  # Email accounts
-  accounts.email.accounts = {
-    "Gmail" = {
-      primary = true;
-      address = userEmail;
-      userName = userEmail;
-      realName = userFullName;
-      thunderbird = pkgs.lib.mkIf (!isDarwin) { enable = true; };
-      flavor = "gmail.com";
-    };
-  };
+  # Email accounts are now configured in platform-specific files
 }

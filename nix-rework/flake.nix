@@ -65,7 +65,7 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                users.${username} = import ./modules/home-manager;
+                users.${username} = import (./modules/home-manager + (if isDarwin then "/darwin.nix" else "/linux.nix"));
                 extraSpecialArgs = { inherit inputs username userFullName userEmail; };
               };
             }

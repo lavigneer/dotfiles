@@ -22,8 +22,7 @@ in
     # Environment variables
     sessionVariables = {
       EDITOR = "nvim";
-      TERMINAL = if isDarwin then "ghostty" else "ghostty";
-      BROWSER = if isDarwin then "open" else "google-chrome";
+      TERMINAL = "ghostty";
     };
 
     # User packages that should be available on both systems
@@ -68,22 +67,6 @@ in
       
       # File management
       yazi
-      
-      # Terminal emulators (removed - using manual installation)
-      
-    ] ++ pkgs.lib.optionals (!isDarwin) [
-      # Linux-specific packages
-      discord
-      google-chrome
-      lutris
-      pavucontrol
-      solaar
-      dunst
-      xclip
-      nil # Nix LSP
-    ] ++ pkgs.lib.optionals isDarwin [
-      # macOS-specific packages
-      mas # Mac App Store CLI
     ];
   };
 
@@ -96,17 +79,13 @@ in
     ".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/zshrc/.zshrc";
   };
 
-  # XDG config files
+  # XDG config files (shared across platforms)
   xdg.configFile = {
     # Neovim configuration
     "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazy-lock.json";
     "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazyvim.json";
     "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lua";
     "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/stylua.toml";
-    
-    # Terminal configurations will be managed by Nix programs, not manual files
-    
-    # Shell configurations - starship managed by Nix programs
     
     # File manager
     "yazi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/yazi/.config/yazi";
@@ -116,23 +95,6 @@ in
     
     # LazyDocker
     "lazydocker".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/lazydocker/.config/lazydocker";
-    
-  } // pkgs.lib.optionalAttrs (!isDarwin) {
-    # Linux-specific configs
-    "i3/config".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/i3/.config/i3/config";
-    "polybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar";
-    "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
-    "picom".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/picom/.config/picom";
-    "dunst".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/dunst/.config/dunst";
-    "sway".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/sway/.config/sway";
-    "waybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/waybar/.config/waybar";
-    "hypr".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/hypr/.config/hypr";
-    "wofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/wofi/.config/wofi";
-    "foot".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/foot/.config/foot";
-  } // pkgs.lib.optionalAttrs isDarwin {
-    # macOS-specific configs
-    "aerospace".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/aerospace/.config/aerospace";
-    "karabiner".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/karabiner/.config/karabiner";
   };
 
   # Enable XDG directories
