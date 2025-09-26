@@ -39,31 +39,7 @@ in
       };
     };
     
-    # Zed editor (Linux)
-    zed-editor = {
-      enable = true;
-      userSettings = {
-        features = { edit_prediction_provider = "copilot"; };
-        vim_mode = true;
-      };
-      extensions = [
-        "biome"
-        "css"
-        "dockerfile"
-        "go"
-        "golangci-lint"
-        "html"
-        "javascript"
-        "json"
-        "lua"
-        "make"
-        "nix"
-        "ruff"
-        "toml"
-        "typescript"
-        "yaml"
-      ];
-    };
+    # Zed editor moved to shared programs/zed.nix module
   };
 
   # Linux-specific environment variables

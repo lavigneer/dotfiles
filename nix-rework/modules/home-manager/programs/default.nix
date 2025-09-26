@@ -11,6 +11,7 @@ in
     ./neovim.nix
     ./tmux.nix
     ./terminals.nix
+    ./zed.nix
   ];
 
   programs = {

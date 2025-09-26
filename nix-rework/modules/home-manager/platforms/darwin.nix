@@ -26,7 +26,17 @@ in
 
   # macOS-specific programs
   programs = {
-    # Programs that work differently or are only available on macOS
+    # Work-specific Zed editor customizations
+    zed-editor = {
+      # Zed is enabled by default via shared module
+      # Add any work-specific overrides here
+      userSettings = {
+        # Work-specific settings can override shared ones
+        # collaboration = {
+        #   channel_default_public = false;
+        # };
+      };
+    };
   };
 
   # macOS-specific services
