@@ -6,7 +6,6 @@ let
 in
 {
   programs = {
-    # Ghostty terminal
     ghostty = {
       enable = true;
       enableZshIntegration = true;
@@ -18,7 +17,5 @@ in
         confirm-close-surface = false;
       };
     };
-    
-    # Alacritty and WezTerm removed - using manual installation/configuration
   };
 }

@@ -39,38 +39,6 @@ in
     
     # Shell aliases
     shellAliases = {
-      # Directory navigation
-      ll = "eza -la";
-      la = "eza -la";
-      ls = "eza";
-      tree = "eza --tree";
-      
-      # Git shortcuts
-      g = "git";
-      gs = "git status";
-      ga = "git add";
-      gc = "git commit";
-      gp = "git push";
-      gl = "git pull";
-      gd = "git diff";
-      gco = "git checkout";
-      gb = "git branch";
-      
-      # Tmux
-      ta = "tmux attach";
-      tn = "tmux new-session";
-      tl = "tmux list-sessions";
-      
-      # File operations
-      cp = "cp -i";
-      mv = "mv -i";
-      rm = "rm -i";
-      
-      # System
-      cat = "bat";
-      find = "fd";
-      grep = "rg";
-      
       # Nix shortcuts
       nix-shell = "nix-shell --run zsh";
       rebuild-nixos = "sudo nixos-rebuild switch --flake ~/workspace/dotfiles/nix-rework#nixos";

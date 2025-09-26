@@ -5,10 +5,11 @@ let
 in
 {
   imports = [
-    ./window-managers
-    
     # Core Home Manager setup
-    ./programs/core.nix
+    ./core.nix
+    
+    # Window managers
+    ./window-managers
     
     # Program modules
     ./programs/cli-tools.nix
@@ -52,8 +53,6 @@ in
         hotmail.isDefault = false;
       };
     };
-    
-    # Zed editor moved to shared programs/zed.nix module
   };
 
   # Linux-specific environment variables
@@ -63,14 +62,14 @@ in
 
   # Linux-specific git configuration
   programs.git = {
-    userEmail = userEmail; # This will be hi_eric@hotmail.com for Linux
+    userEmail = userEmail;
   };
 
   # Email accounts (Linux specific for thunderbird)
   accounts.email.accounts = {
     "Hotmail" = {
       primary = true;
-      address = userEmail; # This will be hi_eric@hotmail.com for Linux
+      address = userEmail;
       userName = userEmail;
       realName = userFullName;
       thunderbird = {

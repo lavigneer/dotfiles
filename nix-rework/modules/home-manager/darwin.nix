@@ -6,7 +6,7 @@ in
 {
   imports = [
     # Core Home Manager setup
-    ./programs/core.nix
+    ./core.nix
     
     # Program modules
     ./programs/cli-tools.nix
@@ -43,25 +43,8 @@ in
     "karabiner".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/karabiner/.config/karabiner";
   };
 
-  # macOS-specific programs
-  programs = {
-    # Work-specific Zed editor customizations
-    zed-editor = {
-      # Zed is enabled by default via shared module
-      # Add any work-specific overrides here
-      userSettings = {
-        # Work-specific settings can override shared ones
-        # collaboration = {
-        #   channel_default_public = false;
-        # };
-      };
-    };
-  };
-
   # macOS-specific services
   services = {
-    # macOS-specific services
-    syncthing.enable = true;
   };
 
   # macOS-specific environment variables
@@ -72,7 +55,7 @@ in
 
   # macOS/Work-specific git configuration
   programs.git = {
-    userEmail = userEmail; # This will be eric.lavigne@mongodb.com for macOS
+    userEmail = userEmail;
     extraConfig = {
       # Work-specific git settings can go here
     };

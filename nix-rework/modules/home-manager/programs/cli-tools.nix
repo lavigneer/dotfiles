@@ -27,29 +27,6 @@ in
       enable = true;
       enableZshIntegration = true;
     };
-
-    # Better cat replacement
-    bat = {
-      enable = true;
-      config = {
-        # Let stylix handle the theme
-        style = "numbers,changes,header";
-      };
-    };
-    
-    # Better ls replacement
-    eza = {
-      enable = true;
-      enableZshIntegration = true;
-      icons = "auto";
-      git = true;
-    };
-    
-    # Smart cd replacement
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-    };
   };
 
   # Additional CLI utilities as packages

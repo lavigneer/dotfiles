@@ -22,6 +22,6 @@ in
 
   # Import services module
   imports = [
-    ../services
+    ./services
   ];
 }
