@@ -1,13 +1,7 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
-  imports = [
-    ./fonts.nix
-    ./gaming.nix
-    ./shell.nix
-  ];
-
-  # Common configurations that apply to both NixOS and nix-darwin
+  # Core Nix configuration that applies to both NixOS and nix-darwin
   
   # Nix settings
   nix = {
@@ -31,8 +25,8 @@
     
     # Garbage collection
     gc = {
-      automatic = pkgs.lib.mkDefault true;
-      options = pkgs.lib.mkDefault "--delete-older-than 30d";
+      automatic = lib.mkDefault true;
+      options = lib.mkDefault "--delete-older-than 30d";
     };
   };
   

@@ -4,6 +4,12 @@
   imports = [
     # Hardware-specific configuration for this machine
     ./hardware-configuration.nix
+    
+    # Shared system modules this system wants
+    ../../shared/system/nix.nix
+    ../../shared/system/fonts.nix
+    ../../shared/system/gaming.nix
+    ../../shared/system/shell.nix
   ];
 
   # ===== HOME MANAGER MODULE IMPORTS =====
@@ -21,6 +27,7 @@
       ../../shared/home-manager/terminals.nix
       ../../shared/home-manager/zed.nix
       ../../shared/home-manager/docker.nix
+      ../../shared/home-manager/thunderbird.nix
       
       # Linux programs this system wants
       ../../linux/modules/programs/desktop-apps.nix
@@ -38,14 +45,7 @@
       hyprland.enable = true;     # Enable Hyprland
     };
 
-    # Email configuration for this system
-    programs.thunderbird = {
-      enable = true;
-      profiles = {
-        gmail.isDefault = true;
-        hotmail.isDefault = false;
-      };
-    };
+    # Thunderbird is enabled by importing the shared module
 
     accounts.email.accounts = {
       "Hotmail" = {
@@ -108,40 +108,15 @@
     };
   };
 
-  # Audio configuration
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  # Machine-specific services
+  # Machine-specific services (additions to platform defaults)
   services = {
     # Enable OpenSSH daemon for this machine
     openssh.enable = true;
-    
-    # Enable CUPS to print documents on this machine
-    printing.enable = true;
   };
 
-  # Machine-specific system packages (minimal - most packages via Home Manager)
-  environment.systemPackages = with pkgs; [
-    # Essential system tools for this machine
-    wget
-    curl
-  ];
-
-  # Machine-specific garbage collection settings (can override platform defaults)
+  # Machine-specific garbage collection settings (override platform defaults)
   nix.gc = {
-    automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 60d";  # More aggressive on this machine
+    options = "--delete-older-than 60d";  # More aggressive than default for personal machine
   };
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. Don't change this after initial setup.
-  system.stateVersion = "25.05";
 }

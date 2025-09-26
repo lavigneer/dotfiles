@@ -59,9 +59,6 @@
             userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
           };
           modules = [
-                  # Shared configuration across all platforms
-                  ./shared
-                  
                   # Platform-specific configuration (provides defaults for the platform)
                   (if isDarwin then ./darwin else ./linux)
                   

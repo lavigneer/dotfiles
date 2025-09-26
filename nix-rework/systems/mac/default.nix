@@ -1,6 +1,14 @@
 { config, pkgs, inputs, username, userEmail, userFullName, ... }:
 
 {
+  imports = [
+    # Shared system modules this system wants
+    ../../shared/system/nix.nix
+    ../../shared/system/fonts.nix
+    ../../shared/system/shell.nix
+    # Note: Not importing gaming.nix since this is macOS
+  ];
+  
   # ===== HOME MANAGER MODULE IMPORTS =====
   # This system imports specific program and window manager modules
   home-manager.users.${username} = {
@@ -30,6 +38,8 @@
       aerospace.enable = true;  # Enable AeroSpace tiling window manager
     };
 
+    # Note: Thunderbird module is available but not imported (using native macOS mail apps)
+
     # Email configuration for this system (work email)
     accounts.email.accounts = {
       "Work" = {
@@ -44,33 +54,24 @@
 
   # Machine-specific configuration for this particular macOS system
   
-  # Machine-specific macOS system preferences
+  # Machine-specific macOS system preferences (only overrides of platform defaults)
   system.defaults = {
-    # Dock settings for this machine
+    # Dock settings - overrides for this specific machine
     dock = {
-      autohide = true;
-      magnification = true;
-      tilesize = 48;        # Larger tiles for this machine
-      largesize = 64;
+      tilesize = 48;        # Larger tiles than default (36)
+      largesize = 64;       # Larger magnified size than default (56)
       orientation = "bottom";
     };
     
-    # Finder settings
+    # Finder settings - additional settings for this machine
     finder = {
-      _FXShowPosixPathInTitle = true;
-      FXEnableExtensionChangeWarning = false;
-      AppleShowAllExtensions = true;
       ShowPathbar = true;
       ShowStatusBar = true;
     };
     
-    # Global UI settings for this machine
+    # Global UI settings - machine-specific overrides
     NSGlobalDomain = {
-      _HIHideMenuBar = false;  # Keep menu bar visible on this machine
-      AppleKeyboardUIMode = 3;
-      AppleShowAllExtensions = true;
-      AppleInterfaceStyle = "Dark";
-      "com.apple.sound.beep.feedback" = 0;
+      _HIHideMenuBar = false;  # Keep menu bar visible (override auto-hide)
       
       # Machine-specific keyboard/mouse settings
       KeyRepeat = 2;
@@ -78,46 +79,21 @@
       ApplePressAndHoldEnabled = false;
     };
     
-    # Trackpad settings for this machine
+    # Trackpad settings - additional features for this machine
     trackpad = {
-      Clicking = true;
-      TrackpadRightClick = true;
-      TrackpadThreeFingerDrag = true;
+      TrackpadThreeFingerDrag = true;  # Not in platform defaults
     };
     
-    # Screenshot settings
+    # Screenshot settings - machine-specific
     screencapture = {
       location = "~/Pictures/Screenshots";
       type = "png";
     };
   };
 
-  # Machine-specific keyboard settings
-  system.keyboard = {
-    enableKeyMapping = true;
-    remapCapsLockToEscape = true;
-  };
-
-  # Machine-specific system packages (minimal - most via Home Manager)
-  environment.systemPackages = with pkgs; [
-    # Essential system tools for this machine
-    vim
-  ];
-
-  # Machine-specific garbage collection settings (can override platform defaults)
+  # Machine-specific garbage collection settings (override platform defaults)
   nix.gc = {
-    automatic = true;
     interval = { Weekday = 0; Hour = 2; Minute = 0; };  # Sunday 2 AM for this machine
-    options = "--delete-older-than 30d";  # Less aggressive on work machine
+    options = "--delete-older-than 30d";  # Less aggressive than default for work machine
   };
-
-  # Machine-specific services
-  services = {
-    nix-daemon.enable = true;
-  };
-
-  # This value determines the nix-darwin release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. Don't change this after initial setup.
-  system.stateVersion = 5;
 }
