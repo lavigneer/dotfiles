@@ -25,8 +25,7 @@
 
   # System packages (keep minimal, most packages should be in Home Manager)
   environment.systemPackages = with pkgs; [
-    # Essential tools
-    git
+    # Essential tools (minimal - most packages in Home Manager)
     vim
   ];
 

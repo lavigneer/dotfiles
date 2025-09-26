@@ -92,15 +92,10 @@
 
   # System packages (keep minimal, move user packages to Home Manager)
   environment.systemPackages = with pkgs; [
-    # Essential system tools
-    git
+    # Essential system tools (minimal - most packages in Home Manager)
     wget
     unzip
-    xclip
     xss-lock
-    
-    # Hardware tools
-    pavucontrol
     
     # Development essentials
     gcc

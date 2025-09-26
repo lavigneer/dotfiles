@@ -9,9 +9,7 @@
 
   # Common window manager packages that work across all WMs
   home.packages = with pkgs; [
-    # Common utilities
-    wl-clipboard # Wayland clipboard (works in XWayland too)
-    xclip # X11 clipboard
+    # Common utilities (clipboard tools moved to neovim module where they're actually needed)
     
     # Screen capture
     grim # Wayland screenshots

@@ -15,7 +15,7 @@ in
       sway
       swaylock
       swayidle
-      wl-clipboard
+      # wl-clipboard managed by neovim module
       mako # notification daemon for wayland
       wofi # rofi alternative for wayland
       waybar

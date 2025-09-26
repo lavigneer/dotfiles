@@ -49,10 +49,8 @@ in
       unzip
       tree
       
-      # Git and version control
-      git
-      lazygit
-      gh
+      # Git and version control (all managed by programs.git module)
+      # lazygit, gh, git - managed by git.nix module
       
       # Text processing (sed, awk, grep are in coreutils/gawk/gnugrep)
       gawk

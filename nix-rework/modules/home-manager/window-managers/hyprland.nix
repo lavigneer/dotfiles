@@ -16,7 +16,7 @@ in
       hyprpaper # wallpaper daemon
       hypridle # idle daemon
       hyprlock # screen locker
-      wl-clipboard
+      # wl-clipboard managed by neovim module
       mako # notification daemon for wayland
       wofi # launcher
       waybar
