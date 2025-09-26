@@ -40,4 +40,15 @@ in
     enable = true;
     profileExtra = "export TERMINAL=ghostty";
   };
+
+  # X11 server configuration
+  services.xserver = {
+    enable = true;
+    displayManager.lightdm.enable = true;
+    
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
+  };
 }

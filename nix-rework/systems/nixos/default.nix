@@ -85,20 +85,7 @@
     LC_TIME = "en_CA.UTF-8";
   };
 
-  # X11 and desktop environment (machine-specific choice)
-  services.xserver = {
-    enable = true;
-    displayManager.lightdm.enable = true;
-    # Window managers are configured via Home Manager
-    windowManager.i3.enable = true;
-    
-    xkb = {
-      layout = "us";
-      variant = "";
-    };
-  };
-
-  # Machine-specific services (additions to platform defaults)
+  # Machine-specific services
   services = {
     # Enable OpenSSH daemon for this machine
     openssh.enable = true;
