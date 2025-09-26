@@ -4,7 +4,7 @@ let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
 in
 {
-  # Core utilities and development tools
+  # Modern CLI tools and utilities
   programs = {
     # Fuzzy finder
     fzf = {
@@ -51,6 +51,33 @@ in
       enableZshIntegration = true;
     };
   };
+
+  # Additional CLI utilities as packages
+  home.packages = with pkgs; [
+    # System monitoring
+    btop
+    htop
+    
+    # File operations
+    fd        # Modern find replacement
+    tree      # Directory tree viewer
+    
+    # Network utilities
+    dig       # DNS lookup
+    curl      # HTTP client
+    wget      # Download utility
+    
+    # Archive utilities
+    unzip
+    
+    # JSON processing
+    jq
+    
+    # Text processing utilities (POSIX compliant versions)
+    gawk      # GNU awk
+    gnugrep   # GNU grep
+    gnused    # GNU sed
+  ];
 
   # Configuration files for utilities
   xdg.configFile = {

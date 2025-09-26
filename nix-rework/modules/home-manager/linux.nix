@@ -5,19 +5,21 @@ let
 in
 {
   imports = [
-    ./default.nix
     ./window-managers
     
-    # Core utilities and development tools
-    ./programs/utils.nix
+    # Core Home Manager setup
+    ./programs/core.nix
     
-    # Linux-specific program modules
+    # Program modules
+    ./programs/cli-tools.nix
+    ./programs/development.nix
     ./programs/git.nix
     ./programs/zsh.nix
     ./programs/neovim.nix
     ./programs/tmux.nix
     ./programs/terminals.nix
     ./programs/zed.nix
+    ./programs/docker.nix
   ];
 
   # Linux-specific Home Manager configuration

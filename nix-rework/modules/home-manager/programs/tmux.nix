@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
+in
 {
   programs.tmux = {
     enable = true;
