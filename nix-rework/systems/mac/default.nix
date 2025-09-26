@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, username, ... }:
+{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
 
 {
   # ===== HOME MANAGER MODULE IMPORTS =====
@@ -19,7 +19,6 @@
       
       # macOS programs this system wants
       ../../darwin/modules/programs/macos-tools.nix
-      ../../darwin/modules/programs/email.nix
       ../../darwin/modules/programs/karabiner.nix
       
       # macOS window managers this system wants
@@ -29,6 +28,17 @@
     # Enable specific window managers for this system
     windowManagers = {
       aerospace.enable = true;  # Enable AeroSpace tiling window manager
+    };
+
+    # Email configuration for this system (work email)
+    accounts.email.accounts = {
+      "Work" = {
+        primary = true;
+        address = userEmail;
+        userName = userEmail;
+        realName = userFullName;
+        # Add work email provider settings as needed
+      };
     };
   };
 

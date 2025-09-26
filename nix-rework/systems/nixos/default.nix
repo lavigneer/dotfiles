@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, username, ... }:
+{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
 
 {
   imports = [
@@ -24,7 +24,6 @@
       
       # Linux programs this system wants
       ../../linux/modules/programs/desktop-apps.nix
-      ../../linux/modules/programs/email.nix
       
       # Linux window managers this system wants  
       ../../linux/modules/window-managers/i3.nix
@@ -37,6 +36,37 @@
       i3.enable = true;           # Enable i3
       sway.enable = true;         # Enable Sway  
       hyprland.enable = true;     # Enable Hyprland
+    };
+
+    # Email configuration for this system
+    programs.thunderbird = {
+      enable = true;
+      profiles = {
+        gmail.isDefault = true;
+        hotmail.isDefault = false;
+      };
+    };
+
+    accounts.email.accounts = {
+      "Hotmail" = {
+        primary = true;
+        address = userEmail;
+        userName = userEmail;
+        realName = userFullName;
+        thunderbird = {
+          enable = true;
+          settings = id: {
+            "mail.server.server_${id}.authMethod" = 10;
+            "mail.smtpserver.smtp_${id}.authMethod" = 10;
+          };
+        };
+        imap = {
+          authentication = "xoauth2";
+          host = "outlook.office365.com";
+          port = 993;
+          tls.enable = true;
+        };
+      };
     };
   };
 
