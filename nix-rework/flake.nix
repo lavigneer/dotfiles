@@ -100,7 +100,7 @@
       # nix-darwin configurations  
       darwinConfigurations = {
         # Your work Mac
-        mac = mkSystem {
+        M-DX000XV19K = mkSystem {
           system = "x86_64-darwin";  # Change to "aarch64-darwin" if you have Apple Silicon
           hostname = "mac";
           isDarwin = true;
