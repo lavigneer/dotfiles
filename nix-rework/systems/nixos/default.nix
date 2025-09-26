@@ -6,6 +6,30 @@
     ./hardware-configuration.nix
   ];
 
+  # ===== HOME MANAGER MODULE IMPORTS =====
+  # This system imports specific program and window manager modules
+  home-manager.users.${username} = {
+    imports = [
+      # Linux programs this system wants
+      ../../linux/modules/programs/desktop-apps.nix
+      ../../linux/modules/programs/email.nix
+      ../../linux/modules/programs/development.nix
+      ../../linux/modules/programs/git.nix
+      
+      # Linux window managers this system wants  
+      ../../linux/modules/window-managers/i3.nix
+      ../../linux/modules/window-managers/sway.nix
+      ../../linux/modules/window-managers/hyprland.nix
+    ];
+
+    # Enable specific window managers for this system
+    windowManagers = {
+      i3.enable = true;           # Enable i3
+      sway.enable = true;         # Enable Sway  
+      hyprland.enable = true;     # Enable Hyprland
+    };
+  };
+
   # Machine-specific configuration for this particular NixOS system
 
   # Bootloader configuration

@@ -1,6 +1,27 @@
 { config, pkgs, inputs, username, ... }:
 
 {
+  # ===== HOME MANAGER MODULE IMPORTS =====
+  # This system imports specific program and window manager modules
+  home-manager.users.${username} = {
+    imports = [
+      # macOS programs this system wants
+      ../../darwin/modules/programs/macos-tools.nix
+      ../../darwin/modules/programs/git.nix
+      ../../darwin/modules/programs/email.nix
+      ../../darwin/modules/programs/karabiner.nix
+      ../../darwin/modules/programs/darwin.nix
+      
+      # macOS window managers this system wants
+      ../../darwin/modules/window-managers/aerospace.nix
+    ];
+
+    # Enable specific window managers for this system
+    windowManagers = {
+      aerospace.enable = true;  # Enable AeroSpace tiling window manager
+    };
+  };
+
   # Machine-specific configuration for this particular macOS system
   
   # Machine-specific macOS system preferences

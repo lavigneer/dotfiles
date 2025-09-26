@@ -1,7 +1,7 @@
 { config, pkgs, lib, username, userFullName, userEmail, ... }:
 
 {
-  # macOS platform defaults (can be overridden by machine-specific configs)
+  # macOS platform system defaults (can be overridden by machine-specific configs)
   
   # Default user configuration for macOS systems
   users.users.${username} = {
@@ -65,60 +65,15 @@
   # Default system state version for macOS (can be overridden per machine)
   system.stateVersion = lib.mkDefault 5;
 
-  # ===== HOME MANAGER CONFIGURATION =====
-  # macOS Home Manager defaults (integrated into platform config)
+  # ===== HOME MANAGER INTEGRATION =====
+  # Basic Home Manager setup - specific module imports handled by systems
   
   home-manager.users.${username} = { config, pkgs, ... }: {
     imports = [
-      # Shared Home Manager configurations
+      # Always import shared Home Manager configurations
       ../shared/home-manager
       
-      # macOS-specific window managers
-      ./window-managers.nix
-      
-      # macOS-specific programs
-      ./programs/karabiner.nix
-      ./programs/darwin.nix
+      # Additional imports will be added by individual systems
     ];
-
-    # macOS-specific Home Manager configuration
-
-    # Enable macOS window manager
-    windowManagers = {
-      aerospace.enable = lib.mkDefault true;  # Enable AeroSpace tiling window manager
-    };
-
-    # macOS-specific packages
-    home.packages = with pkgs; [
-      # macOS-specific packages
-      mas # Mac App Store CLI
-      
-      # macOS development tools
-      darwin.cctools
-    ];
-
-    # macOS-specific environment variables
-    home.sessionVariables = {
-      BROWSER = "open";
-    };
-
-    # macOS/Work-specific git configuration
-    programs.git = {
-      userEmail = userEmail;
-      extraConfig = {
-        # Work-specific git settings can go here
-      };
-    };
-
-    # Work-specific email accounts for macOS
-    accounts.email.accounts = {
-      "Work" = {
-        primary = true;
-        address = userEmail;
-        userName = userEmail;
-        realName = userFullName;
-        # Add work email provider settings as needed
-      };
-    };
   };
 }
