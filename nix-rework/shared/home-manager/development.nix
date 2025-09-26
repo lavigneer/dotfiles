@@ -3,6 +3,9 @@
 {
   # Development tools and programming languages
   home.packages = with pkgs; [
+    # C/C++ development
+    gcc       # GNU Compiler Collection
+    
     # Rust toolchain
     cargo
     rustup

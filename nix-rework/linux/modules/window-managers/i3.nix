@@ -20,7 +20,8 @@ in
       polybar
       picom
       dunst
-      feh # wallpaper setter
+      feh       # wallpaper setter
+      xss-lock  # X11 screen locker utility
     ];
 
     # i3 configuration

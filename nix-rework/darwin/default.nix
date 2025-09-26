@@ -10,12 +10,6 @@
     home = "/Users/${username}";
   };
 
-  # Default macOS system packages (minimal - most via Home Manager)
-  environment.systemPackages = with pkgs; [
-    # Essential macOS system tools
-    vim
-  ];
-
   # Default macOS services
   services = {
     nix-daemon.enable = true;
@@ -53,13 +47,6 @@
   system.keyboard = {
     enableKeyMapping = lib.mkDefault true;
     remapCapsLockToEscape = lib.mkDefault true;
-  };
-
-  # Default Stylix theming for macOS
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
   };
 
   # Default system state version for macOS (can be overridden per machine)

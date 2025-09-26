@@ -9,8 +9,8 @@ in
     google-chrome
   ];
 
-  # Set browser environment variable
+  # Set browser environment variable (platform-specific)
   home.sessionVariables = {
-    BROWSER = "google-chrome";
+    BROWSER = if isDarwin then "open" else "google-chrome";
   };
 }

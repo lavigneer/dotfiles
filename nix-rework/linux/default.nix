@@ -11,18 +11,9 @@
     shell = pkgs.zsh;
   };
 
-  # Default Linux system packages (minimal - most via Home Manager)
-  environment.systemPackages = with pkgs; [
-    # Essential Linux system tools
-    wget
-    unzip
-    xss-lock
-    gcc  # Common development dependency on Linux
-  ];
-
   # Default Linux services
   services = {
-    # Audio (PipeWire is the modern default for Linux)
+    # Audio
     pulseaudio.enable = false;
     pipewire = {
       enable = lib.mkDefault true;
@@ -31,22 +22,15 @@
       pulse.enable = lib.mkDefault true;
     };
     
-    # Bluetooth support (common on Linux desktops)
+    # Bluetooth support
     blueman.enable = lib.mkDefault true;
     
-    # Printing support (common need)
+    # Printing support
     printing.enable = lib.mkDefault true;
   };
 
-  # Security defaults for Linux
+  # Security defaults
   security.rtkit.enable = lib.mkDefault true;
-
-  # Default Stylix theming for Linux
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
-  };
 
   # Default system state version for Linux (can be overridden per machine)
   system.stateVersion = lib.mkDefault "25.05";

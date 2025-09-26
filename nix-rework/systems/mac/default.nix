@@ -6,6 +6,7 @@
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
+    ../../shared/system/stylix.nix
     # Note: Not importing gaming.nix since this is macOS
   ];
   
@@ -28,7 +29,6 @@
       ../../shared/home-manager/browser.nix
       
       # macOS programs this system wants
-      ../../darwin/modules/programs/macos-tools.nix
       ../../darwin/modules/programs/karabiner.nix
       
       # macOS window managers this system wants
@@ -41,6 +41,12 @@
     };
 
     # Note: Thunderbird module is available but not imported (using native macOS mail apps)
+
+    # macOS-specific tools and utilities
+    home.packages = with pkgs; [
+      mas             # Mac App Store CLI
+      darwin.cctools  # macOS development tools
+    ];
 
     # Email configuration for this system (work email)
     accounts.email.accounts = {

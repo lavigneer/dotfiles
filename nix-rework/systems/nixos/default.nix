@@ -9,6 +9,7 @@
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
+    ../../shared/system/stylix.nix
     
     # Linux-specific system modules
     ../../linux/modules/system/gaming.nix
