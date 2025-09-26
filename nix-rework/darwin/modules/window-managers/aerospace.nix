@@ -12,8 +12,6 @@ in
   config = lib.mkIf cfg.enable {
     # AeroSpace tiling window manager for macOS
     home.packages = with pkgs; [
-      # Note: aerospace may not be available in nixpkgs
-      # Typically installed via Homebrew: brew install nikitabobko/tap/aerospace
       aerospace
     ];
 

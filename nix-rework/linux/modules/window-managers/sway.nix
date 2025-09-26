@@ -5,23 +5,23 @@ let
   cfg = config.windowManagers.sway;
 in
 {
+  imports = [
+    # Import shared Wayland components
+    ./wayland.nix
+  ];
+
   options.windowManagers.sway = {
     enable = lib.mkEnableOption "Enable Sway window manager configuration";
   };
 
   config = lib.mkIf cfg.enable {
-    # Sway-specific packages
+    # Sway-specific packages (shared Wayland components imported above)
     home.packages = with pkgs; [
       sway
       swaylock
       swayidle
-      # wl-clipboard managed by neovim module
-      mako # notification daemon for wayland
-      rofi # launcher with Wayland support (v2.0.0+)
-      polybar # status bar (works on Wayland via XWayland)
-      grim # screenshot utility
-      slurp # select region for screenshot
-      kanshi # display management
+      # Common Wayland components (mako, rofi, polybar, grim, slurp, kanshi) 
+      # are now provided by shared/wayland.nix
       # Using Ghostty as terminal (configured in shared terminals.nix)
     ];
 
@@ -38,38 +38,18 @@ in
       '';
     };
 
-    # Sway-related XDG config files
+    # Sway-specific XDG config files (common Wayland configs in shared/wayland.nix)
     xdg.configFile = {
       "sway".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/sway/.config/sway";
-      "polybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar";
-      "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
-      "kanshi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/kanshi/.config/kanshi";
-      # foot config removed - using Ghostty as terminal
+      # Common configs (polybar, rofi, kanshi) are now in shared/wayland.nix
     };
 
-    # Sway-related programs
-    programs = {
-      rofi.enable = true;
-      # foot.enable removed - using Ghostty as terminal
-    };
+    # Sway-specific programs (common Wayland programs in shared/wayland.nix)
+    # Note: rofi, polybar services are handled by shared/wayland.nix
 
-    # Sway-related services
+    # Sway-specific services (common Wayland services in linux/modules/wayland.nix)
     services = {
-      # Polybar status bar (works on Wayland via XWayland)
-      polybar = {
-        enable = true;
-        config = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar/config.ini";
-        script = "${dotfilesPath}/polybar/.config/polybar/start.sh";
-      };
-
-      # Mako notification daemon
-      mako = {
-        enable = true;
-        # Configuration will come from dotfiles if needed
-      };
-      
-      # Kanshi display management
-      kanshi.enable = true;
+      # Common services (polybar, mako, kanshi) are now in wayland.nix
       
       # Swayidle
       swayidle = {

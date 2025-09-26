@@ -5,24 +5,24 @@ let
   cfg = config.windowManagers.hyprland;
 in
 {
+  imports = [
+    # Import shared Wayland components
+    ./wayland.nix
+  ];
+
   options.windowManagers.hyprland = {
     enable = lib.mkEnableOption "Enable Hyprland window manager configuration";
   };
 
   config = lib.mkIf cfg.enable {
-    # Hyprland-specific packages
+    # Hyprland-specific packages (shared Wayland components imported above)
     home.packages = with pkgs; [
       hyprland
       hyprpaper # wallpaper daemon
       hypridle # idle daemon
       hyprlock # screen locker
-      # wl-clipboard managed by neovim module
-      mako # notification daemon for wayland
-      rofi # launcher with Wayland support (v2.0.0+)
-      polybar # status bar (works on Wayland via XWayland)
-      grim # screenshot utility
-      slurp # select region for screenshot
-      kanshi # display management
+      # Common Wayland components (mako, rofi, polybar, grim, slurp, kanshi) 
+      # are now provided by linux/modules/wayland.nix
       # Using Ghostty as terminal (configured in shared terminals.nix)
       wf-recorder # screen recording
     ];
@@ -40,38 +40,18 @@ in
       '';
     };
 
-    # Hyprland-related XDG config files
+    # Hyprland-specific XDG config files (common Wayland configs in linux/modules/wayland.nix)
     xdg.configFile = {
       "hypr".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/hypr/.config/hypr";
-      "polybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar";
-      "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
-      "kanshi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/kanshi/.config/kanshi";
-      # foot config removed - using Ghostty as terminal
+      # Common configs (polybar, rofi, kanshi) are now in wayland.nix
     };
 
-    # Hyprland-related programs
-    programs = {
-      rofi.enable = true;
-      # foot.enable removed - using Ghostty as terminal
-    };
+    # Hyprland-specific programs (common Wayland programs in linux/modules/wayland.nix)
+    # Note: rofi, polybar services are handled by wayland.nix
 
-    # Hyprland-related services
+    # Hyprland-specific services (common Wayland services in linux/modules/wayland.nix)
     services = {
-      # Polybar status bar (works on Wayland via XWayland)
-      polybar = {
-        enable = true;
-        config = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar/config.ini";
-        script = "${dotfilesPath}/polybar/.config/polybar/start.sh";
-      };
-
-      # Mako notification daemon
-      mako = {
-        enable = true;
-        # Configuration will come from dotfiles if needed
-      };
-      
-      # Kanshi display management
-      kanshi.enable = true;
+      # Common services (polybar, mako, kanshi) are now in wayland.nix
       
       # Hypridle (replaces swayidle for hyprland)
       hypridle = {

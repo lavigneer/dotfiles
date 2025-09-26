@@ -5,66 +5,46 @@ let
   cfg = config.windowManagers.i3;
 in
 {
+  imports = [
+    # Import shared X11 components
+    ./x11.nix
+  ];
+
   options.windowManagers.i3 = {
     enable = lib.mkEnableOption "Enable i3 window manager configuration";
   };
 
   config = lib.mkIf cfg.enable {
-    # i3-specific packages
+    # i3-specific packages (shared X11 components imported above)
     home.packages = with pkgs; [
       i3status
       i3lock
       dmenu
-      rofi
-      polybar
-      picom
-      dunst
-      feh       # wallpaper setter
-      xss-lock  # X11 screen locker utility
+      # Common X11 components (rofi, polybar, picom, dunst, feh, xss-lock) 
+      # are now provided by linux/modules/x11.nix
     ];
 
-    # i3 configuration
-    xsession = {
+    # i3 configuration (xsession.enable handled by x11.nix)
+    xsession.windowManager.i3 = { 
       enable = true;
-      profileExtra = "export TERMINAL=ghostty";
-      windowManager.i3 = { 
-        enable = true;
-        config.bars = []; # Disable default bar, use polybar instead
-        extraConfig = ''
-          include ~/.config/i3/config
-        '';
-      };
+      config.bars = []; # Disable default bar, use polybar instead
+      extraConfig = ''
+        include ~/.config/i3/config
+      '';
     };
 
-    # i3-related XDG config files
+    # i3-specific XDG config files (common X11 configs in linux/modules/x11.nix)
     xdg.configFile = {
-      "polybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar";
-      "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
-      "picom".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/picom/.config/picom";
-      "dunst".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/dunst/.config/dunst";
+      "i3".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/i3/.config/i3";
+      # Common configs (polybar, rofi, picom, dunst) are now in x11.nix
     };
 
-    # i3-related programs
-    programs = {
-      rofi.enable = true;
-    };
-
-    # i3-related services
+    # i3-specific programs and services (common X11 ones in ./x11.nix)
+    # Note: rofi, polybar, dunst, picom services are handled by x11.nix
+    
+    # Additional i3-specific services can go here if needed
     services = {
-      # Polybar for i3
-      polybar = {
-        enable = true;
-        config = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar/config.ini";
-        script = "${dotfilesPath}/polybar/.config/polybar/start.sh";
-      };
-      
-      # Dunst notification daemon
-      dunst.enable = true;
-      
-      # Picom compositor
-      picom.enable = true;
-      
-      # Redshift (blue light filter)
+      # Redshift (blue light filter) - i3-specific
       redshift = {
         enable = true;
         latitude = 53.5461;   # Edmonton coordinates
