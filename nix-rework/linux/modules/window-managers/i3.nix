@@ -6,8 +6,10 @@ let
 in
 {
   imports = [
-    # Import shared X11 components
+    # Import shared components
     ./x11.nix
+    ../system/polybar.nix
+    ../system/rofi.nix
   ];
 
   options.windowManagers.i3 = {

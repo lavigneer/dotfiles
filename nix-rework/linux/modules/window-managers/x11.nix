@@ -7,12 +7,8 @@ in
   # Shared X11 components for i3 and other X11 window managers
   # This module provides common packages, services, and configurations
   
-  # Common X11 packages
+  # X11-specific packages (rofi and polybar now in dedicated system modules)
   home.packages = with pkgs; [
-    # Core shared components (also used on Wayland)
-    rofi # launcher
-    polybar # status bar
-    
     # X11-specific components
     dunst # notification daemon for X11
     picom # compositor for X11
@@ -25,29 +21,14 @@ in
     xorg.xset # X11 settings
   ];
 
-  # Common X11 config files
+  # X11-specific config files (rofi and polybar now in dedicated system modules)
   xdg.configFile = {
-    "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
-    "polybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar";
     "picom".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/picom/.config/picom";
     "dunst".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/dunst/.config/dunst";
   };
 
-  # Common X11 programs
-  programs = {
-    rofi.enable = true;
-    # Note: polybar is managed via services, not programs
-  };
-
-  # Common X11 services
+  # X11-specific services (rofi and polybar now in dedicated system modules)
   services = {
-    # Polybar status bar
-    polybar = {
-      enable = true;
-      config = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/polybar/.config/polybar/config.ini";
-      script = "${dotfilesPath}/polybar/.config/polybar/start.sh";
-    };
-
     # Dunst notification daemon
     dunst = {
       enable = true;

@@ -6,8 +6,10 @@ let
 in
 {
   imports = [
-    # Import shared Wayland components
+    # Import shared components
     ./wayland.nix
+    ../system/polybar.nix
+    ../system/rofi.nix
   ];
 
   options.windowManagers.hyprland = {
