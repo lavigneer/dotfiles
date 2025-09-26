@@ -5,6 +5,18 @@
   # This system imports specific program and window manager modules
   home-manager.users.${username} = {
     imports = [
+      # Shared Home Manager modules this system wants
+      ../../shared/home-manager/core.nix
+      ../../shared/home-manager/cli-tools.nix
+      ../../shared/home-manager/development.nix
+      ../../shared/home-manager/git.nix
+      ../../shared/home-manager/zsh.nix
+      ../../shared/home-manager/neovim.nix
+      ../../shared/home-manager/tmux.nix
+      ../../shared/home-manager/terminals.nix
+      ../../shared/home-manager/zed.nix
+      ../../shared/home-manager/docker.nix
+      
       # macOS programs this system wants
       ../../darwin/modules/programs/macos-tools.nix
       ../../darwin/modules/programs/git.nix

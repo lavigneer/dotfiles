@@ -50,16 +50,4 @@
 
   # Default system state version for Linux (can be overridden per machine)
   system.stateVersion = lib.mkDefault "25.05";
-
-  # ===== HOME MANAGER INTEGRATION =====
-  # Basic Home Manager setup - specific module imports handled by systems
-  
-  home-manager.users.${username} = { config, pkgs, ... }: {
-    imports = [
-      # Always import shared Home Manager configurations
-      ../shared/home-manager
-      
-      # Additional imports will be added by individual systems
-    ];
-  };
 }
