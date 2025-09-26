@@ -1,16 +1,15 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Only apply this configuration on macOS
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
+  cfg = config.windowManagers.aerospace;
 in
 {
   options.windowManagers.aerospace = {
     enable = lib.mkEnableOption "Enable AeroSpace window manager configuration";
   };
 
-  config = lib.mkIf (isDarwin && config.windowManagers.aerospace.enable) {
+  config = lib.mkIf cfg.enable {
     # AeroSpace tiling window manager for macOS
     home.packages = with pkgs; [
       # Note: aerospace may not be available in nixpkgs

@@ -3,14 +3,13 @@
 let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
   cfg = config.windowManagers.sway;
-  isLinux = !pkgs.stdenv.hostPlatform.isDarwin;
 in
 {
   options.windowManagers.sway = {
     enable = lib.mkEnableOption "Enable Sway window manager configuration";
   };
 
-  config = lib.mkIf (isLinux && cfg.enable) {
+  config = lib.mkIf cfg.enable {
     # Sway-specific packages
     home.packages = with pkgs; [
       sway
