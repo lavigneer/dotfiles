@@ -32,15 +32,9 @@ in
   # Additional CLI utilities as packages
   home.packages = with pkgs; [
     # System monitoring
-    btop
     htop
     
-    # File operations
-    fd        # Modern find replacement
-    tree      # Directory tree viewer
-    
     # Network utilities
-    dig       # DNS lookup
     curl      # HTTP client
     wget      # Download utility
     

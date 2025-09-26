@@ -13,8 +13,5 @@
     
     # Node.js and npm
     nodejs_24
-    
-    # Zig programming language
-    zig
   ];
 }

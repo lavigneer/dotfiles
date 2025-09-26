@@ -19,9 +19,4 @@ in
 
   # Enable XDG directories
   xdg.enable = true;
-
-  # Import services module
-  imports = [
-    ./services
-  ];
 }

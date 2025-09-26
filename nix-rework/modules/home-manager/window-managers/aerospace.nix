@@ -15,18 +15,12 @@ in
     home.packages = with pkgs; [
       # Note: aerospace may not be available in nixpkgs
       # Typically installed via Homebrew: brew install nikitabobko/tap/aerospace
-      # aerospace
+      aerospace
     ];
 
     # AeroSpace configuration
     xdg.configFile = {
       "aerospace".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/aerospace/.config/aerospace";
     };
-
-    # Optional: Homebrew installation example
-    # homebrew = {
-    #   taps = [ "nikitabobko/tap" ];
-    #   brews = [ "aerospace" ];
-    # };
   };
 }
