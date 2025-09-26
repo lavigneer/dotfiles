@@ -1,6 +1,12 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../system/fonts.nix
+    ../system/gaming.nix
+    ../system/shell.nix
+  ];
+
   # Common configurations that apply to both NixOS and nix-darwin
   
   # Nix settings

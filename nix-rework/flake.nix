@@ -79,10 +79,12 @@
               };
             }
             
-            # Stylix (only for NixOS for now)
-          ] ++ nixpkgs.lib.optionals (!isDarwin) [
+            # Stylix for both platforms
+          ] ++ (if isDarwin then [
+            stylix.darwinModules.stylix
+          ] else [
             stylix.nixosModules.stylix
-          ];
+          ]);
         };
     in
     {

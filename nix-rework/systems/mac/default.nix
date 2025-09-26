@@ -29,20 +29,9 @@
     vim
   ];
 
-  # Fonts
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk-sans
-    noto-fonts-extra
-    nerd-fonts.go-mono
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.heavy-data
-  ];
+  # Fonts configuration moved to modules/system/fonts.nix
 
-  # Shell configuration
-  programs.zsh.enable = true;
-  environment.shells = with pkgs; [ zsh ];
+  # Shell configuration moved to modules/system/shell.nix
 
   # macOS system preferences
   system.defaults = {
@@ -100,6 +89,17 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Stylix theming (same as NixOS for consistency, but you can customize)
+  stylix = {
+    enable = true;
+    autoEnable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+    
+    # macOS-specific styling can be added here
+    # For example, you might want a different theme for work:
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+  };
 
   # This value determines the nix-darwin release from which the default
   # settings for stateful data, like file locations and database versions

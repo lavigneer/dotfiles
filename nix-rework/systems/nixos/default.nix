@@ -77,18 +77,11 @@
     extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.zsh;
   };
-  programs.zsh.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # Gaming
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    localNetworkGameTransfers.openFirewall = true;
-  };
+  # Gaming configuration moved to modules/system/gaming.nix
 
   # System packages (keep minimal, move user packages to Home Manager)
   environment.systemPackages = with pkgs; [
@@ -100,10 +93,7 @@
     # Development essentials
     gcc
     
-    # Gaming (system-level required)
-    steam
-    steam-run
-    steam-unwrapped
+    # Gaming packages moved to modules/system/gaming.nix
   ];
 
   # Stylix theming
@@ -113,19 +103,9 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
   };
 
-  # Shell configuration
-  environment.shells = with pkgs; [ zsh ];
+  # Shell configuration moved to modules/system/shell.nix
 
-  # Fonts
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk-sans
-    noto-fonts-extra
-    nerd-fonts.go-mono
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.heavy-data
-  ];
+  # Fonts configuration moved to modules/system/fonts.nix
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
