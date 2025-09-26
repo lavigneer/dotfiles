@@ -64,38 +64,11 @@
   
   # Machine-specific macOS system preferences (only overrides of platform defaults)
   system.defaults = {
-    # Dock settings - overrides for this specific machine
+    # Dock settings - personal preferences for this work machine
     dock = {
-      tilesize = 48;        # Larger tiles than default (36)
-      largesize = 64;       # Larger magnified size than default (56)
+      tilesize = 48;        # Larger tiles than platform default (36)
+      largesize = 64;       # Larger magnified size than platform default (56)
       orientation = "bottom";
-    };
-    
-    # Finder settings - additional settings for this machine
-    finder = {
-      ShowPathbar = true;
-      ShowStatusBar = true;
-    };
-    
-    # Global UI settings - machine-specific overrides
-    NSGlobalDomain = {
-      _HIHideMenuBar = false;  # Keep menu bar visible (override auto-hide)
-      
-      # Machine-specific keyboard/mouse settings
-      KeyRepeat = 2;
-      InitialKeyRepeat = 15;
-      ApplePressAndHoldEnabled = false;
-    };
-    
-    # Trackpad settings - additional features for this machine
-    trackpad = {
-      TrackpadThreeFingerDrag = true;  # Not in platform defaults
-    };
-    
-    # Screenshot settings - machine-specific
-    screencapture = {
-      location = "~/Pictures/Screenshots";
-      type = "png";
     };
   };
 

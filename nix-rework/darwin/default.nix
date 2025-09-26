@@ -28,6 +28,8 @@
       _FXShowPosixPathInTitle = lib.mkDefault true;
       FXEnableExtensionChangeWarning = lib.mkDefault false;
       AppleShowAllExtensions = lib.mkDefault true;
+      ShowPathbar = lib.mkDefault true;
+      ShowStatusBar = lib.mkDefault true;
     };
     
     NSGlobalDomain = {
@@ -35,11 +37,24 @@
       AppleShowAllExtensions = lib.mkDefault true;
       AppleInterfaceStyle = lib.mkDefault "Dark";
       "com.apple.sound.beep.feedback" = lib.mkDefault 0;
+      _HIHideMenuBar = lib.mkDefault false;
+      
+      # Keyboard and mouse defaults
+      KeyRepeat = lib.mkDefault 2;
+      InitialKeyRepeat = lib.mkDefault 15;
+      ApplePressAndHoldEnabled = lib.mkDefault false;
     };
     
     trackpad = {
       Clicking = lib.mkDefault true;
       TrackpadRightClick = lib.mkDefault true;
+      TrackpadThreeFingerDrag = lib.mkDefault true;
+    };
+    
+    # Screenshot settings - sensible defaults for all Macs
+    screencapture = {
+      location = lib.mkDefault "~/Pictures/Screenshots";
+      type = lib.mkDefault "png";
     };
   };
 
