@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 let
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
   cfg = config.windowManagers.sway;
 in
 {
@@ -28,13 +27,6 @@ in
         terminal = "ghostty";
         menu = "rofi -show drun";
       };
-      extraConfig = ''
-        include ~/.config/sway/config
-      '';
-    };
-
-    xdg.configFile = {
-      "sway".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/sway/.config/sway";
     };
 
     services.swayidle = {

@@ -80,11 +80,16 @@ in
     '';
   };
 
-  # Neovim configuration files
+  # Neovim configuration files - keeping symlinks for complex, frequently-changed configs
   xdg.configFile = {
+    # LazyVim lock files and configs that change frequently
     "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazy-lock.json";
     "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazyvim.json";
+    
+    # Custom Lua configuration - symlinked because it's actively developed
     "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lua";
+    
+    # Stylua formatter config
     "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/stylua.toml";
   };
 }

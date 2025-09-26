@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 let
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
   cfg = config.windowManagers.hyprland;
 in
 {
@@ -30,13 +29,6 @@ in
         "$terminal" = "ghostty";
         "$menu" = "rofi -show drun";
       };
-      extraConfig = ''
-        source = ~/.config/hypr/hyprland.conf
-      '';
-    };
-
-    xdg.configFile = {
-      "hypr".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/hypr/.config/hypr";
     };
 
     services = {

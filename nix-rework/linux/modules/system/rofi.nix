@@ -1,16 +1,20 @@
 { config, pkgs, ... }:
 
-let
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
-in
 {
-  home.packages = with pkgs; [
-    rofi
-  ];
-
-  xdg.configFile = {
-    "rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/rofi/.config/rofi";
+  programs.rofi = {
+    enable = true;
+    package = pkgs.rofi;
+    extraConfig = {
+      modi = "drun,run,combi";
+      combi-modi = "drun,run";
+      timeout = {
+        action = "kb-cancel";
+        delay = 0;
+      };
+      filebrowser = {
+        directories-first = true;
+        sorting-method = "name";
+      };
+    };
   };
-
-  programs.rofi.enable = true;
 }

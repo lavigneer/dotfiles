@@ -2,7 +2,6 @@
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
 in
 {
   programs = {

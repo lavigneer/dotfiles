@@ -1,10 +1,15 @@
 { config, pkgs, ... }:
 
-let
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
-in
 {
-  xdg.configFile = {
-    "lazydocker".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/lazydocker/.config/lazydocker";
-  };
+  # LazyDocker configuration
+  xdg.configFile."lazydocker/config.yml".text = ''
+    gui:
+      # Confusing, but this disables mouse events
+      mouseEvents: true
+  '';
+  
+  # Install lazydocker package
+  home.packages = with pkgs; [
+    lazydocker
+  ];
 }

@@ -1,12 +1,115 @@
 { config, pkgs, ... }:
 
-let
-  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
-in
 {
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
+    settings = {
+      # Get editor completions based on the config schema
+      "$schema" = "https://starship.rs/config-schema.json";
+      
+      # Inserts a blank line between shell prompts
+      add_newline = false;
+      
+      # A minimal left prompt
+      format = "$directory$git_branch$character";
+      
+      # move the rest of the prompt to the right
+      right_format = "$all";
+      
+      line_break.disabled = true;
+      
+      aws.symbol = "  ";
+      buf.symbol = " ";
+      c.symbol = " ";
+      conda.symbol = " ";
+      crystal.symbol = " ";
+      dart.symbol = " ";
+      directory.read_only = " 󰌾";
+      docker_context.symbol = " ";
+      elixir.symbol = " ";
+      elm.symbol = " ";
+      fennel.symbol = " ";
+      fossil_branch.symbol = " ";
+      git_branch.symbol = " ";
+      git_commit.tag_symbol = "  ";
+      golang.symbol = " ";
+      guix_shell.symbol = " ";
+      haskell.symbol = " ";
+      haxe.symbol = " ";
+      hg_branch.symbol = " ";
+      hostname.ssh_symbol = " ";
+      java.symbol = " ";
+      julia.symbol = " ";
+      kotlin.symbol = " ";
+      lua.symbol = " ";
+      memory_usage.symbol = "󰍛 ";
+      meson.symbol = "󰔷 ";
+      nim.symbol = "󰆥 ";
+      nix_shell = {
+        symbol = " ";
+        impure_msg = "";
+      };
+      nodejs.symbol = " ";
+      ocaml.symbol = " ";
+      "os.symbols" = {
+        Alpaquita = " ";
+        Alpine = " ";
+        AlmaLinux = " ";
+        Amazon = " ";
+        Android = " ";
+        Arch = " ";
+        Artix = " ";
+        CentOS = " ";
+        Debian = " ";
+        DragonFly = " ";
+        Emscripten = " ";
+        EndeavourOS = " ";
+        Fedora = " ";
+        FreeBSD = " ";
+        Garuda = "󰛓 ";
+        Gentoo = " ";
+        HardenedBSD = "󰞌 ";
+        Illumos = "󰈸 ";
+        Kali = " ";
+        Linux = " ";
+        Mabox = " ";
+        Macos = " ";
+        Manjaro = " ";
+        Mariner = " ";
+        MidnightBSD = " ";
+        Mint = " ";
+        NetBSD = " ";
+        NixOS = " ";
+        OpenBSD = "󰈺 ";
+        openSUSE = " ";
+        OracleLinux = "󰌷 ";
+        Pop = " ";
+        Raspbian = " ";
+        Redhat = " ";
+        RedHatEnterprise = " ";
+        RockyLinux = " ";
+        Redox = "󰀘 ";
+        Solus = "󰠳 ";
+        SUSE = " ";
+        Ubuntu = " ";
+        Unknown = " ";
+        Void = " ";
+        Windows = "󰍲 ";
+      };
+      package.symbol = "󰏗 ";
+      perl.symbol = " ";
+      php.symbol = " ";
+      pijul_channel.symbol = " ";
+      python.symbol = " ";
+      rlang.symbol = "󰟔 ";
+      ruby.symbol = " ";
+      rust.symbol = "󱘗 ";
+      scala.symbol = " ";
+      swift.symbol = " ";
+      zig.symbol = " ";
+      gradle.symbol = " ";
+    };
   };
 
   programs.zsh = {
@@ -37,12 +140,7 @@ in
     };
     
     # Additional shell initialization
-    initContent = ''
-      # Source manual zshrc if it exists
-      if [[ -f ~/.zshrc.manual ]]; then
-        source ~/.zshrc.manual
-      fi
-      
+    initExtra = ''
       # History settings
       setopt HIST_VERIFY
       setopt SHARE_HISTORY
@@ -89,6 +187,4 @@ in
     };
   };
   
-  # Link to manual zshrc for additional customizations
-  home.file.".zshrc.manual".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/zshrc/.zshrc";
 }

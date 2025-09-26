@@ -33,9 +33,14 @@ in
   # LazyGit - TUI for git
   programs.lazygit = {
     enable = true;
+    settings = {
+      git = {
+        autoFetch = false;
+      };
+      gui = {
+        mouseEvents = false;
+        nerdFontsVersion = "3";
+      };
+    };
   };
-
-  # LazyGit config file symlink
-  xdg.configFile."lazygit".source = config.lib.file.mkOutOfStoreSymlink 
-    "${config.home.homeDirectory}/workspace/dotfiles/lazygit/.config/lazygit";
 }
