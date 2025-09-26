@@ -68,13 +68,12 @@
                   # Machine-specific configuration (can override platform defaults)
                   (./systems + "/${hostname}")
                   
-                  # Home Manager integration
+                  # Home Manager integration (configuration now in platform defaults)
                   homeManagerModule
                   {
                     home-manager = {
                       useGlobalPkgs = true;
                       useUserPackages = true;
-                      users.${username} = import ((if isDarwin then ./darwin else ./linux) + "/home-manager");
                       extraSpecialArgs = { 
                         inherit inputs username userFullName; 
                         userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
@@ -111,26 +110,10 @@
         };
       };
 
-            # Standalone Home Manager configurations (optional)
-            homeConfigurations = {
-              "${username}@nixos" = home-manager.lib.homeManagerConfiguration {
-                pkgs = nixpkgs.legacyPackages.x86_64-linux;
-                modules = [ ./linux/home-manager ];
-                extraSpecialArgs = { 
-                  inherit inputs username userFullName; 
-                  userEmail = linuxUserEmail;
-                };
-              };
-              
-              "${username}@mac" = home-manager.lib.homeManagerConfiguration {
-                pkgs = nixpkgs-darwin.legacyPackages.x86_64-darwin;
-                modules = [ ./darwin/home-manager ];
-                extraSpecialArgs = { 
-                  inherit inputs username userFullName; 
-                  userEmail = darwinUserEmail;
-                };
-              };
-            };
+            # Standalone Home Manager configurations removed
+            # Home Manager configuration is now integrated into platform defaults
+            # Use system configurations (nixosConfigurations/darwinConfigurations) instead
+            homeConfigurations = {};
 
       # Development shell
       devShells = flake-utils.lib.eachDefaultSystemMap (system: {
