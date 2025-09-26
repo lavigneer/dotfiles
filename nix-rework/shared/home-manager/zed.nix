@@ -16,17 +16,6 @@ in
       };
       vim_mode = lib.mkDefault true;
       
-      # UI preferences (use mkDefault to allow stylix overrides)
-      ui_font_size = lib.mkDefault (if isDarwin then 14 else 12);
-      buffer_font_size = lib.mkDefault (if isDarwin then 14 else 12);
-      
-      # Theme settings (will be managed by stylix if enabled)
-      # theme = {
-      #   mode = "system";
-      #   light = "One Light";
-      #   dark = "One Dark";
-      # };
-      
       # Editor behavior
       soft_wrap = lib.mkDefault "editor_width";
       tab_size = lib.mkDefault 2;
@@ -103,15 +92,11 @@ in
   # Additional packages that Zed might need
   home.packages = with pkgs; [
     # Language servers (if not already included elsewhere)
-    nil # Nix LSP
+    nil
     rust-analyzer
     
     # Formatters that Zed extensions might use
     nixpkgs-fmt
     rustfmt
-  ] ++ lib.optionals (!isDarwin) [
-    # Linux-specific packages for Zed
-  ] ++ lib.optionals isDarwin [
-    # macOS-specific packages for Zed
   ];
 }

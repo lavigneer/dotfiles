@@ -10,8 +10,6 @@
     # Note: Not importing gaming.nix since this is macOS
   ];
   
-  # ===== HOME MANAGER MODULE IMPORTS =====
-  # This system imports specific program and window manager modules
   home-manager.users.${username} = {
     imports = [
       # Shared Home Manager modules this system wants
@@ -27,47 +25,33 @@
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
-      
-      # macOS programs this system wants
       ../../darwin/modules/programs/karabiner.nix
-      
-      # macOS window managers this system wants
       ../../darwin/modules/window-managers/aerospace.nix
     ];
 
     # Enable specific window managers for this system
     windowManagers = {
-      aerospace.enable = true;  # Enable AeroSpace tiling window manager
+      aerospace.enable = true;
     };
 
-    # Note: Thunderbird module is available but not imported (using native macOS mail apps)
-
     # macOS-specific tools and utilities
-    home.packages = with pkgs; [
-      mas             # Mac App Store CLI
-      darwin.cctools  # macOS development tools
-    ];
+    home.packages = with pkgs; [];
 
-    # Email configuration for this system (work email)
+    # Email configuration for this system
     accounts.email.accounts = {
       "Work" = {
         primary = true;
         address = userEmail;
         userName = userEmail;
         realName = userFullName;
-        # Add work email provider settings as needed
       };
     };
   };
 
-  # Machine-specific configuration for this particular macOS system
-  
-  # Machine-specific macOS system preferences (only overrides of platform defaults)
   system.defaults = {
-    # Dock settings - personal preferences for this work machine
     dock = {
-      tilesize = 48;        # Larger tiles than platform default (36)
-      largesize = 64;       # Larger magnified size than platform default (56)
+      tilesize = 48;
+      largesize = 64;
       orientation = "bottom";
     };
   };

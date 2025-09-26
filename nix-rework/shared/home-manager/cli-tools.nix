@@ -25,11 +25,8 @@ in
   };
 
   home.packages = with pkgs; [
-    btop
     htop
     fd
-    tree
-    dig
     curl
     wget
     unzip

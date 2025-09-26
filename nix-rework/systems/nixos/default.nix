@@ -2,24 +2,17 @@
 
 {
   imports = [
-    # Hardware-specific configuration for this machine
     ./hardware-configuration.nix
     
-    # Shared system modules this system wants
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
-    
-    # Linux-specific system modules
     ../../linux/modules/system/gaming.nix
   ];
 
-  # ===== HOME MANAGER MODULE IMPORTS =====
-  # This system imports specific program and window manager modules
   home-manager.users.${username} = {
     imports = [
-      # Shared Home Manager modules this system wants
       ../../shared/home-manager/core.nix
       ../../shared/home-manager/cli-tools.nix
       ../../shared/home-manager/development.nix
@@ -33,25 +26,18 @@
       ../../shared/home-manager/thunderbird.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
-      
-      # Linux programs this system wants
       ../../linux/modules/programs/desktop-apps.nix
       ../../linux/modules/programs/gaming.nix
-      
-      # Linux window managers this system wants  
       ../../linux/modules/window-managers/i3.nix
       ../../linux/modules/window-managers/sway.nix
       ../../linux/modules/window-managers/hyprland.nix
     ];
 
-    # Enable specific window managers for this system
     windowManagers = {
-      i3.enable = true;           # Enable i3
-      sway.enable = true;         # Enable Sway  
-      hyprland.enable = true;     # Enable Hyprland
+      i3.enable = true;
+      sway.enable = true;
+      hyprland.enable = true;
     };
-
-    # Thunderbird is enabled by importing the shared module
 
     accounts.email.accounts = {
       "Hotmail" = {
@@ -75,8 +61,6 @@
       };
     };
   };
-
-  # Machine-specific configuration for this particular NixOS system
 
   # Bootloader configuration
   boot.loader.systemd-boot.enable = true;

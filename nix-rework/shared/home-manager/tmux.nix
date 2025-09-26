@@ -16,26 +16,6 @@ in
     plugins = with pkgs.tmuxPlugins; [
       sensible
       pain-control
-      resurrect
-      continuum
-      {
-        plugin = tmux-thumbs;
-        extraConfig = ''
-          set -g @thumbs-key F
-          set -g @thumbs-alphabet dvorak-homerow
-          set -g @thumbs-contrast 1
-        '';
-      }
-      {
-        plugin = vim-tmux-navigator;
-        extraConfig = ''
-          # Smart pane switching with awareness of Vim splits.
-          bind -n C-h run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-h) || tmux select-pane -L"
-          bind -n C-j run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-j) || tmux select-pane -D"
-          bind -n C-k run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-k) || tmux select-pane -U"
-          bind -n C-l run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-l) || tmux select-pane -R"
-        '';
-      }
     ];
     
     extraConfig = ''

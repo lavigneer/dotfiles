@@ -1,208 +1,180 @@
-# Unified Nix Configuration
+# Nix Configuration
 
-This directory contains a unified Nix flake configuration that manages both NixOS (Linux) and nix-darwin (macOS) systems using Home Manager for user-level package management and configuration.
+A clean, modular Nix configuration supporting both NixOS and nix-darwin with Home Manager integration.
 
-## Structure
+## 🏗️ Architecture
+
+This configuration uses a layered architecture with shared components and platform-specific overrides:
 
 ```
 nix-rework/
-├── flake.nix                          # Main flake configuration
-├── systems/                           # System-specific configurations
-│   ├── nixos/                        # NixOS configuration
-│   │   ├── default.nix               # Main NixOS config
-│   │   └── hardware-configuration.nix # Hardware-specific config
-│   └── mac/                          # nix-darwin configuration
-│       └── default.nix               # Main macOS config
-├── modules/
-│   ├── home-manager/                 # Home Manager configurations
-│   │   ├── default.nix               # Main home config
-│   │   ├── programs/                 # Program configurations
-│   │   │   ├── default.nix
-│   │   │   ├── git.nix
-│   │   │   ├── zsh.nix
-│   │   │   ├── neovim.nix
-│   │   │   ├── tmux.nix
-│   │   │   └── terminals.nix
-│   │   └── services/                 # Service configurations
-│   │       └── default.nix
-│   └── shared/                       # Shared configurations
-│       └── default.nix
-└── README.md                         # This file
+├── flake.nix                    # Main flake entry point
+├── shared/                      # Cross-platform components
+├── linux/                      # Linux/NixOS specific
+├── darwin/                      # macOS/nix-darwin specific
+└── systems/                     # Machine-specific configs
 ```
 
-## Features
+## 📁 Directory Structure
 
-- **Unified Configuration**: Single flake manages both Linux and macOS systems
-- **Home Manager Integration**: User-level packages and configurations
-- **Platform Detection**: Automatically applies platform-specific configurations
-- **Dotfile Symlinks**: Links to your existing dotfiles in the main directory
-- **Modular Design**: Easy to customize and extend
+### `shared/` - Cross-platform Components
+```
+shared/
+├── home-manager/               # User-level configs
+│   ├── cli-tools.nix          # CLI utilities (fzf, ripgrep, direnv, yazi)
+│   ├── development.nix        # Programming languages & tools
+│   ├── git.nix               # Git configuration
+│   ├── neovim.nix            # Neovim with LSPs and tools
+│   ├── zsh.nix               # Zsh with oh-my-zsh and starship
+│   ├── tmux.nix              # Tmux configuration
+│   ├── terminals.nix         # Terminal emulators (ghostty)
+│   ├── zed.nix               # Zed editor
+│   ├── browser.nix           # Web browser (Chrome)
+│   ├── discord.nix           # Discord
+│   ├── docker.nix            # Docker tools (lazydocker)
+│   ├── thunderbird.nix       # Email client
+│   └── core.nix              # Basic Home Manager setup
+└── system/                    # System-level configs
+    ├── nix.nix               # Core Nix settings
+    ├── fonts.nix             # Font packages
+    ├── shell.nix             # System shell config
+    └── stylix.nix            # Theming with Stylix
+```
 
-## Setup Instructions
+### `linux/` - Linux Platform
+```
+linux/
+├── default.nix               # Linux platform defaults
+└── modules/
+    ├── system/               # System-level Linux configs
+    │   ├── gaming.nix       # Steam and gaming setup
+    │   ├── polybar.nix      # Status bar (shared across WMs)
+    │   └── rofi.nix         # Application launcher (shared)
+    ├── programs/             # User programs (Linux-specific)
+    │   ├── desktop-apps.nix # Desktop applications
+    │   └── gaming.nix       # User gaming tools (lutris)
+    └── window-managers/      # Window manager configs
+        ├── wayland.nix      # Wayland ecosystem (mako, grim, slurp, kanshi)
+        ├── x11.nix          # X11 ecosystem (dunst, picom, feh, xss-lock)
+        ├── i3.nix           # i3 window manager
+        ├── sway.nix         # Sway compositor
+        └── hyprland.nix     # Hyprland compositor
+```
 
-### Prerequisites
+### `darwin/` - macOS Platform
+```
+darwin/
+├── default.nix               # macOS platform defaults
+└── modules/
+    ├── programs/
+    │   └── karabiner.nix     # Karabiner-Elements key remapping
+    └── window-managers/
+        └── aerospace.nix     # AeroSpace tiling window manager
+```
 
-1. **Install Nix** (if not already installed):
-   ```bash
-   # macOS or Linux
-   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-   ```
+### `systems/` - Machine-specific Configurations
+```
+systems/
+├── nixos/                    # Linux machine config
+│   ├── default.nix         # NixOS system configuration
+│   └── hardware-configuration.nix
+└── mac/                      # macOS machine config
+    └── default.nix          # nix-darwin system configuration
+```
 
-2. **Enable flakes** (if not already enabled):
-   ```bash
-   mkdir -p ~/.config/nix
-   echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
-   ```
+## 🎯 Key Features
 
-### NixOS Setup (Linux PC)
+### Modular Design
+- **Shared components** for cross-platform consistency
+- **Platform-specific modules** for Linux and macOS differences
+- **Machine-specific overrides** for personal preferences
 
-1. **Copy hardware configuration**:
-   ```bash
-   sudo cp /etc/nixos/hardware-configuration.nix ~/workspace/dotfiles/nix-rework/systems/nixos/
-   ```
+### Window Manager Support
+- **Linux**: i3 (X11), Sway (Wayland), Hyprland (Wayland)
+- **macOS**: AeroSpace tiling window manager
+- **Unified tools**: Rofi launcher and Polybar status bar across all WMs
 
-2. **Update flake inputs**:
-   ```bash
-   cd ~/workspace/dotfiles/nix-rework
-   nix flake update
-   ```
+### Development Environment
+- **Languages**: Rust, Go, Node.js, Nix
+- **Editors**: Neovim (with LSPs), Zed Editor
+- **Tools**: Git, Docker, CLI utilities
 
-3. **Test the configuration**:
-   ```bash
-   sudo nixos-rebuild dry-build --flake .#nixos
-   ```
+### Clean Architecture
+- **DRY principle**: No code duplication
+- **Layered imports**: Platform defaults → Machine overrides
+- **Consistent formatting**: Clean, readable configuration
 
-4. **Apply the configuration**:
-   ```bash
-   sudo nixos-rebuild switch --flake .#nixos
-   ```
+## 🚀 Usage
 
-### macOS Setup (nix-darwin)
-
-1. **Install nix-darwin**:
-   ```bash
-   nix build .#darwinConfigurations.mac.system
-   ./result/sw/bin/darwin-rebuild switch --flake .#mac
-   ```
-
-2. **For subsequent updates**:
-   ```bash
-   darwin-rebuild switch --flake ~/workspace/dotfiles/nix-rework#mac
-   ```
-
-### Home Manager (Optional Standalone)
-
-If you want to use Home Manager without system-level Nix:
-
+### Build NixOS System
 ```bash
-# Linux
-home-manager switch --flake .#elavigne@nixos
-
-# macOS  
-home-manager switch --flake .#elavigne@mac
+sudo nixos-rebuild switch --flake ~/workspace/dotfiles/nix-rework#nixos
 ```
 
-## Configuration Customization
+### Build macOS System
+```bash
+darwin-rebuild switch --flake ~/workspace/dotfiles/nix-rework#mac
+```
+
+### Development Shell
+```bash
+nix develop
+```
+
+## 🔧 Configuration
 
 ### Adding New Programs
+1. **Cross-platform**: Add to `shared/home-manager/`
+2. **Linux-specific**: Add to `linux/modules/programs/`
+3. **macOS-specific**: Add to `darwin/modules/programs/`
 
-1. Create a new `.nix` file in `modules/home-manager/programs/`
-2. Import it in `modules/home-manager/programs/default.nix`
-3. Configure the program using Home Manager options
+### Adding New Window Managers
+1. Create new file in `linux/modules/window-managers/`
+2. Import appropriate base module (`wayland.nix` or `x11.nix`)
+3. Import shared components (`../system/polybar.nix`, `../system/rofi.nix`)
+4. Add to system imports in `systems/nixos/default.nix`
 
-### Platform-Specific Configurations
+### Customizing Per Machine
+- Edit files in `systems/*/default.nix`
+- Override platform defaults using higher priority
+- Add machine-specific Home Manager module imports
 
-Use the `isDarwin` variable to conditionally apply configurations:
+## 📋 System Requirements
 
-```nix
-{ config, pkgs, ... }:
+- **NixOS**: 25.05 or later
+- **nix-darwin**: Compatible version
+- **Home Manager**: Latest stable
+- **Flakes**: Enabled (`experimental-features = nix-command flakes`)
 
-let
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-in
-{
-  # This will only apply on macOS
-  programs.someProgram = pkgs.lib.mkIf isDarwin {
-    enable = true;
-    # macOS-specific settings
-  };
-  
-  # This will only apply on Linux
-  services.someService = pkgs.lib.mkIf (!isDarwin) {
-    enable = true;
-    # Linux-specific settings
-  };
-}
-```
+## 🎨 Theming
 
-### Adding System Packages
+The configuration uses Stylix for consistent theming across:
+- Terminal applications
+- Desktop environments
+- Development tools
 
-- **System-level packages**: Add to `environment.systemPackages` in system configs
-- **User-level packages**: Add to `home.packages` in Home Manager config
+Theme is configured in `shared/system/stylix.nix` and enabled for both platforms.
 
-### Updating Dotfile Symlinks
+## 🔄 Updates
 
-To add new dotfile symlinks, edit the `xdg.configFile` section in `modules/home-manager/default.nix`.
-
-## Daily Usage
-
-### Useful Commands
-
+To update all inputs:
 ```bash
-# Update flake inputs
 nix flake update
-
-# Rebuild NixOS system
-sudo nixos-rebuild switch --flake ~/workspace/dotfiles/nix-rework#nixos
-
-# Rebuild macOS system  
-darwin-rebuild switch --flake ~/workspace/dotfiles/nix-rework#mac
-
-# Rebuild Home Manager only
-home-manager switch --flake ~/workspace/dotfiles/nix-rework
-
-# Check what will be built (dry run)
-nixos-rebuild dry-build --flake ~/workspace/dotfiles/nix-rework#nixos
-darwin-rebuild check --flake ~/workspace/dotfiles/nix-rework#mac
-
-# Garbage collect old generations
-sudo nix-collect-garbage -d
-nix-collect-garbage -d
-
-# List generations
-sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
-home-manager generations
 ```
 
-### Shell Aliases
+To update specific input:
+```bash
+nix flake lock --update-input nixpkgs
+```
 
-The zsh configuration includes helpful aliases:
-- `rebuild-nixos`: Rebuild NixOS system
-- `rebuild-darwin`: Rebuild macOS system  
-- `rebuild-home`: Rebuild Home Manager
+## 📝 Notes
 
-## Troubleshooting
+- **Email configuration** is machine-specific (personal vs work)
+- **Gaming setup** is Linux-only
+- **Polybar** works on Wayland via XWayland
+- **Rofi 2.0.0+** has native Wayland support
+- **Configuration files** are symlinked from dotfiles directory
 
-### Common Issues
+## 🤝 Contributing
 
-1. **Dotfile symlinks not working**: Ensure the dotfiles directory exists and paths are correct
-2. **Permission errors**: Make sure you're using `sudo` for system rebuilds on NixOS
-3. **Platform detection**: Check that `isDarwin` variable is working correctly
-4. **Missing hardware config**: Copy from `/etc/nixos/hardware-configuration.nix` on NixOS
-
-### Getting Help
-
-- Check the [NixOS Manual](https://nixos.org/manual/nixos/stable/)
-- Check the [nix-darwin Manual](https://daiderd.com/nix-darwin/manual/)  
-- Check the [Home Manager Manual](https://nix-community.github.io/home-manager/)
-- Visit the [NixOS Discourse](https://discourse.nixos.org/)
-
-## Migration Notes
-
-This configuration is designed to work alongside your existing dotfiles. The old `nixos/` directory configuration is preserved for reference. Once you've verified everything works, you can:
-
-1. Update your system to use this new flake
-2. Remove the old `nixos/` directory if desired
-3. Customize the configuration to your preferences
-
-The configuration maintains compatibility with your existing dotfile structure by using symlinks to the original locations.
+This is a personal configuration, but feel free to use it as inspiration for your own setup. The modular architecture makes it easy to adapt to different needs.

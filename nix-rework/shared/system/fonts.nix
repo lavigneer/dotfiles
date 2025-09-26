@@ -13,9 +13,5 @@
     nerd-fonts.go-mono
     nerd-fonts.jetbrains-mono
     nerd-fonts.heavy-data
-    
-    # Additional fonts can be added here
-    # nerd-fonts.fira-code
-    # nerd-fonts.source-code-pro
   ];
 }

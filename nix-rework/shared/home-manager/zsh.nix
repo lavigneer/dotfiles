@@ -21,7 +21,6 @@ in
         "kubectl"
         "tmux"
         "fzf"
-        "z"
       ];
       theme = "";
     };

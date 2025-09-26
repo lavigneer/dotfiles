@@ -9,7 +9,7 @@ in
     userName = userFullName;
     userEmail = userEmail;
     
-    extraConfig = lib.mkMerge [
+    extraConfig = 
       {
         init.defaultBranch = "main";
         core.editor = "nvim";
@@ -17,11 +17,7 @@ in
         push.autoSetupRemote = true;
         diff.tool = "nvimdiff";
         merge.tool = "nvimdiff";
-      }
-      (lib.mkIf isDarwin {
-        # Work-specific git settings for macOS
-      })
-    ];
+      };
   };
   
   # GitHub CLI
@@ -37,10 +33,6 @@ in
   # LazyGit - TUI for git
   programs.lazygit = {
     enable = true;
-    # Additional lazygit configuration can go here
-    # settings = {
-    #   # Custom lazygit settings
-    # };
   };
 
   # LazyGit config file symlink
