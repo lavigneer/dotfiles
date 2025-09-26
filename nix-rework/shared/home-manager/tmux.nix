@@ -6,14 +6,10 @@ in
 {
   programs.tmux = {
     enable = true;
-    
-    # Basic settings
     terminal = "screen-256color";
     historyLimit = 10000;
     mouse = true;
     keyMode = "vi";
-    
-    # Start window numbering at 1
     baseIndex = 1;
     
     # Plugins

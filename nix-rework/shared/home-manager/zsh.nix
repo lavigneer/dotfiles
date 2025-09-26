@@ -4,20 +4,14 @@ let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
 in
 {
-  # Starship prompt (moved from default.nix)
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    # You can add custom settings here or let it use defaults
-    # settings = {
-    #   # Custom starship configuration
-    # };
   };
 
   programs.zsh = {
     enable = true;
     
-    # Oh My Zsh configuration
     oh-my-zsh = {
       enable = true;
       plugins = [
@@ -29,17 +23,14 @@ in
         "fzf"
         "z"
       ];
-      theme = ""; # Disabled to use starship instead
+      theme = "";
     };
     
-    # Environment variables
     sessionVariables = {
       ZSH_TMUX_CONFIG = "${config.home.homeDirectory}/.config/tmux/tmux.conf";
     };
     
-    # Shell aliases
     shellAliases = {
-      # Nix shortcuts
       nix-shell = "nix-shell --run zsh";
       rebuild-nixos = "sudo nixos-rebuild switch --flake ~/workspace/dotfiles/nix-rework#nixos";
       rebuild-darwin = "darwin-rebuild switch --flake ~/workspace/dotfiles/nix-rework#mac";

@@ -11,38 +11,27 @@ in
     viAlias = true;
     vimdiffAlias = true;
     
-    # Extra packages available to Neovim
     extraPackages = with pkgs; [
-      # Language servers
-      nil # Nix LSP
+      nil
       nodePackages.typescript-language-server
       nodePackages.bash-language-server
-      nodePackages.vscode-langservers-extracted # HTML, CSS, JSON, ESLint
+      nodePackages.vscode-langservers-extracted
       lua-language-server
       gopls
       rust-analyzer
       pyright
-      
-      # Formatters
       stylua
       nixpkgs-fmt
       nodePackages.prettier
       black
       rustfmt
-      # gofmt is included with go package
-      
-      # DAP (Debug Adapter Protocol)
-      delve # Go debugger
-      
-      # Tools
+      delve
       tree-sitter
       ripgrep
       fd
       nodePackages.neovim
-      
-      # Clipboard support
-      wl-clipboard # Wayland
-      xclip # X11
+      wl-clipboard
+      xclip
     ];
     
     # Neovim configuration
