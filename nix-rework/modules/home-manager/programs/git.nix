@@ -66,4 +66,17 @@
       prompt = "enabled";
     };
   };
+
+  # LazyGit - TUI for git
+  programs.lazygit = {
+    enable = true;
+    # Additional lazygit configuration can go here
+    # settings = {
+    #   # Custom lazygit settings
+    # };
+  };
+
+  # LazyGit config file symlink
+  xdg.configFile."lazygit".source = config.lib.file.mkOutOfStoreSymlink 
+    "${config.home.homeDirectory}/workspace/dotfiles/lazygit/.config/lazygit";
 }

@@ -90,11 +90,10 @@ in
     # File manager
     "yazi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/yazi/.config/yazi";
     
-    # Lazy git
-    "lazygit".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/lazygit/.config/lazygit";
-    
     # LazyDocker
     "lazydocker".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/lazydocker/.config/lazydocker";
+    
+    # Lazy git config moved to git.nix module
   };
 
   # Enable XDG directories

@@ -65,8 +65,7 @@ in
       # };
     };
 
-    # LazyGit
-    lazygit.enable = true;
+    # LazyGit moved to git.nix module
 
     # Platform-specific programs are now in platform files
   };
