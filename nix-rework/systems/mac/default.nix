@@ -10,7 +10,6 @@
       ../../darwin/modules/programs/git.nix
       ../../darwin/modules/programs/email.nix
       ../../darwin/modules/programs/karabiner.nix
-      ../../darwin/modules/programs/darwin.nix
       
       # macOS window managers this system wants
       ../../darwin/modules/window-managers/aerospace.nix
