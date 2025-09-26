@@ -177,3 +177,10 @@ esac
 if [ -e /home/elavigne/.nix-profile/etc/profile.d/nix.sh ]; then . /home/elavigne/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 #[ "$ASDF_DATA_DIR" != "" ] && [[ ! -r $ASDF_DATA_DIR/plugins/java/set-java-home.zsh ]] || source $ASDF_DATA_DIR/plugins/java/set-java-home.zsh
+
+# Added by Windsurf
+export PATH="/Users/elavigne/.codeium/windsurf/bin:$PATH"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/elavigne/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
