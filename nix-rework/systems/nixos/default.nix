@@ -8,8 +8,10 @@
     # Shared system modules this system wants
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix
-    ../../shared/system/gaming.nix
     ../../shared/system/shell.nix
+    
+    # Linux-specific system modules
+    ../../linux/modules/system/gaming.nix
   ];
 
   # ===== HOME MANAGER MODULE IMPORTS =====
@@ -28,9 +30,12 @@
       ../../shared/home-manager/zed.nix
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/thunderbird.nix
+      ../../shared/home-manager/discord.nix
+      ../../shared/home-manager/browser.nix
       
       # Linux programs this system wants
       ../../linux/modules/programs/desktop-apps.nix
+      ../../linux/modules/programs/gaming.nix
       
       # Linux window managers this system wants  
       ../../linux/modules/window-managers/i3.nix

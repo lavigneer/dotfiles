@@ -1,17 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Linux desktop applications
+  # Linux-specific desktop applications
   home.packages = with pkgs; [
-    discord
-    google-chrome
-    lutris
-    pavucontrol
-    solaar
+    pavucontrol   # PulseAudio volume control (Linux audio)
+    solaar        # Logitech device manager (more useful on Linux desktops)
   ];
-
-  # Browser configuration
-  home.sessionVariables = {
-    BROWSER = "google-chrome";
-  };
 }
