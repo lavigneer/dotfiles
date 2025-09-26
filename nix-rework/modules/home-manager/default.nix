@@ -9,7 +9,7 @@ let
 in
 {
   imports = [
-    ./programs
+    # Programs and services are now imported per-platform
     ./services
   ];
 

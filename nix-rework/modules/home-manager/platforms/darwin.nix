@@ -4,6 +4,22 @@ let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
 in
 {
+  imports = [
+    # Core utilities and development tools
+    ../programs/utils.nix
+    
+    # macOS-specific program modules
+    ../programs/git.nix
+    ../programs/zsh.nix
+    ../programs/neovim.nix
+    ../programs/tmux.nix
+    ../programs/terminals.nix
+    ../programs/zed.nix
+    
+    # Note: No window managers imported for macOS
+    # Add other macOS-specific programs here as needed
+  ];
+
   # macOS-specific Home Manager configuration
 
   # macOS-specific packages

@@ -6,6 +6,17 @@ in
 {
   imports = [
     ../window-managers
+    
+    # Core utilities and development tools
+    ../programs/utils.nix
+    
+    # Linux-specific program modules
+    ../programs/git.nix
+    ../programs/zsh.nix
+    ../programs/neovim.nix
+    ../programs/tmux.nix
+    ../programs/terminals.nix
+    ../programs/zed.nix
   ];
 
   # Linux-specific Home Manager configuration

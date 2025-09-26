@@ -4,6 +4,16 @@ let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
 in
 {
+  # Starship prompt (moved from default.nix)
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    # You can add custom settings here or let it use defaults
+    # settings = {
+    #   # Custom starship configuration
+    # };
+  };
+
   programs.zsh = {
     enable = true;
     
@@ -19,7 +29,7 @@ in
         "fzf"
         "z"
       ];
-      theme = "robbyrussell"; # You can change this or disable if using starship
+      theme = ""; # Disabled to use starship instead
     };
     
     # Environment variables
