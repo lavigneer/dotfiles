@@ -3,13 +3,14 @@
 let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
   cfg = config.windowManagers.i3;
+  isLinux = !pkgs.stdenv.hostPlatform.isDarwin;
 in
 {
   options.windowManagers.i3 = {
     enable = lib.mkEnableOption "Enable i3 window manager configuration";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (isLinux && cfg.enable) {
     # i3-specific packages
     home.packages = with pkgs; [
       i3status

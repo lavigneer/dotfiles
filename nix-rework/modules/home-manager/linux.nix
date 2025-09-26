@@ -8,8 +8,8 @@ in
     # Core Home Manager setup
     ./core.nix
     
-    # Window managers
-    ./window-managers
+    # Window managers (Linux-specific)
+    ./window-managers/linux.nix
     
     # Program modules
     ./programs/cli-tools.nix

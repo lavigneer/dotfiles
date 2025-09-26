@@ -3,13 +3,14 @@
 let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
   cfg = config.windowManagers.hyprland;
+  isLinux = !pkgs.stdenv.hostPlatform.isDarwin;
 in
 {
   options.windowManagers.hyprland = {
     enable = lib.mkEnableOption "Enable Hyprland window manager configuration";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (isLinux && cfg.enable) {
     # Hyprland-specific packages
     home.packages = with pkgs; [
       hyprland

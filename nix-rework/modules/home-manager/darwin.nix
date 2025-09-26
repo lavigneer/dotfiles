@@ -18,12 +18,18 @@ in
     ./programs/terminals.nix
     ./programs/zed.nix
     ./programs/docker.nix
+    ./programs/karabiner.nix
     
-    # Note: No window managers imported for macOS
-    # Add other macOS-specific programs here as needed
+    # Window managers (macOS-specific)
+    ./window-managers/darwin.nix
   ];
 
   # macOS-specific Home Manager configuration
+
+  # Enable macOS window manager
+  windowManagers = {
+    aerospace.enable = true;  # Enable AeroSpace tiling window manager
+  };
 
   # macOS-specific packages
   home.packages = with pkgs; [
@@ -32,15 +38,13 @@ in
     
     # macOS development tools
     darwin.cctools
+    
+    # macOS window management and utilities moved to programs/macos-window-management.nix
   ];
 
   # macOS-specific XDG config files
   xdg.configFile = {
-    # macOS window management
-    "aerospace".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/aerospace/.config/aerospace";
-    
-    # macOS key remapping
-    "karabiner".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/karabiner/.config/karabiner";
+    # macOS window management configs moved to programs/macos-window-management.nix
   };
 
   # macOS-specific services
