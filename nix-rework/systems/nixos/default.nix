@@ -2,113 +2,82 @@
 
 {
   imports = [
+    # Hardware-specific configuration for this machine
     ./hardware-configuration.nix
   ];
 
-  # Automatic garbage collection
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 60d";
-  };
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Machine-specific configuration for this particular NixOS system
 
-  # Bootloader
+  # Bootloader configuration
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Networking
+  # Networking configuration
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  # Locale and timezone
+  # Time zone and locale (machine-specific)
   time.timeZone = "America/Edmonton";
   i18n.defaultLocale = "en_CA.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_CA.UTF-8";
+    LC_IDENTIFICATION = "en_CA.UTF-8";
+    LC_MEASUREMENT = "en_CA.UTF-8";
+    LC_MONETARY = "en_CA.UTF-8";
+    LC_NAME = "en_CA.UTF-8";
+    LC_NUMERIC = "en_CA.UTF-8";
+    LC_PAPER = "en_CA.UTF-8";
+    LC_TELEPHONE = "en_CA.UTF-8";
+    LC_TIME = "en_CA.UTF-8";
+  };
 
-  # Display and desktop
-  services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
-  services.gnome.gnome-keyring.enable = true;
-  
-  # i3 window manager
-  services.xserver.windowManager.i3 = {
+  # X11 and desktop environment (machine-specific choice)
+  services.xserver = {
     enable = true;
-    extraPackages = with pkgs; [ dmenu i3status i3lock ];
-  };
-  services.displayManager.defaultSession = "none+i3";
-  security.pam.services.i3lock.enable = true;
-
-  # Bluetooth
-  services.blueman.enable = true;
-
-  # Keyboard
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
+    displayManager.lightdm.enable = true;
+    # Window managers are configured via Home Manager
+    windowManager.i3.enable = true;
+    
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
   };
 
-  # Printing
-  services.printing.enable = true;
-
-  # Audio
-  services.pulseaudio.enable = false;
+  # Audio configuration
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-
-    wireplumber.extraConfig."10-bluez" = {
-      "monitor.bluez.properties" = {
-        "bluez5.enable-sbc-xq" = true;
-        "bluez5.enable-msbc" = true;
-        "bluez5.enable-hw-volume" = true;
-        "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
-      };
-    };
   };
 
-  # User configuration
-  users.users.${username} = {
-    isNormalUser = true;
-    description = "Eric Lavigne";
-    extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.zsh;
+  # Machine-specific services
+  services = {
+    # Enable OpenSSH daemon for this machine
+    openssh.enable = true;
+    
+    # Enable CUPS to print documents on this machine
+    printing.enable = true;
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # Gaming configuration moved to modules/system/gaming.nix
-
-  # System packages (keep minimal, move user packages to Home Manager)
+  # Machine-specific system packages (minimal - most packages via Home Manager)
   environment.systemPackages = with pkgs; [
-    # Essential system tools (minimal - most packages in Home Manager)
+    # Essential system tools for this machine
     wget
-    unzip
-    xss-lock
-    
-    # Development essentials
-    gcc
-    
-    # Gaming packages moved to modules/system/gaming.nix
+    curl
   ];
 
-  # Stylix theming
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+  # Machine-specific garbage collection settings (can override platform defaults)
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 60d";  # More aggressive on this machine
   };
-
-  # Shell configuration moved to modules/system/shell.nix
-
-  # Fonts configuration moved to modules/system/fonts.nix
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
-  # on your system were taken.
+  # on your system were taken. Don't change this after initial setup.
   system.stateVersion = "25.05";
 }

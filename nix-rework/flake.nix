@@ -59,33 +59,36 @@
             userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
           };
           modules = [
-            # Shared configuration
-            ./modules/shared
-            
-            # System configuration
-            (./systems + "/${hostname}")
-            
-            # Home Manager integration
-            homeManagerModule
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users.${username} = import (./modules/home-manager + (if isDarwin then "/darwin.nix" else "/linux.nix"));
-                extraSpecialArgs = { 
-                  inherit inputs username userFullName; 
-                  userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
-                };
+                  # Shared configuration across all platforms
+                  ./shared
+                  
+                  # Platform-specific configuration (provides defaults for the platform)
+                  (if isDarwin then ./darwin else ./linux)
+                  
+                  # Machine-specific configuration (can override platform defaults)
+                  (./systems + "/${hostname}")
+                  
+                  # Home Manager integration
+                  homeManagerModule
+                  {
+                    home-manager = {
+                      useGlobalPkgs = true;
+                      useUserPackages = true;
+                      users.${username} = import ((if isDarwin then ./darwin else ./linux) + "/home-manager");
+                      extraSpecialArgs = { 
+                        inherit inputs username userFullName; 
+                        userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+                      };
+                    };
+                  }
+                  
+                  # Stylix for both platforms
+                ] ++ (if isDarwin then [
+                  stylix.darwinModules.stylix
+                ] else [
+                  stylix.nixosModules.stylix
+                ]);
               };
-            }
-            
-            # Stylix for both platforms
-          ] ++ (if isDarwin then [
-            stylix.darwinModules.stylix
-          ] else [
-            stylix.nixosModules.stylix
-          ]);
-        };
     in
     {
       # NixOS configurations
@@ -108,26 +111,26 @@
         };
       };
 
-      # Standalone Home Manager configurations (optional)
-      homeConfigurations = {
-        "${username}@nixos" = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          modules = [ ./modules/home-manager/linux.nix ];
-          extraSpecialArgs = { 
-            inherit inputs username userFullName; 
-            userEmail = linuxUserEmail;
-          };
-        };
-        
-        "${username}@mac" = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs-darwin.legacyPackages.x86_64-darwin;
-          modules = [ ./modules/home-manager/darwin.nix ];
-          extraSpecialArgs = { 
-            inherit inputs username userFullName; 
-            userEmail = darwinUserEmail;
-          };
-        };
-      };
+            # Standalone Home Manager configurations (optional)
+            homeConfigurations = {
+              "${username}@nixos" = home-manager.lib.homeManagerConfiguration {
+                pkgs = nixpkgs.legacyPackages.x86_64-linux;
+                modules = [ ./linux/home-manager ];
+                extraSpecialArgs = { 
+                  inherit inputs username userFullName; 
+                  userEmail = linuxUserEmail;
+                };
+              };
+              
+              "${username}@mac" = home-manager.lib.homeManagerConfiguration {
+                pkgs = nixpkgs-darwin.legacyPackages.x86_64-darwin;
+                modules = [ ./darwin/home-manager ];
+                extraSpecialArgs = { 
+                  inherit inputs username userFullName; 
+                  userEmail = darwinUserEmail;
+                };
+              };
+            };
 
       # Development shell
       devShells = flake-utils.lib.eachDefaultSystemMap (system: {

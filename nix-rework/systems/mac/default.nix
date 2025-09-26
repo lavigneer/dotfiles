@@ -1,108 +1,82 @@
 { config, pkgs, inputs, username, ... }:
 
 {
-  # nix-darwin configuration for macOS
-
-  # Enable flakes and other experimental features
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Machine-specific configuration for this particular macOS system
   
-  # Auto upgrade nix package and the daemon service
-  services.nix-daemon.enable = true;
-  
-  # Garbage collection
-  nix.gc = {
-    automatic = true;
-    interval = { Weekday = 0; Hour = 2; Minute = 0; }; # Weekly on Sunday at 2 AM
-    options = "--delete-older-than 60d";
-  };
-
-  # User configuration
-  users.users.${username} = {
-    name = username;
-    home = "/Users/${username}";
-    shell = pkgs.zsh;
-  };
-
-  # System packages (keep minimal, most packages should be in Home Manager)
-  environment.systemPackages = with pkgs; [
-    # Essential tools (minimal - most packages in Home Manager)
-    vim
-  ];
-
-  # Fonts configuration moved to modules/system/fonts.nix
-
-  # Shell configuration moved to modules/system/shell.nix
-
-  # macOS system preferences
+  # Machine-specific macOS system preferences
   system.defaults = {
-    # Dock settings
+    # Dock settings for this machine
     dock = {
       autohide = true;
-      autohide-delay = 0.0;
-      autohide-time-modifier = 0.2;
-      minimize-to-application = true;
-      show-recents = false;
-      static-only = true;
-      tilesize = 48;
+      magnification = true;
+      tilesize = 48;        # Larger tiles for this machine
+      largesize = 64;
+      orientation = "bottom";
     };
-
+    
     # Finder settings
     finder = {
-      AppleShowAllExtensions = true;
-      FXEnableExtensionChangeWarning = false;
-      QuitMenuItem = true;
       _FXShowPosixPathInTitle = true;
+      FXEnableExtensionChangeWarning = false;
+      AppleShowAllExtensions = true;
+      ShowPathbar = true;
+      ShowStatusBar = true;
     };
-
-    # Login window settings
-    loginwindow = {
-      GuestEnabled = false;
-      DisableConsoleAccess = true;
+    
+    # Global UI settings for this machine
+    NSGlobalDomain = {
+      _HIHideMenuBar = false;  # Keep menu bar visible on this machine
+      AppleKeyboardUIMode = 3;
+      AppleShowAllExtensions = true;
+      AppleInterfaceStyle = "Dark";
+      "com.apple.sound.beep.feedback" = 0;
+      
+      # Machine-specific keyboard/mouse settings
+      KeyRepeat = 2;
+      InitialKeyRepeat = 15;
+      ApplePressAndHoldEnabled = false;
     };
-
-    # Screenshots
-    screencapture.location = "~/Pictures/Screenshots";
-
-    # Trackpad and mouse
+    
+    # Trackpad settings for this machine
     trackpad = {
       Clicking = true;
       TrackpadRightClick = true;
       TrackpadThreeFingerDrag = true;
     };
-
-    # Keyboard
-    NSGlobalDomain = {
-      AppleKeyboardUIMode = 3; # Full keyboard access for all controls
-      ApplePressAndHoldEnabled = false; # Disable press-and-hold for keys in favor of key repeat
-      KeyRepeat = 2; # Fast key repeat
-      InitialKeyRepeat = 15; # Faster initial key repeat
-      "com.apple.mouse.tapBehavior" = 1; # Tap to click
-      "com.apple.sound.beep.volume" = 0.0; # Disable system beep
+    
+    # Screenshot settings
+    screencapture = {
+      location = "~/Pictures/Screenshots";
+      type = "png";
     };
   };
 
-  # Keyboard shortcuts and key remapping
+  # Machine-specific keyboard settings
   system.keyboard = {
     enableKeyMapping = true;
     remapCapsLockToEscape = true;
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # Machine-specific system packages (minimal - most via Home Manager)
+  environment.systemPackages = with pkgs; [
+    # Essential system tools for this machine
+    vim
+  ];
 
-  # Stylix theming (same as NixOS for consistency, but you can customize)
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
-    
-    # macOS-specific styling can be added here
-    # For example, you might want a different theme for work:
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+  # Machine-specific garbage collection settings (can override platform defaults)
+  nix.gc = {
+    automatic = true;
+    interval = { Weekday = 0; Hour = 2; Minute = 0; };  # Sunday 2 AM for this machine
+    options = "--delete-older-than 30d";  # Less aggressive on work machine
+  };
+
+  # Machine-specific services
+  services = {
+    nix-daemon.enable = true;
   };
 
   # This value determines the nix-darwin release from which the default
   # settings for stateful data, like file locations and database versions
-  # on your system were taken.
+  # on your system were taken. Don't change this after initial setup.
   system.stateVersion = 5;
 }
