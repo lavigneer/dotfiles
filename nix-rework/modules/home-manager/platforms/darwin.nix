@@ -40,4 +40,23 @@ in
     # macOS-specific environment variables
     BROWSER = "open";
   };
+
+  # macOS/Work-specific git configuration
+  programs.git = {
+    userEmail = userEmail; # This will be eric.lavigne@mongodb.com for macOS
+    extraConfig = {
+      # Work-specific git settings can go here
+    };
+  };
+
+  # Work-specific email accounts for macOS
+  accounts.email.accounts = {
+    "Work" = {
+      primary = true;
+      address = userEmail;
+      userName = userEmail;
+      realName = userFullName;
+      # Add work email provider settings as needed
+    };
+  };
 }

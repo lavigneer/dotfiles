@@ -36,7 +36,10 @@
       # User configuration
       username = "elavigne";
       userFullName = "Eric Lavigne";
-      userEmail = "lavigneer@gmail.com";
+      
+      # Platform-specific user info
+      linuxUserEmail = "hi_eric@hotmail.com";
+      darwinUserEmail = "eric.lavigne@mongodb.com";
       
       # System configurations
       linuxSystems = [ "x86_64-linux" ];
@@ -51,7 +54,10 @@
         in
         systemFunc {
           inherit system;
-          specialArgs = { inherit inputs username userFullName userEmail; };
+          specialArgs = { 
+            inherit inputs username userFullName; 
+            userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+          };
           modules = [
             # Shared configuration
             ./modules/shared
@@ -66,7 +72,10 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 users.${username} = import (./modules/home-manager + (if isDarwin then "/darwin.nix" else "/linux.nix"));
-                extraSpecialArgs = { inherit inputs username userFullName userEmail; };
+                extraSpecialArgs = { 
+                  inherit inputs username userFullName; 
+                  userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+                };
               };
             }
             
@@ -101,14 +110,20 @@
       homeConfigurations = {
         "${username}@nixos" = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          modules = [ ./modules/home-manager ];
-          extraSpecialArgs = { inherit inputs username userFullName userEmail; };
+          modules = [ ./modules/home-manager/linux.nix ];
+          extraSpecialArgs = { 
+            inherit inputs username userFullName; 
+            userEmail = linuxUserEmail;
+          };
         };
         
         "${username}@mac" = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs-darwin.legacyPackages.x86_64-darwin;
-          modules = [ ./modules/home-manager ];
-          extraSpecialArgs = { inherit inputs username userFullName userEmail; };
+          modules = [ ./modules/home-manager/darwin.nix ];
+          extraSpecialArgs = { 
+            inherit inputs username userFullName; 
+            userEmail = darwinUserEmail;
+          };
         };
       };
 

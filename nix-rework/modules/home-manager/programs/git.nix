@@ -4,7 +4,7 @@
   programs.git = {
     enable = true;
     userName = userFullName;
-    userEmail = userEmail;
+    # userEmail is set in platform-specific configurations
     
     extraConfig = {
       init.defaultBranch = "main";

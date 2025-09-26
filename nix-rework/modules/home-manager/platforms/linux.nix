@@ -146,15 +146,31 @@ in
     };
   };
 
+  # Linux-specific git configuration
+  programs.git = {
+    userEmail = userEmail; # This will be hi_eric@hotmail.com for Linux
+  };
+
   # Email accounts (Linux specific for thunderbird)
   accounts.email.accounts = {
-    "Gmail" = {
+    "Hotmail" = {
       primary = true;
-      address = userEmail;
+      address = userEmail; # This will be hi_eric@hotmail.com for Linux
       userName = userEmail;
       realName = userFullName;
-      thunderbird.enable = true;
-      flavor = "gmail.com";
+      thunderbird = {
+        enable = true;
+        settings = id: {
+          "mail.server.server_${id}.authMethod" = 10;
+          "mail.smtpserver.smtp_${id}.authMethod" = 10;
+        };
+      };
+      imap = {
+        authentication = "xoauth2";
+        host = "outlook.office365.com";
+        port = 993;
+        tls.enable = true;
+      };
     };
   };
 }
