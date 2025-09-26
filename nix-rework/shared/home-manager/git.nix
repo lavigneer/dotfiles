@@ -1,25 +1,35 @@
-{ config, pkgs, userFullName, userEmail, ... }:
+{ config, pkgs, lib, userFullName, userEmail, ... }:
 
+let
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+in
 {
   programs.git = {
     enable = true;
     userName = userFullName;
-    # userEmail is set in platform-specific configurations
+    userEmail = userEmail;
     
-    extraConfig = {
-      init.defaultBranch = "main";
-      core.editor = "nvim";
-      pull.rebase = true;
-      push.autoSetupRemote = true;
-      
-      # Better diff and merge tools
-      diff.tool = "nvimdiff";
-      merge.tool = "nvimdiff";
-      
-      # Signing commits (optional)
-      # commit.gpgsign = true;
-      # user.signingkey = "YOUR_GPG_KEY_ID";
-    };
+    extraConfig = lib.mkMerge [
+      {
+        # Shared git configuration
+        init.defaultBranch = "main";
+        core.editor = "nvim";
+        pull.rebase = true;
+        push.autoSetupRemote = true;
+        
+        # Better diff and merge tools
+        diff.tool = "nvimdiff";
+        merge.tool = "nvimdiff";
+        
+        # Signing commits (optional)
+        # commit.gpgsign = true;
+        # user.signingkey = "YOUR_GPG_KEY_ID";
+      }
+      (lib.mkIf isDarwin {
+        # Work-specific git settings for macOS can go here
+        # This is where you'd add any macOS/work-specific git configuration
+      })
+    ];
   };
   
   # GitHub CLI

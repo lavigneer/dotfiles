@@ -13,5 +13,8 @@
     
     # Node.js and npm
     nodejs_24
+    
+    # Nix development
+    nil # Nix LSP
   ];
 }

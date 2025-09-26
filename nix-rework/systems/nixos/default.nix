@@ -25,8 +25,6 @@
       # Linux programs this system wants
       ../../linux/modules/programs/desktop-apps.nix
       ../../linux/modules/programs/email.nix
-      ../../linux/modules/programs/development.nix
-      ../../linux/modules/programs/git.nix
       
       # Linux window managers this system wants  
       ../../linux/modules/window-managers/i3.nix
