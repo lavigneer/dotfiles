@@ -37,12 +37,8 @@ in
       
       # CLI utilities
       btop
-      fzf
-      ripgrep
+      # fzf, ripgrep, bat, eza, zoxide managed by utils.nix module
       fd
-      bat
-      eza
-      zoxide
       jq
       curl
       wget
@@ -64,7 +60,7 @@ in
       htop
       
       # File management
-      yazi
+      # yazi managed by utils.nix module
     ];
   };
 
@@ -79,19 +75,12 @@ in
 
   # XDG config files (shared across platforms)
   xdg.configFile = {
-    # Neovim configuration
-    "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazy-lock.json";
-    "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazyvim.json";
-    "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lua";
-    "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/stylua.toml";
-    
-    # File manager
-    "yazi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/yazi/.config/yazi";
+    # Neovim config moved to programs/neovim.nix
+    # Yazi config moved to programs/utils.nix
+    # Lazy git config moved to programs/git.nix
     
     # LazyDocker
     "lazydocker".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/lazydocker/.config/lazydocker";
-    
-    # Lazy git config moved to git.nix module
   };
 
   # Enable XDG directories

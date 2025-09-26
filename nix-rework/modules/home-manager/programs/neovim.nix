@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
+in
 {
   programs.neovim = {
     enable = true;
@@ -86,5 +89,13 @@
         vim.opt.clipboard = "unnamedplus"
       end
     '';
+  };
+
+  # Neovim configuration files
+  xdg.configFile = {
+    "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazy-lock.json";
+    "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lazyvim.json";
+    "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lua";
+    "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/stylua.toml";
   };
 }

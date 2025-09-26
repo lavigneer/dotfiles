@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
+in
 {
   # Core utilities and development tools
   programs = {
@@ -24,5 +27,34 @@
       enable = true;
       enableZshIntegration = true;
     };
+
+    # Better cat replacement
+    bat = {
+      enable = true;
+      config = {
+        # Let stylix handle the theme
+        style = "numbers,changes,header";
+      };
+    };
+    
+    # Better ls replacement
+    eza = {
+      enable = true;
+      enableZshIntegration = true;
+      icons = "auto";
+      git = true;
+    };
+    
+    # Smart cd replacement
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+  };
+
+  # Configuration files for utilities
+  xdg.configFile = {
+    # Yazi file manager
+    "yazi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/yazi/.config/yazi";
   };
 }
