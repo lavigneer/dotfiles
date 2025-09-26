@@ -19,10 +19,6 @@
     steam
     steam-run
     steam-unwrapped
-    
-    # Additional gaming tools can be added here
-    # gamemode
-    # mangohud
   ];
 
   # Gaming-related hardware support
