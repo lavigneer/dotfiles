@@ -110,7 +110,10 @@ if (( $+commands[bazel] )); then
 fi
 
 # User configuration
-ZSH_TMUX_AUTOSTART=true
+# Do not use tmux when in vscode (or similar) as the key-bindings interfere
+if [[ "$TERM_PROGRAM" != "vscode" ]]; then
+  ZSH_TMUX_AUTOSTART=true
+fi
 ZSH_TMUX_AUTOCONNET=false
 ZSH_TMUX_AUTOQUIT=false
 ZSH_TMUX_AUTOSTART_ONCE=false
