@@ -218,6 +218,8 @@
   mini = {
     enable = true;
     modules = {
+      # Base16 colorscheme support for stylix
+      base16 = {};
       basics = {
         options = {
           extra_ui = true;
@@ -352,6 +354,6 @@
   # Find and replace
   spectre.enable = true;
 
-  # Windsurf integration
+  # Helm integration
   helm.enable = true;
 }
