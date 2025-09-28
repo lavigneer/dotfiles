@@ -8,7 +8,7 @@ let
     set -e
     
     HOSTNAME=$(hostname)
-    FLAKE_PATH="$HOME/workspace/dotfiles/nix-rework"
+    FLAKE_PATH="$HOME/workspace/dotfiles"
     
     echo "Rebuilding system: $HOSTNAME"
     
