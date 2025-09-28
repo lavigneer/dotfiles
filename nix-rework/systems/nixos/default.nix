@@ -18,7 +18,7 @@
       ../../shared/home-manager/development.nix
       ../../shared/home-manager/git.nix
       ../../shared/home-manager/zsh.nix
-      ../../shared/home-manager/neovim.nix
+      ../../shared/home-manager/nixvim
       ../../shared/home-manager/tmux.nix
       ../../shared/home-manager/terminals.nix
       ../../shared/home-manager/zed.nix

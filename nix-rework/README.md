@@ -24,7 +24,10 @@ shared/
 │   ├── cli-tools.nix          # CLI utilities (fzf, ripgrep, direnv, yazi)
 │   ├── development.nix        # Programming languages & tools
 │   ├── git.nix               # Git configuration
-│   ├── neovim.nix            # Neovim with LSPs and tools
+│   ├── nixvim/               # Nixvim configuration directory
+│   │   ├── default.nix       # Main nixvim configuration
+│   │   ├── keymaps.nix       # Key mappings
+│   │   └── plugins.nix       # Plugin configurations
 │   ├── zsh.nix               # Zsh with oh-my-zsh and starship
 │   ├── tmux.nix              # Tmux configuration
 │   ├── terminals.nix         # Terminal emulators (ghostty)
