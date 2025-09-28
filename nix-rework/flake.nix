@@ -101,8 +101,8 @@
       darwinConfigurations = {
         # Your work Mac
         M-DX000XV19K = mkSystem {
-          system = "x86_64-darwin";  # Change to "aarch64-darwin" if you have Apple Silicon
-          hostname = "mac";
+          system = "aarch64-darwin";  # Change to "aarch64-darwin" if you have Apple Silicon
+          hostname = "M-DX000XV19K";
           isDarwin = true;
         };
       };
