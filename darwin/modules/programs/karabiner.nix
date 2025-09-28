@@ -11,6 +11,6 @@ in
 
   # Karabiner-Elements configuration
   xdg.configFile = {
-    "karabiner".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/darwin/config/karabiner.json";
+    "karabiner/karabiner.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/darwin/config/karabiner.json";
   };
 }
