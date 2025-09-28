@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.packages = with pkgs; [
@@ -18,8 +18,6 @@
     
     # Shadows
     shadow = true;
-    shadowRadius = 7;
-    shadowOffsets = [ (-7) (-7) ];
     shadowExclude = [
       "name = 'Notification'"
       "class_g = 'Conky'"
@@ -30,7 +28,6 @@
     
     # Fading
     fade = false;
-    fadeSteps = [ 0.03 0.03 ];
     
     # Transparency/Opacity
     activeOpacity = 1.0;
@@ -39,6 +36,15 @@
     
     # Background blurring
     settings = {
+      # Shadow settings
+      shadow-radius = 7;
+      shadow-offset-x = -7;
+      shadow-offset-y = -7;
+      
+      # Fade settings
+      fade-in-step = 0.03;
+      fade-out-step = 0.03;
+      
       # Backend
       backend = "xrender";
       
@@ -96,30 +102,15 @@
     screen-locker = {
       enable = true;
       lockCmd = "${pkgs.i3lock}/bin/i3lock -c 000000";
-      xautolock = {
-        enable = true;
-        time = 10;
-      };
     };
   };
 
   home.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "X11";
+    XDG_CURRENT_DESKTOP = lib.mkDefault "X11";
   };
 
   xsession = {
     enable = true;
     profileExtra = "export TERMINAL=ghostty";
-  };
-
-  # X11 server configuration
-  services.xserver = {
-    enable = true;
-    displayManager.lightdm.enable = true;
-    
-    xkb = {
-      layout = "us";
-      variant = "";
-    };
   };
 }

@@ -8,7 +8,6 @@
     
     # Rust ecosystem
     cargo
-    rustup
     rustc
     rust-analyzer
     rustfmt

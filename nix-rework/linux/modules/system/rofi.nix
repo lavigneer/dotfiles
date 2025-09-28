@@ -7,14 +7,10 @@
     extraConfig = {
       modi = "drun,run,combi";
       combi-modi = "drun,run";
-      timeout = {
-        action = "kb-cancel";
-        delay = 0;
-      };
-      filebrowser = {
-        directories-first = true;
-        sorting-method = "name";
-      };
+      timeout-action = "kb-cancel";
+      timeout-delay = 0;
+      filebrowser-directories-first = true;
+      filebrowser-sorting-method = "name";
     };
   };
 }

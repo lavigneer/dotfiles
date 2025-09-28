@@ -67,7 +67,6 @@
     
     # Cleanup settings
     onActivation = {
-      cleanup = lib.mkDefault "zap";
       autoUpdate = lib.mkDefault true;
       upgrade = lib.mkDefault true;
     };

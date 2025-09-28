@@ -8,14 +8,17 @@
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
     ../../darwin/modules/programs/terminals.nix
+    ../../darwin/modules/programs/1password.nix
   ];
+
+  home-manager.backupFileExtension = "bak";
   
   home-manager.users.${username} = {
     imports = [
       # Shared Home Manager modules this system wants
       ../../shared/home-manager/core.nix
       ../../shared/home-manager/cli-tools.nix
-      # ../../shared/home-manager/development.nix
+      ../../shared/home-manager/development.nix
       ../../shared/home-manager/git.nix
       ../../shared/home-manager/zsh.nix
       ../../shared/home-manager/neovim.nix
@@ -25,6 +28,7 @@
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
+      ../../shared/home-manager/asdf.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/window-managers/aerospace.nix
     ];

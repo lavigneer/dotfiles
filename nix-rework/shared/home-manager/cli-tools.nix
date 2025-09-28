@@ -14,7 +14,7 @@ let
     
     if [[ "${toString isDarwin}" == "1" ]]; then
       echo "Detected Darwin system - running darwin-rebuild..."
-      darwin-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
+      sudo darwin-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
     else
       echo "Detected NixOS system - running nixos-rebuild..."
       sudo nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"

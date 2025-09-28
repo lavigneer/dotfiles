@@ -26,9 +26,15 @@
 
     # Flake utils for easier multi-system support
     flake-utils.url = "github:numtide/flake-utils";
+
+    # Nixvim for declarative Neovim configuration
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-darwin, home-manager, nix-darwin, stylix, flake-utils, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-darwin, home-manager, nix-darwin, stylix, flake-utils, nixvim, ... }@inputs:
     let
       # Helper functions
       shared = import ./modules/shared;

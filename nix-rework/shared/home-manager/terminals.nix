@@ -12,7 +12,6 @@ in
       settings = lib.mkIf (!isDarwin) {
         font-family = "JetBrainsMono Nerd Font";
         font-size = 12;
-        theme = "base16";
         window-opacity = 0.95;
         confirm-close-surface = false;
       };
@@ -25,8 +24,6 @@ in
     file.".config/ghostty/config".text = ''
       font-family = JetBrainsMono Nerd Font
       font-size = 14
-      theme = base16
-      window-opacity = 0.95
       confirm-close-surface = false
     '';
   };
