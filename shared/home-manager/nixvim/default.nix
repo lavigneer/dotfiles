@@ -56,11 +56,6 @@
       colorcolumn = "80";
     };
 
-    # Colorschemes
-    colorschemes = {
-      kanagawa.enable = true;
-    };
-
     # Key mappings
     keymaps = import ./keymaps.nix;
 
