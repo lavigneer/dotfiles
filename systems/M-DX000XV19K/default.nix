@@ -29,6 +29,7 @@
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
       ../../darwin/modules/programs/karabiner.nix
+      ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/window-managers/aerospace.nix
     ];
 
