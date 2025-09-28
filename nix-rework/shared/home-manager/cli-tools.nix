@@ -25,6 +25,10 @@ let
 in
 {
   programs = {
+    awscli = {
+      enable = true;
+    };
+
     fzf = {
       enable = true;
       enableZshIntegration = true;
@@ -56,11 +60,6 @@ in
           mouse_events = [];
         };
       };
-    };
-
-    # JSON processor with native configuration
-    jq = {
-      enable = true;
     };
   };
 

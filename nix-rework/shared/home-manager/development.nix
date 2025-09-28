@@ -5,6 +5,7 @@
   home.packages = with pkgs; [
     # System development
     gnumake
+    bazelisk
     
     # Rust ecosystem
     cargo
@@ -36,7 +37,6 @@
     nil
     nixpkgs-fmt
     nixd
-    
   ];
   
   # Development environment variables
@@ -44,6 +44,7 @@
     # Go configuration
     GOPATH = "${config.home.homeDirectory}/go";
     GOBIN = "${config.home.homeDirectory}/go/bin";
+    GOROOT = "${pkgs.go}/share/go";
     
     # Rust configuration
     RUST_BACKTRACE = "1";
