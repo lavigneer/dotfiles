@@ -1,5 +1,0 @@
-git:
-  autoFetch: false
-gui:
-  mouseEvents: false
-  nerdFontsVersion: "3"

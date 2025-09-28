@@ -37,6 +37,8 @@ in
     ripgrep = {
       enable = true;
       arguments = [
+        "--hidden"
+        "--glob=!.git/*"
         "--max-columns-preview"
         "--colors=line:style:bold"
         "--smart-case"
@@ -64,6 +66,7 @@ in
   };
 
   home.packages = with pkgs; [
+    asdf
     htop     
     curl     
     wget     
@@ -76,6 +79,6 @@ in
     file     
     jq
     yq
-    rebuild-nix  # Universal rebuild script
+    rebuild-nix
   ];
 }

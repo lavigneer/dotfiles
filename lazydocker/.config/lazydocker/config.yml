@@ -1,3 +1,0 @@
-gui:
-  # Confusing, but this disables mouse events
-  mouseEvents: true

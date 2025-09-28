@@ -28,7 +28,6 @@
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
-      ../../shared/home-manager/asdf.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/window-managers/aerospace.nix
     ];

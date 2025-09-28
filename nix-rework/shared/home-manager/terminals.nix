@@ -22,9 +22,21 @@ in
   home = lib.mkIf isDarwin {
     # Create Ghostty config file manually on macOS
     file.".config/ghostty/config".text = ''
-      font-family = JetBrainsMono Nerd Font
-      font-size = 14
-      confirm-close-surface = false
+      window-decoration=false
+      confirm-close-surface=false
+      gtk-single-instance=true
+
+      mouse-scroll-multiplier=0.5
+
+      macos-secure-input-indication=true
+      macos-option-as-alt=true
+      macos-non-native-fullscreen=true
+
+      font-size=14
+      adjust-cell-height=4
+
+      cursor-style=block
+      shell-integration-features=no-cursor
     '';
   };
 

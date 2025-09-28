@@ -52,7 +52,7 @@
       };
       nodejs.symbol = " ";
       ocaml.symbol = " ";
-      "os.symbols" = {
+      os.symbols = {
         Alpaquita = " ";
         Alpine = " ";
         AlmaLinux = " ";
