@@ -187,19 +187,7 @@ in {
 
         "ghostty/config.user".source = config.lib.file.mkOutOfStoreSymlink
           "${config.home.homeDirectory}/workspace/dotfiles/ghostty/.config/ghostty/config";
-
-        "nvim/lazy-lock.json".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lazy-lock.json";
-
-        "nvim/lazyvim.json".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lazyvim.json";
-
-        "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/lua";
-
-        "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink
-          "${config.home.homeDirectory}/workspace/dotfiles/nvim/.config/nvim/stylua.toml";
-
+          
         "i3/config.user".source = config.lib.file.mkOutOfStoreSymlink
           "${config.home.homeDirectory}/workspace/dotfiles/i3/.config/i3/config";
         # "rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink

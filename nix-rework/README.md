@@ -58,7 +58,7 @@ linux/
     │   └── gaming.nix       # User gaming tools (lutris)
     └── window-managers/      # Window manager configs
         ├── wayland.nix      # Wayland ecosystem (mako, grim, slurp)
-        ├── x11.nix          # X11 ecosystem (dunst, picom, feh, xss-lock)
+        ├── x11.nix          # X11 ecosystem (dunst, feh, xss-lock)
         ├── i3.nix           # i3 window manager
         ├── sway.nix         # Sway compositor
         └── hyprland.nix     # Hyprland compositor
