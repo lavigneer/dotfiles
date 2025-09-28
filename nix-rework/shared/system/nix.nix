@@ -5,9 +5,11 @@
   
   # Nix settings
   nix = {
+    optimise = {
+      automatic = true;
+    };
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
-      auto-optimise-store = true;
       
       # Trusted users for nix
       trusted-users = [ "root" "@admin" "@wheel" ];

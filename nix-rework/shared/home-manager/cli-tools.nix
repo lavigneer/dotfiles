@@ -54,29 +54,24 @@
       };
     };
 
-    bat = {
+    # JSON processor with native configuration
+    jq = {
       enable = true;
-      config = {
-        theme = "base16";
-        style = "numbers,changes,header";
-        pager = "less -FR";
-      };
     };
   };
 
   home.packages = with pkgs; [
-    htop
-    fd
-    curl
-    wget
-    unzip
+    htop     
+    curl     
+    wget     
+    unzip    
+    gawk     
+    gnugrep  
+    gnused   
+    less     
+    tree     
+    file     
     jq
-    gawk
-    gnugrep
-    gnused
-    tree  # for fzf directory preview
-    file  # for file type detection
-    less  # for bat pager
+    yq       
   ];
-
 }

@@ -7,6 +7,7 @@
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
+    ../../darwin/modules/programs/terminals.nix
     # Note: Not importing gaming.nix since this is macOS
   ];
   

@@ -1,7 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in
 {
   programs.neovim = {
@@ -30,8 +31,6 @@ in
       ripgrep
       fd
       nodePackages.neovim
-      wl-clipboard
-      xclip
     ];
     
     # Neovim configuration
@@ -89,7 +88,11 @@ in
     # Custom Lua configuration - symlinked because it's actively developed
     "nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/lua";
     
-    # Stylua formatter config
-    "nvim/stylua.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim/.config/nvim/stylua.toml";
+    # Stylua formatter config (converted from symlink)
+    "nvim/stylua.toml".text = ''
+      indent_type = "Spaces"
+      indent_width = 2
+      column_width = 120
+    '';
   };
 }

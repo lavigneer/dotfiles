@@ -6,14 +6,11 @@
   # Default user configuration for macOS systems
   users.users.${username} = {
     name = username;
-    fullName = userFullName;
+    # fullName = userFullName;
     home = "/Users/${username}";
   };
-
-  # Default macOS services
-  services = {
-    nix-daemon.enable = true;
-  };
+  
+  system.primaryUser = username;
 
   # Default macOS system preferences (conservative defaults)
   system.defaults = {
@@ -62,6 +59,18 @@
   system.keyboard = {
     enableKeyMapping = lib.mkDefault true;
     remapCapsLockToEscape = lib.mkDefault true;
+  };
+
+  # Homebrew configuration (base setup)
+  homebrew = {
+    enable = lib.mkDefault true;
+    
+    # Cleanup settings
+    onActivation = {
+      cleanup = lib.mkDefault "zap";
+      autoUpdate = lib.mkDefault true;
+      upgrade = lib.mkDefault true;
+    };
   };
 
   # Default system state version for macOS (can be overridden per machine)

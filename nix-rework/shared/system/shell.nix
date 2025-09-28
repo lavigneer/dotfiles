@@ -6,5 +6,5 @@
   environment.shells = with pkgs; [ zsh ];
   
   # Set default shell
-  users.defaultUserShell = pkgs.zsh;
+  # users.defaultUserShell = pkgs.zsh;
 }
