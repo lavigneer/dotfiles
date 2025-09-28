@@ -81,6 +81,9 @@
                         inherit inputs username userFullName; 
                         userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
                       };
+                      sharedModules = [
+                        stylix.homeModules.stylix
+                      ];
                     };
                   }
                   
