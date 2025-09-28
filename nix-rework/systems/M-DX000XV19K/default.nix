@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
+{ config, pkgs, lib, inputs, username, userEmail, userFullName, ... }:
 
 {
   imports = [
@@ -8,7 +8,6 @@
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
     ../../darwin/modules/programs/terminals.nix
-    # Note: Not importing gaming.nix since this is macOS
   ];
   
   home-manager.users.${username} = {
@@ -56,10 +55,11 @@
       orientation = "bottom";
     };
   };
-
-  # Machine-specific garbage collection settings (override platform defaults)
-  nix.gc = {
-    interval = { Weekday = 0; Hour = 2; Minute = 0; };  # Sunday 2 AM for this machine
-    options = "--delete-older-than 30d";  # Less aggressive than default for work machine
+  
+  # Let Determinate Nix manage things
+  nix = {
+    enable = lib.mkForce false;
+    optimise.automatic = lib.mkForce false;
+    gc.automatic = lib.mkForce false;
   };
 }

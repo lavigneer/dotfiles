@@ -28,25 +28,6 @@ in
     fzf = {
       enable = true;
       enableZshIntegration = true;
-      defaultCommand = "fd --type f --hidden --follow --exclude .git";
-      defaultOptions = [
-        "--height 40%"
-        "--border"
-        "--reverse"
-        "--inline-info"
-      ];
-      fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
-      fileWidgetOptions = [
-        "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-      ];
-      changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
-      changeDirWidgetOptions = [
-        "--preview 'tree -C {} | head -200'"
-      ];
-      historyWidgetOptions = [
-        "--sort"
-        "--exact"
-      ];
     };
 
     ripgrep = {
