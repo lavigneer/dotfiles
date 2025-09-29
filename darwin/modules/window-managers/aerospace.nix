@@ -17,6 +17,8 @@ in
         enable-normalization-flatten-containers = false;
         enable-normalization-opposite-orientation-for-nested-containers = false;
 
+        on-focused-monitor-changed = [];
+
         # macOS app behavior
         automatically-unhide-macos-hidden-apps = false;
 
