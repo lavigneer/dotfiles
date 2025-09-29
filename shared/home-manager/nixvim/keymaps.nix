@@ -151,12 +151,6 @@
   # Diagnostic keymaps
   {
     mode = "n";
-    key = "<leader>e";
-    action.__raw = "vim.diagnostic.open_float";
-    options.desc = "Show diagnostic [E]rror messages";
-  }
-  {
-    mode = "n";
     key = "<leader>q";
     action.__raw = "vim.diagnostic.setloclist";
     options.desc = "Open diagnostic [Q]uickfix list";

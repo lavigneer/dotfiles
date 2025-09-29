@@ -1,9 +1,19 @@
-{ config, pkgs, lib, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 {
   imports = [
     inputs.nixvim.homeModules.nixvim
   ];
+
+  stylix.targets.nixvim = {
+    enable = true;
+  };
 
   programs.nixvim = {
     enable = true;
@@ -147,9 +157,21 @@
         desc = "Disable indentscope for certain filetypes";
         group = "miniindentscope-disable";
         pattern = [
-          "Trouble" "alpha" "dashboard" "fzf" "help" "lazy" "mason"
-          "neo-tree" "notify" "snacks_dashboard" "snacks_notif"
-          "snacks_terminal" "snacks_win" "toggleterm" "trouble"
+          "Trouble"
+          "alpha"
+          "dashboard"
+          "fzf"
+          "help"
+          "lazy"
+          "mason"
+          "neo-tree"
+          "notify"
+          "snacks_dashboard"
+          "snacks_notif"
+          "snacks_terminal"
+          "snacks_win"
+          "toggleterm"
+          "trouble"
         ];
         callback.__raw = ''
           function()
@@ -203,21 +225,21 @@
       gopls
       rust-analyzer
       pyright
-      
+
       # Formatters
       stylua
       nixpkgs-fmt
       nodePackages.prettier
       black
       rustfmt
-      
+
       # Tools
       delve
       tree-sitter
       ripgrep
       fd
       nodePackages.neovim
-      
+
       # Additional formatters for conform
       biome
       rustywind

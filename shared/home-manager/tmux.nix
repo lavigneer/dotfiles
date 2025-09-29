@@ -3,18 +3,18 @@
 {
   programs.tmux = {
     enable = true;
-    terminal = "screen-256color";
+    terminal = "tmux-256color";
     historyLimit = 10000;
     mouse = true;
     keyMode = "vi";
-    baseIndex = 1;
-    
+    shell = "${pkgs.zsh}/bin/zsh";
+
     # Plugins
     plugins = with pkgs.tmuxPlugins; [
       sensible
       pain-control
     ];
-    
+
     extraConfig = ''
       # Session management
       bind-key -r f display-popup -E -E "tmux-sessionizer"
@@ -29,15 +29,13 @@
       setw -g monitor-activity on
       set -g visual-activity on
 
+      set -gu default-command
+
       # Increase escape time for vim
       set -sg escape-time 0
-
-      # Colors and styling will be handled by stylix
-      set -g default-terminal "screen-256color"
-      set -ga terminal-overrides ",*256col*:Tc"
     '';
   };
-  
+
   # tmux-sessionizer script
   home.file.".local/bin/tmux-sessionizer" = {
     text = ''

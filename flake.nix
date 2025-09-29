@@ -34,63 +34,82 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-darwin, home-manager, nix-darwin, stylix, flake-utils, nixvim, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-darwin,
+      home-manager,
+      nix-darwin,
+      stylix,
+      flake-utils,
+      nixvim,
+      ...
+    }@inputs:
     let
       # Helper functions
       shared = import ./modules/shared;
-      
+
       # User configuration
       username = "elavigne";
       userFullName = "Eric Lavigne";
-      
+
       # Platform-specific user info
       linuxUserEmail = "hi_eric@hotmail.com";
       darwinUserEmail = "eric.lavigne@mongodb.com";
-      
+
       # System configurations
       linuxSystems = [ "x86_64-linux" ];
-      darwinSystems = [ "x86_64-darwin" "aarch64-darwin" ];
-      
+      darwinSystems = [
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+
       # Helper to create system configs
-      mkSystem = { system, hostname, isDarwin ? false }:
+      mkSystem =
+        {
+          system,
+          hostname,
+          isDarwin ? false,
+        }:
         let
-          pkgs = if isDarwin then nixpkgs-darwin.legacyPackages.${system} else nixpkgs.legacyPackages.${system};
+          pkgs =
+            if isDarwin then nixpkgs-darwin.legacyPackages.${system} else nixpkgs.legacyPackages.${system};
           systemFunc = if isDarwin then nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
-          homeManagerModule = if isDarwin then home-manager.darwinModules.home-manager else home-manager.nixosModules.home-manager;
+          homeManagerModule =
+            if isDarwin then
+              home-manager.darwinModules.home-manager
+            else
+              home-manager.nixosModules.home-manager;
         in
         systemFunc {
           inherit system;
-          specialArgs = { 
-            inherit inputs username userFullName; 
+          specialArgs = {
+            inherit inputs username userFullName;
             userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
           };
           modules = [
-                  # Platform-specific configuration (provides defaults for the platform)
-                  (if isDarwin then ./darwin else ./linux)
-                  
-                  # Machine-specific configuration (can override platform defaults)
-                  (./systems + "/${hostname}")
-                  
-                  # Home Manager integration (configuration now in platform defaults)
-                  homeManagerModule
-                  {
-                    home-manager = {
-                      useGlobalPkgs = true;
-                      useUserPackages = true;
-                      extraSpecialArgs = { 
-                        inherit inputs username userFullName; 
-                        userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
-                      };
-                    };
-                  }
-                  
-                  # Stylix for both platforms
-                ] ++ (if isDarwin then [
-                  stylix.darwinModules.stylix
-                ] else [
-                  stylix.nixosModules.stylix
-                ]);
+            (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
+            # Platform-specific configuration (provides defaults for the platform)
+            (if isDarwin then ./darwin else ./linux)
+
+            # Machine-specific configuration (can override platform defaults)
+            (./systems + "/${hostname}")
+
+            # Home Manager integration (configuration now in platform defaults)
+            homeManagerModule
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = {
+                  inherit inputs username userFullName;
+                  userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+                };
               };
+            }
+          ];
+        };
     in
     {
       # NixOS configurations
@@ -103,20 +122,20 @@
         };
       };
 
-      # nix-darwin configurations  
+      # nix-darwin configurations
       darwinConfigurations = {
         # Your work Mac
         M-DX000XV19K = mkSystem {
-          system = "aarch64-darwin";  # Change to "aarch64-darwin" if you have Apple Silicon
+          system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
           hostname = "M-DX000XV19K";
           isDarwin = true;
         };
       };
 
-            # Standalone Home Manager configurations removed
-            # Home Manager configuration is now integrated into platform defaults
-            # Use system configurations (nixosConfigurations/darwinConfigurations) instead
-            homeConfigurations = {};
+      # Standalone Home Manager configurations removed
+      # Home Manager configuration is now integrated into platform defaults
+      # Use system configurations (nixosConfigurations/darwinConfigurations) instead
+      homeConfigurations = { };
 
       # Development shell
       devShells = flake-utils.lib.eachDefaultSystemMap (system: {

@@ -2,16 +2,16 @@
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-  
+
   # Universal rebuild script that auto-detects system type
   rebuild-nix = pkgs.writeShellScriptBin "rebuild-nix" ''
     set -e
-    
+
     HOSTNAME=$(hostname)
     FLAKE_PATH="$HOME/workspace/dotfiles"
-    
+
     echo "Rebuilding system: $HOSTNAME"
-    
+
     if [[ "${toString isDarwin}" == "1" ]]; then
       echo "Detected Darwin system - running darwin-rebuild..."
       sudo darwin-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
@@ -19,7 +19,7 @@ let
       echo "Detected NixOS system - running nixos-rebuild..."
       sudo nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
     fi
-    
+
     echo "Rebuild completed successfully!"
   '';
 in
@@ -44,7 +44,7 @@ in
         "--smart-case"
       ];
     };
-    
+
     direnv = {
       enable = true;
       enableZshIntegration = true;
@@ -59,7 +59,7 @@ in
           show_hidden = true;
           sort_by = "natural";
           sort_dir_first = true;
-          mouse_events = [];
+          mouse_events = [ ];
         };
       };
     };
@@ -67,16 +67,16 @@ in
 
   home.packages = with pkgs; [
     asdf
-    htop     
-    curl     
-    wget     
-    unzip    
-    gawk     
-    gnugrep  
-    gnused   
-    less     
-    tree     
-    file     
+    htop
+    curl
+    wget
+    unzip
+    gawk
+    gnugrep
+    gnused
+    less
+    tree
+    file
     jq
     yq
     rebuild-nix

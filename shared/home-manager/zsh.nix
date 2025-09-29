@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   programs.starship = {
@@ -7,18 +12,18 @@
     settings = {
       # Get editor completions based on the config schema
       "$schema" = "https://starship.rs/config-schema.json";
-      
+
       # Inserts a blank line between shell prompts
       add_newline = false;
-      
+
       # A minimal left prompt
       format = "$directory$git_branch$character";
-      
+
       # move the rest of the prompt to the right
       right_format = "$all";
-      
+
       line_break.disabled = true;
-      
+
       aws.symbol = "  ";
       buf.symbol = " ";
       c.symbol = " ";
@@ -114,7 +119,7 @@
 
   programs.zsh = {
     enable = true;
-    
+
     oh-my-zsh = {
       enable = true;
       plugins = [
@@ -123,14 +128,21 @@
         "ssh-agent"
         "pj"
         "jira"
-      ] ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
-        ++ lib.optionals config.programs.fzf.enable [ "fzf" ]
-        ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "asdf") config.home.packages) [ "asdf" ]
-        ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "bazelisk") config.home.packages) [ "bazel" ]
-        ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "lazydocker") config.home.packages) [ "docker" ];
+      ]
+      ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
+      ++ lib.optionals config.programs.fzf.enable [ "fzf" ]
+      ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "asdf") config.home.packages) [
+        "asdf"
+      ]
+      ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "bazelisk") config.home.packages) [
+        "bazel"
+      ]
+      ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "lazydocker") config.home.packages) [
+        "docker"
+      ];
       theme = "";
     };
-    
+
     sessionVariables = {
       ZSH_TMUX_CONFIG = "${config.home.homeDirectory}/.config/tmux/tmux.conf";
       ZSH_TMUX_AUTOSTART = "true";
@@ -143,44 +155,23 @@
       XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/Pictures/screenshots";
       PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     };
-    
+
     # Additional shell initialization
     initContent = ''
+      export PATH=$HOME/.local/bin:$PATH
+
       # Source profile if it exists
       if test -f ~/.profile; then
         source ~/.profile
       fi
-      
+
       # Completion configuration
       zstyle ':completion:*' use-cache on
       zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
-      
+
       # Shell options from original .zshrc
       setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
-      
-      # History settings
-      setopt HIST_VERIFY
-      setopt SHARE_HISTORY
-      setopt EXTENDED_HISTORY
-      setopt HIST_IGNORE_DUPS
-      setopt HIST_IGNORE_ALL_DUPS
-      setopt HIST_IGNORE_SPACE
-      
-      # Directory stack
-      setopt AUTO_PUSHD
-      setopt PUSHD_IGNORE_DUPS
-      setopt PUSHD_SILENT
-      
-      # Correction
-      setopt CORRECT
-      setopt CORRECT_ALL
-      
-      # Key bindings
-      bindkey '^R' history-incremental-search-backward
-      bindkey '^S' history-incremental-search-forward
-      bindkey '^P' history-search-backward
-      bindkey '^N' history-search-forward
-      
+
       # Custom functions
       # Conditional tmux autostart (disable in vscode)
       if [[ "$TERM_PROGRAM" != "vscode" ]]; then
@@ -188,63 +179,50 @@
       else
         export ZSH_TMUX_AUTOSTART=false
       fi
-      
+
       # Additional plugins for tools not managed by nix
       if (( $+commands[brew] )); then
         plugins+=(brew)
       fi
-      
+
       if (( $+commands[kubectl] )); then
         plugins+=(kubectl)
       fi
-      
+
       # PATH additions
       export PATH="$HOME/.local/bin:$PATH"
       export PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
-      
+
       # PNPM path setup
       case ":$PATH:" in
         *":$PNPM_HOME:"*) ;;
         *) export PATH="$PNPM_HOME:$PATH" ;;
       esac
-      
+
       # Cargo environment
       [[ ! -r $HOME/.cargo/env ]] || source $HOME/.cargo/env > /dev/null 2> /dev/null
-      
+
       # Go configuration (fallback if not set by nix)
       [[ ! -r /usr/local/go ]] || export GOROOT=/usr/local/go
-      
+
       # OPAM configuration
       [[ ! -r $HOME/.opam/opam-init/init.zsh ]] || source $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null
-      
+
       # FZF key bindings and completion
       if command -v fzf-share >/dev/null; then
         source "$(fzf-share)/key-bindings.zsh"
         source "$(fzf-share)/completion.zsh"
       fi
-      
+
       # FZF fallback paths (for non-nix systems)
       [[ ! -r /usr/share/doc/fzf/examples/key-bindings.zsh ]] || source /usr/share/doc/fzf/examples/key-bindings.zsh > /dev/null 2> /dev/null
       [[ ! -r /usr/share/doc/fzf/examples/completion.zsh ]] || source /usr/share/doc/fzf/examples/completion.zsh > /dev/null 2> /dev/null
-      
-      # ASDF Java home (if using asdf)
-      #[ "$ASDF_DATA_DIR" != "" ] && [[ ! -r $ASDF_DATA_DIR/plugins/java/set-java-home.zsh ]] || source $ASDF_DATA_DIR/plugins/java/set-java-home.zsh
-      
+
       # Nix profile sourcing (for non-NixOS systems)
       if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then 
         . $HOME/.nix-profile/etc/profile.d/nix.sh
       fi
     '';
-    
-    # History configuration
-    history = {
-      size = 10000;
-      save = 10000;
-      path = "${config.xdg.dataHome}/zsh/history";
-      ignoreDups = true;
-      ignoreSpace = true;
-      extended = true;
-    };
   };
-  
+
 }

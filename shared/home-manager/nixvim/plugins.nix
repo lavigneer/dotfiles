@@ -103,7 +103,6 @@
         "<leader>ds" = "document_symbol";
       };
       diagnostic = {
-        "<leader>e" = "open_float";
         "<leader>q" = "setloclist";
         "grX" = "setqflist";
         "grx" = "setloclist";
