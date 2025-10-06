@@ -182,10 +182,45 @@
     ];
 
     # Plugins
-    plugins = import ./plugins.nix;
+    plugins = import ./plugins.nix { inherit pkgs; };
+
+    # Extra plugins not in nixvim
+    extraPlugins = with pkgs.vimPlugins; [
+      neotest-golang
+      pkgs.vimPlugins.nvim-treesitter
+      (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [plugins.go]))
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "sidekick.nvim";
+        src = pkgs.fetchFromGitHub {
+          owner = "folke";
+          repo = "sidekick.nvim";
+          rev = "main";
+          sha256 = "sha256-yhKnsUCZWJnPQ+/EuSqhb2fj6KGxuGWpkPsxCiwcO2o=";
+        };
+        doCheck = false;
+      })
+    ];
 
     # Extra Lua configuration for complex setups
     extraConfigLua = ''
+      -- Neotest golang adapter configuration
+      require('neotest').setup({
+        adapters = {
+          require('neotest-golang'),
+        },
+      })
+
+      -- Sidekick configuration
+      require('sidekick').setup({
+        cli = {
+          mux = {
+            backend = "tmux",
+            enabled = true,
+          },
+        },
+      })
+
+
       -- Custom filetype detection
       vim.filetype.add({
         extension = {

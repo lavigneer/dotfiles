@@ -1,4 +1,13 @@
-{ config, pkgs, lib, inputs, username, userEmail, userFullName, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  username,
+  userEmail,
+  userFullName,
+  ...
+}:
 
 {
   imports = [
@@ -12,7 +21,7 @@
   ];
 
   home-manager.backupFileExtension = "bak";
-  
+
   home-manager.users.${username} = {
     imports = [
       # Shared Home Manager modules this system wants
@@ -41,7 +50,7 @@
     };
 
     # macOS-specific tools and utilities
-    home.packages = with pkgs; [];
+    home.packages = with pkgs; [ ];
 
     # Email configuration for this system
     accounts.email.accounts = {
@@ -53,7 +62,11 @@
       };
     };
   };
-
+  security.pam.services.sudo_local = {
+    enable = true;
+    reattach = true;
+    touchIdAuth = true;
+  };
   system.defaults = {
     dock = {
       tilesize = 48;
@@ -61,14 +74,12 @@
       orientation = "bottom";
     };
   };
-  
+
   # Let Determinate Nix manage things
   nix = {
     enable = lib.mkForce false;
     optimise.automatic = lib.mkForce false;
     gc.automatic = lib.mkForce false;
   };
-
-
 
 }

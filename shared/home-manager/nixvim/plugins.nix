@@ -1,4 +1,5 @@
 # Plugins configuration for nixvim
+{ pkgs, ... }:
 {
   # LSP
   lsp = {

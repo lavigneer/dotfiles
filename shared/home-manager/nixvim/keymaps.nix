@@ -293,4 +293,125 @@
     action.__raw = "function() require('spectre').open() end";
     options.desc = "Find/Replace in Spectre";
   }
+
+  # Sidekick keymaps
+  {
+    mode = "n";
+    key = "<Tab>";
+    action.__raw = ''
+      function()
+        if not require("sidekick").nes_jump_or_apply() then
+          return "<Tab>"
+        end
+      end
+    '';
+    options = {
+      expr = true;
+      desc = "Goto/Apply Next Edit Suggestion";
+    };
+  }
+  {
+    mode = "n";
+    key = "<leader>aa";
+    action.__raw = "function() require('sidekick.cli').toggle() end";
+    options.desc = "Sidekick Toggle CLI";
+  }
+  {
+    mode = "n";
+    key = "<leader>as";
+    action.__raw = "function() require('sidekick.cli').select() end";
+    options.desc = "Select CLI";
+  }
+  {
+    mode = ["x" "n"];
+    key = "<leader>at";
+    action.__raw = "function() require('sidekick.cli').send({ msg = '{this}' }) end";
+    options.desc = "Send This";
+  }
+  {
+    mode = "x";
+    key = "<leader>av";
+    action.__raw = "function() require('sidekick.cli').send({ msg = '{selection}' }) end";
+    options.desc = "Send Visual Selection";
+  }
+  {
+    mode = ["n" "x"];
+    key = "<leader>ap";
+    action.__raw = "function() require('sidekick.cli').prompt() end";
+    options.desc = "Sidekick Select Prompt";
+  }
+  {
+    mode = ["n" "x" "i" "t"];
+    key = "<C-.>";
+    action.__raw = "function() require('sidekick.cli').focus() end";
+    options.desc = "Sidekick Switch Focus";
+  }
+  {
+    mode = "n";
+    key = "<leader>ac";
+    action.__raw = "function() require('sidekick.cli').toggle({ name = 'claude', focus = true }) end";
+    options.desc = "Sidekick Toggle Claude";
+  }
+
+  # Neotest keymaps
+  {
+    mode = "n";
+    key = "<leader>tt";
+    action.__raw = "function() require('neotest').run.run(vim.fn.expand('%')) end";
+    options.desc = "Run File (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tT";
+    action.__raw = "function() require('neotest').run.run(vim.uv.cwd()) end";
+    options.desc = "Run All Test Files (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tr";
+    action.__raw = "function() require('neotest').run.run() end";
+    options.desc = "Run Nearest (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tl";
+    action.__raw = "function() require('neotest').run.run_last() end";
+    options.desc = "Run Last (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>ts";
+    action.__raw = "function() require('neotest').summary.toggle() end";
+    options.desc = "Toggle Summary (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>to";
+    action.__raw = "function() require('neotest').output.open({ enter = true, auto_close = true }) end";
+    options.desc = "Show Output (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tO";
+    action.__raw = "function() require('neotest').output_panel.toggle() end";
+    options.desc = "Toggle Output Panel (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tS";
+    action.__raw = "function() require('neotest').run.stop() end";
+    options.desc = "Stop (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>td";
+    action.__raw = "function() require('neotest').run.run({strategy = 'dap'}) end";
+    options.desc = "Debug Nearest (Neotest)";
+  }
+  {
+    mode = "n";
+    key = "<leader>tw";
+    action.__raw = "function() require('neotest').watch.toggle(vim.fn.expand('%')) end";
+    options.desc = "Toggle Watch (Neotest)";
+  }
 ]
