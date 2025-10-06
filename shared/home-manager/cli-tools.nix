@@ -79,6 +79,7 @@ in
     file
     jq
     yq
+    xz
     rebuild-nix
   ];
 }

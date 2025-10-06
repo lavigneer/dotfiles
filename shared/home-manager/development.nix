@@ -3,6 +3,9 @@
 {
   # Development languages and tools
   home.packages = with pkgs; [
+    pre-commit
+    devcontainer
+
     # System development
     gnumake
     bazelisk

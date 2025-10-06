@@ -28,6 +28,7 @@
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
+      ../../shared/home-manager/claude.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix
@@ -67,4 +68,7 @@
     optimise.automatic = lib.mkForce false;
     gc.automatic = lib.mkForce false;
   };
+
+
+
 }

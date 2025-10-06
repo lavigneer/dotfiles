@@ -25,10 +25,6 @@
       # Renumber windows when one is closed
       set -g renumber-windows on
 
-      # Activity monitoring
-      setw -g monitor-activity on
-      set -g visual-activity on
-
       set -gu default-command
 
       # Increase escape time for vim

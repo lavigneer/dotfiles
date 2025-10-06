@@ -11,5 +11,6 @@
   # Install lazydocker package
   home.packages = with pkgs; [
     lazydocker
+    amazon-ecr-credential-helper
   ];
 }
