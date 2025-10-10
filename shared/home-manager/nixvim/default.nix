@@ -58,12 +58,12 @@
       splitkeep = "screen";
       hlsearch = true;
       expandtab = true;
-      shiftwidth = 2;
-      tabstop = 2;
+      shiftwidth = 4;
+      tabstop = 4;
       smartindent = true;
       wrap = false;
       termguicolors = true;
-      colorcolumn = "80";
+      colorcolumn = "100";
     };
 
     # Key mappings
@@ -117,10 +117,11 @@
         callback.__raw = ''
           function(event)
             local client = vim.lsp.get_client_by_id(event.data.client_id)
-            
-            -- Enable inlay hints if supported
+
+            -- Enable endhints if supported (lsp-endhints handles this automatically)
+            -- Disable built-in inline inlay hints
             if client and client.supports_method("textDocument/inlayHint") then
-              vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+              vim.lsp.inlay_hint.enable(false, { bufnr = event.buf })
             end
 
             -- Custom keymaps
@@ -129,7 +130,7 @@
             end
 
             map("<leader>lh", function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }), { bufnr = 0 })
+              require('lsp-endhints').toggle()
             end, "[L]sp [H]int Toggle")
 
             -- Format command
@@ -199,6 +200,16 @@
         };
         doCheck = false;
       })
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "nvim-lsp-endhints";
+        src = pkgs.fetchFromGitHub {
+          owner = "chrisgrieser";
+          repo = "nvim-lsp-endhints";
+          rev = "main";
+          sha256 = "sha256-gfVE5XSGuf+aC/Pi+sGWsfgmWpQ6RvC9x+SMTRagdSM=";
+        };
+        doCheck = false;
+      })
     ];
 
     # Extra Lua configuration for complex setups
@@ -217,6 +228,17 @@
             backend = "tmux",
             enabled = true,
           },
+        },
+      })
+
+      -- LSP Endhints configuration
+      require('lsp-endhints').setup({
+        icons = {
+          type = "=> ",
+          parameter = "=> ",
+        },
+        label = {
+          padding = 1,
         },
       })
 

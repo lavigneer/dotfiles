@@ -163,6 +163,18 @@
     };
   };
 
+  # Treesitter context (sticky scroll)
+  treesitter-context = {
+    enable = true;
+    settings = {
+      max_lines = 3;
+      min_window_height = 0;
+      multiline_threshold = 1;
+      trim_scope = "outer";
+      mode = "cursor";
+    };
+  };
+
   # Completion
   blink-cmp = {
     enable = true;
