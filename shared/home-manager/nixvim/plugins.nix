@@ -116,9 +116,9 @@
     enable = true;
     settings = {
       ensure_installed = [
-        "bash" "c" "html" "lua" "markdown" "markdown_inline" 
+        "bash" "c" "html" "lua" "markdown" "markdown_inline"
         "vim" "vimdoc" "go" "rust" "typescript" "javascript"
-        "python" "nix" "json" "yaml" "toml"
+        "python" "nix" "json" "yaml" "toml" "starlark"
       ];
       auto_install = true;
       highlight.enable = true;

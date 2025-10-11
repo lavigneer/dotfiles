@@ -242,12 +242,31 @@
         },
       })
 
+      -- Tilt LSP configuration
+      local lspconfig = require('lspconfig')
+      local configs = require('lspconfig.configs')
+
+      if not configs.tilt_lsp then
+        configs.tilt_lsp = {
+          default_config = {
+            cmd = { 'tilt', 'lsp', 'start' },
+            filetypes = { 'starlark', 'tiltfile' },
+            root_dir = lspconfig.util.root_pattern('Tiltfile'),
+            settings = {},
+          },
+        }
+      end
+
+      lspconfig.tilt_lsp.setup({})
 
       -- Custom filetype detection
       vim.filetype.add({
         extension = {
           mdx = "markdown.mdx",
           tf = "terraform",
+        },
+        filename = {
+          ["Tiltfile"] = "starlark",
         },
         pattern = {
           [".*Tiltfile"] = "starlark",
@@ -282,6 +301,7 @@
       gopls
       rust-analyzer
       pyright
+      tilt
 
       # Formatters
       stylua
