@@ -129,6 +129,11 @@
           hostname = "M-DX000XV19K";
           isDarwin = true;
         };
+	Erics-MacBook-Air.local = mkSystem {
+          system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
+          hostname = "Erics-MacBook-Air.local";
+          isDarwin = true;
+        };
       };
 
       # Standalone Home Manager configurations removed
