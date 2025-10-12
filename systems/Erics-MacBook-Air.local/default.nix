@@ -82,9 +82,10 @@
   };
   system.defaults = {
     dock = {
-      tilesize = 48;
-      largesize = 64;
+      tilesize = 18;
+      largesize = 36;
       orientation = "bottom";
+      static-only = true;
     };
   };
 
