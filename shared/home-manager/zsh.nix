@@ -126,8 +126,6 @@
         "git"
         "sudo"
         "ssh-agent"
-        "pj"
-        "jira"
       ]
       ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
       ++ lib.optionals config.programs.fzf.enable [ "fzf" ]
@@ -156,10 +154,12 @@
       PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     };
 
+    envExtra = ''
+      export PATH=$HOME/.local/bin:$PATH
+    '';
+
     # Additional shell initialization
     initContent = ''
-      export PATH=$HOME/.local/bin:$PATH
-
       # Source profile if it exists
       if test -f ~/.profile; then
         source ~/.profile
