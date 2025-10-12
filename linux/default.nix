@@ -1,4 +1,12 @@
-{ config, pkgs, lib, username, userFullName, userEmail, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  userFullName,
+  userEmail,
+  ...
+}:
 
 {
   # Linux platform system defaults (can be overridden by machine-specific configs)
@@ -7,7 +15,10 @@
   users.users.${username} = {
     isNormalUser = true;
     description = userFullName;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     shell = pkgs.zsh;
   };
 

@@ -31,18 +31,26 @@
     nixvim = {
       url = "github:nix-community/nixvim";
     };
+
+    # treefmt for formatting
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , nixpkgs-darwin
-    , home-manager
-    , nix-darwin
-    , stylix
-    , flake-utils
-    , nixvim
-    , ...
+    {
+      self,
+      nixpkgs,
+      nixpkgs-darwin,
+      home-manager,
+      nix-darwin,
+      stylix,
+      flake-utils,
+      nixvim,
+      treefmt-nix,
+      ...
     }@inputs:
     let
       # Helper functions
@@ -65,10 +73,10 @@
 
       # Helper to create system configs
       mkSystem =
-        { system
-        , hostname
-        , isDarwin ? false
-        ,
+        {
+          system,
+          hostname,
+          isDarwin ? false,
         }:
         let
           pkgs =
@@ -150,5 +158,29 @@
           ];
         };
       });
+
+      # Formatter configuration
+      formatter = flake-utils.lib.eachDefaultSystemMap (
+        system:
+        treefmt-nix.lib.mkWrapper nixpkgs.legacyPackages.${system} {
+          projectRootFile = "flake.nix";
+          programs = {
+            nixfmt.enable = true;
+            prettier.enable = true;
+          };
+          settings.formatter = {
+            prettier = {
+              options = [
+                "--prose-wrap"
+                "always"
+              ];
+              includes = [
+                "*.md"
+                "*.json"
+              ];
+            };
+          };
+        }
+      );
     };
 }

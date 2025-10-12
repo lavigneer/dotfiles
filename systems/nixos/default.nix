@@ -1,4 +1,12 @@
-{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  username,
+  userEmail,
+  userFullName,
+  ...
+}:
 
 {
   imports = [

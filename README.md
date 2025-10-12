@@ -1,10 +1,12 @@
 # Nix Configuration
 
-A clean, modular Nix configuration supporting both NixOS and nix-darwin with Home Manager integration.
+A clean, modular Nix configuration supporting both NixOS and nix-darwin with
+Home Manager integration.
 
 ## 🏗️ Architecture
 
-This configuration uses a layered architecture with shared components and platform-specific overrides:
+This configuration uses a layered architecture with shared components and
+platform-specific overrides:
 
 ```
 nix-rework/
@@ -18,6 +20,7 @@ nix-rework/
 ## 📁 Directory Structure
 
 ### `shared/` - Cross-platform Components
+
 ```
 shared/
 ├── home-manager/               # User-level configs
@@ -45,6 +48,7 @@ shared/
 ```
 
 ### `linux/` - Linux Platform
+
 ```
 linux/
 ├── default.nix               # Linux platform defaults
@@ -65,6 +69,7 @@ linux/
 ```
 
 ### `darwin/` - macOS Platform
+
 ```
 darwin/
 ├── default.nix               # macOS platform defaults
@@ -76,6 +81,7 @@ darwin/
 ```
 
 ### `systems/` - Machine-specific Configurations
+
 ```
 systems/
 ├── nixos/                    # Linux machine config
@@ -88,21 +94,25 @@ systems/
 ## 🎯 Key Features
 
 ### Modular Design
+
 - **Shared components** for cross-platform consistency
 - **Platform-specific modules** for Linux and macOS differences
 - **Machine-specific overrides** for personal preferences
 
 ### Window Manager Support
+
 - **Linux**: i3 (X11), Sway (Wayland), Hyprland (Wayland)
 - **macOS**: AeroSpace tiling window manager
 - **Unified tools**: Rofi launcher and Polybar status bar across all WMs
 
 ### Development Environment
+
 - **Languages**: Rust, Go, Node.js, Nix
 - **Editors**: Neovim (with LSPs), Zed Editor
 - **Tools**: Git, Docker, CLI utilities
 
 ### Clean Architecture
+
 - **DRY principle**: No code duplication
 - **Layered imports**: Platform defaults → Machine overrides
 - **Consistent formatting**: Clean, readable configuration
@@ -110,16 +120,19 @@ systems/
 ## 🚀 Usage
 
 ### Build NixOS System
+
 ```bash
 sudo nixos-rebuild switch --flake ~/workspace/dotfile#nixos
 ```
 
 ### Build macOS System
+
 ```bash
 darwin-rebuild switch --flake ~/workspace/dotfiles#mac
 ```
 
 ### Development Shell
+
 ```bash
 nix develop
 ```
@@ -127,17 +140,20 @@ nix develop
 ## 🔧 Configuration
 
 ### Adding New Programs
+
 1. **Cross-platform**: Add to `shared/home-manager/`
 2. **Linux-specific**: Add to `linux/modules/programs/`
 3. **macOS-specific**: Add to `darwin/modules/programs/`
 
 ### Adding New Window Managers
+
 1. Create new file in `linux/modules/window-managers/`
 2. Import appropriate base module (`wayland.nix` or `x11.nix`)
 3. Import shared components (`../system/polybar.nix`, `../system/rofi.nix`)
 4. Add to system imports in `systems/nixos/default.nix`
 
 ### Customizing Per Machine
+
 - Edit files in `systems/*/default.nix`
 - Override platform defaults using higher priority
 - Add machine-specific Home Manager module imports
@@ -152,20 +168,24 @@ nix develop
 ## 🎨 Theming
 
 The configuration uses Stylix for consistent theming across:
+
 - Terminal applications
 - Desktop environments
 - Development tools
 
-Theme is configured in `shared/system/stylix.nix` and enabled for both platforms.
+Theme is configured in `shared/system/stylix.nix` and enabled for both
+platforms.
 
 ## 🔄 Updates
 
 To update all inputs:
+
 ```bash
 nix flake update
 ```
 
 To update specific input:
+
 ```bash
 nix flake lock --update-input nixpkgs
 ```
@@ -180,4 +200,6 @@ nix flake lock --update-input nixpkgs
 
 ## 🤝 Contributing
 
-This is a personal configuration, but feel free to use it as inspiration for your own setup. The modular architecture makes it easy to adapt to different needs.
+This is a personal configuration, but feel free to use it as inspiration for
+your own setup. The modular architecture makes it easy to adapt to different
+needs.

@@ -1,4 +1,11 @@
-{ config, pkgs, lib, userFullName, userEmail, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  userFullName,
+  userEmail,
+  ...
+}:
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
@@ -9,15 +16,14 @@ in
     userName = userFullName;
     userEmail = userEmail;
 
-    extraConfig =
-      {
-        init.defaultBranch = "main";
-        core.editor = "nvim";
-        pull.rebase = true;
-        push.autoSetupRemote = true;
-        diff.tool = "nvimdiff";
-        merge.tool = "nvimdiff";
-      };
+    extraConfig = {
+      init.defaultBranch = "main";
+      core.editor = "nvim";
+      pull.rebase = true;
+      push.autoSetupRemote = true;
+      diff.tool = "nvimdiff";
+      merge.tool = "nvimdiff";
+    };
   };
 
   # GitHub CLI

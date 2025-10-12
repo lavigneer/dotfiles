@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   cfg = config.windowManagers.aerospace;
@@ -97,8 +102,16 @@ in
         };
 
         workspace-to-monitor-force-assignment = {
-          "1" = [ "LS32R75" "SAMSUNG" "main" ];
-          "2" = [ "^BenQ" "SAMSUNG" "main" ];
+          "1" = [
+            "LS32R75"
+            "SAMSUNG"
+            "main"
+          ];
+          "2" = [
+            "^BenQ"
+            "SAMSUNG"
+            "main"
+          ];
           "3" = "built-in";
         };
       };

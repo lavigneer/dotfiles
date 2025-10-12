@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   dotfilesPath = "${config.home.homeDirectory}/workspace/dotfiles";
@@ -11,6 +16,7 @@ in
 
   # Karabiner-Elements configuration
   xdg.configFile = {
-    "karabiner/karabiner.json".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/darwin/config/karabiner.json";
+    "karabiner/karabiner.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/darwin/config/karabiner.json";
   };
 }

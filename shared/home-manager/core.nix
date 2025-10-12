@@ -1,4 +1,12 @@
-{ config, pkgs, inputs, username, userFullName, userEmail, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  username,
+  userFullName,
+  userEmail,
+  ...
+}:
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;

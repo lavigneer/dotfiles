@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # Core Nix configuration that applies to both NixOS and nix-darwin
@@ -9,10 +14,17 @@
       automatic = true;
     };
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
 
       # Trusted users for nix
-      trusted-users = [ "root" "@admin" "@wheel" ];
+      trusted-users = [
+        "root"
+        "@admin"
+        "@wheel"
+      ];
 
       # Binary caches
       substituters = [

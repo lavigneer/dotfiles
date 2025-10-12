@@ -28,7 +28,13 @@
       };
       html = {
         enable = true;
-        filetypes = [ "html" "twig" "hbs" "htmldjango" "templ" ];
+        filetypes = [
+          "html"
+          "twig"
+          "hbs"
+          "htmldjango"
+          "templ"
+        ];
       };
       gopls = {
         enable = true;
@@ -214,7 +220,12 @@
         list.selection.auto_insert = false;
         accept.auto_brackets.enabled = false;
       };
-      sources.default = [ "lsp" "path" "snippets" "buffer" ];
+      sources.default = [
+        "lsp"
+        "path"
+        "snippets"
+        "buffer"
+      ];
     };
   };
 
@@ -223,16 +234,34 @@
     enable = true;
     settings = {
       formatters_by_ft = {
-        javascript = [ "prettier" "biome" ];
-        javascriptreact = [ "prettier" "biome" ];
-        typescript = [ "prettier" "biome" ];
-        typescriptreact = [ "prettier" "biome" ];
+        javascript = [
+          "prettier"
+          "biome"
+        ];
+        javascriptreact = [
+          "prettier"
+          "biome"
+        ];
+        typescript = [
+          "prettier"
+          "biome"
+        ];
+        typescriptreact = [
+          "prettier"
+          "biome"
+        ];
         astro = [ "prettier" ];
         vue = [ "prettier" ];
         css = [ "prettier" ];
         scss = [ "prettier" ];
-        html = [ "rustywind" "prettier" ];
-        json = [ "prettier" "biome" ];
+        html = [
+          "rustywind"
+          "prettier"
+        ];
+        json = [
+          "prettier"
+          "biome"
+        ];
         jsonc = [ "biome" ];
         yaml = [ "prettier" ];
         markdown = [ "prettier" ];
@@ -317,26 +346,86 @@
       };
       clue = {
         triggers = [
-          { mode = "n"; keys = "<Leader>"; }
-          { mode = "x"; keys = "<Leader>"; }
-          { mode = "i"; keys = "<C-x>"; }
-          { mode = "n"; keys = "g"; }
-          { mode = "x"; keys = "g"; }
-          { mode = "n"; keys = "'"; }
-          { mode = "n"; keys = "`"; }
-          { mode = "x"; keys = "'"; }
-          { mode = "x"; keys = "`"; }
-          { mode = "n"; keys = "\""; }
-          { mode = "x"; keys = "\""; }
-          { mode = "i"; keys = "<C-r>"; }
-          { mode = "c"; keys = "<C-r>"; }
-          { mode = "n"; keys = "<C-w>"; }
-          { mode = "n"; keys = "z"; }
-          { mode = "x"; keys = "z"; }
-          { mode = "n"; keys = "["; }
-          { mode = "x"; keys = "["; }
-          { mode = "n"; keys = "]"; }
-          { mode = "x"; keys = "]"; }
+          {
+            mode = "n";
+            keys = "<Leader>";
+          }
+          {
+            mode = "x";
+            keys = "<Leader>";
+          }
+          {
+            mode = "i";
+            keys = "<C-x>";
+          }
+          {
+            mode = "n";
+            keys = "g";
+          }
+          {
+            mode = "x";
+            keys = "g";
+          }
+          {
+            mode = "n";
+            keys = "'";
+          }
+          {
+            mode = "n";
+            keys = "`";
+          }
+          {
+            mode = "x";
+            keys = "'";
+          }
+          {
+            mode = "x";
+            keys = "`";
+          }
+          {
+            mode = "n";
+            keys = "\"";
+          }
+          {
+            mode = "x";
+            keys = "\"";
+          }
+          {
+            mode = "i";
+            keys = "<C-r>";
+          }
+          {
+            mode = "c";
+            keys = "<C-r>";
+          }
+          {
+            mode = "n";
+            keys = "<C-w>";
+          }
+          {
+            mode = "n";
+            keys = "z";
+          }
+          {
+            mode = "x";
+            keys = "z";
+          }
+          {
+            mode = "n";
+            keys = "[";
+          }
+          {
+            mode = "x";
+            keys = "[";
+          }
+          {
+            mode = "n";
+            keys = "]";
+          }
+          {
+            mode = "x";
+            keys = "]";
+          }
         ];
         window = {
           delay = 450;
