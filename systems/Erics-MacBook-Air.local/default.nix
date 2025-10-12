@@ -16,6 +16,7 @@
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
+    ../../darwin/modules/programs/claude.nix
     ../../darwin/modules/programs/terminals.nix
     ../../darwin/modules/programs/1password.nix
   ];
@@ -77,6 +78,7 @@
       };
     };
   };
+
   security.pam.services.sudo_local = {
     enable = true;
     reattach = true;
