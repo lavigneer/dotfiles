@@ -77,6 +77,7 @@
           system,
           hostname,
           isDarwin ? false,
+          userEmail,
         }:
         let
           pkgs =
@@ -91,8 +92,7 @@
         systemFunc {
           inherit system;
           specialArgs = {
-            inherit inputs username userFullName;
-            userEmail = if isDarwin then workUserEmail else personalUserEmail;
+            inherit inputs username userFullName userEmail;
           };
           modules = [
             (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
@@ -109,8 +109,7 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 extraSpecialArgs = {
-                  inherit inputs username userFullName;
-                  userEmail = if isDarwin then workUserEmail else personalUserEmail;
+                  inherit inputs username userFullName userEmail;
                 };
               };
             }
@@ -125,6 +124,7 @@
           system = "x86_64-linux";
           hostname = "nixos";
           isDarwin = false;
+          userEmail = personalUserEmail;
         };
       };
 
@@ -135,11 +135,13 @@
           system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
           hostname = "M-DX000XV19K";
           isDarwin = true;
+          userEmail = workUserEmail;
         };
         Erics-MacBook-Air.local = mkSystem {
           system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
           hostname = "Erics-MacBook-Air.local";
           isDarwin = true;
+          userEmail = personalUserEmail;
         };
       };
 
