@@ -29,6 +29,11 @@
 
       # Increase escape time for vim
       set -sg escape-time 0
+
+      # Toggle collapse/expand for right pane
+      bind-key C-Space if-shell "[[ $(tmux display -p '#{pane_width}') -le 5 ]]" \
+        "resize-pane -L 999; resize-pane -R 80" \
+        "resize-pane -R 999"
     '';
   };
 
