@@ -8,8 +8,8 @@ in
     enable = true;
     userName = userFullName;
     userEmail = userEmail;
-    
-    extraConfig = 
+
+    extraConfig =
       {
         init.defaultBranch = "main";
         core.editor = "nvim";
@@ -19,7 +19,7 @@ in
         merge.tool = "nvimdiff";
       };
   };
-  
+
   # GitHub CLI
   programs.gh = {
     enable = true;

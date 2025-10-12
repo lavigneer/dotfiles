@@ -1,11 +1,10 @@
-{
-  config,
-  pkgs,
-  lib,
-  username,
-  userFullName,
-  userEmail,
-  ...
+{ config
+, pkgs
+, lib
+, username
+, userFullName
+, userEmail
+, ...
 }:
 
 {

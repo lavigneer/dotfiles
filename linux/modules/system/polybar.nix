@@ -4,7 +4,7 @@
   services.polybar = {
     enable = true;
     package = pkgs.polybar;
-    
+
     config = {
       # Font configuration
       "fonts" = {
@@ -16,13 +16,13 @@
         xos = "Nimbus Sans:size=14;0";
         nerd = "JetBrainsMono Nerd Font:size=12;0";
       };
-      
+
       # Color scheme
       "colors" = {
         light-red = "#D95B5B";
         light-green = "#249824";
         light-purple = "#A44BA0";
-        
+
         menucol-yellow = "#F7F272";
         menucol-blue = "#1771F1";
         menucol-orange = "#FFAF60";
@@ -33,7 +33,7 @@
         menucol-pink = "#FF77BF";
         menucol-deepblue = "#6560FF";
         menucol-lightblue = "#60FFF7";
-        
+
         fav-purple = "#6633FF";
         dark = "#111";
         dark-red = "#311";
@@ -41,7 +41,7 @@
         dark-purple = "#201134";
       };
     };
-    
+
     script = ''
       # Polybar startup script
       pkill polybar

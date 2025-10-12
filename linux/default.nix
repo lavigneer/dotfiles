@@ -2,7 +2,7 @@
 
 {
   # Linux platform system defaults (can be overridden by machine-specific configs)
-  
+
   # Default user configuration for Linux systems
   users.users.${username} = {
     isNormalUser = true;
@@ -21,10 +21,10 @@
       alsa.support32Bit = lib.mkDefault true;
       pulse.enable = lib.mkDefault true;
     };
-    
+
     # Bluetooth support
     blueman.enable = lib.mkDefault true;
-    
+
     # Printing support
     printing.enable = lib.mkDefault true;
   };

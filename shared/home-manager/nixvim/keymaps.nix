@@ -2,7 +2,7 @@
 [
   # Basic keymaps
   {
-    mode = ["n" "v"];
+    mode = [ "n" "v" ];
     key = "<Space>";
     action = "<Nop>";
     options.silent = true;
@@ -105,7 +105,7 @@
 
   # Better up/down
   {
-    mode = ["n" "x"];
+    mode = [ "n" "x" ];
     key = "j";
     action = "v:count == 0 ? 'gj' : 'j'";
     options = {
@@ -114,7 +114,7 @@
     };
   }
   {
-    mode = ["n" "x"];
+    mode = [ "n" "x" ];
     key = "<Down>";
     action = "v:count == 0 ? 'gj' : 'j'";
     options = {
@@ -123,7 +123,7 @@
     };
   }
   {
-    mode = ["n" "x"];
+    mode = [ "n" "x" ];
     key = "k";
     action = "v:count == 0 ? 'gk' : 'k'";
     options = {
@@ -132,7 +132,7 @@
     };
   }
   {
-    mode = ["n" "x"];
+    mode = [ "n" "x" ];
     key = "<Up>";
     action = "v:count == 0 ? 'gk' : 'k'";
     options = {
@@ -323,7 +323,7 @@
     options.desc = "Select CLI";
   }
   {
-    mode = ["x" "n"];
+    mode = [ "x" "n" ];
     key = "<leader>at";
     action.__raw = "function() require('sidekick.cli').send({ msg = '{this}' }) end";
     options.desc = "Send This";
@@ -335,13 +335,13 @@
     options.desc = "Send Visual Selection";
   }
   {
-    mode = ["n" "x"];
+    mode = [ "n" "x" ];
     key = "<leader>ap";
     action.__raw = "function() require('sidekick.cli').prompt() end";
     options.desc = "Sidekick Select Prompt";
   }
   {
-    mode = ["n" "x" "i" "t"];
+    mode = [ "n" "x" "i" "t" ];
     key = "<C-.>";
     action.__raw = "function() require('sidekick.cli').focus() end";
     options.desc = "Sidekick Switch Focus";

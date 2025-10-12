@@ -17,7 +17,7 @@ in
         enable-normalization-flatten-containers = false;
         enable-normalization-opposite-orientation-for-nested-containers = false;
 
-        on-focused-monitor-changed = [];
+        on-focused-monitor-changed = [ ];
 
         # macOS app behavior
         automatically-unhide-macos-hidden-apps = false;
@@ -97,8 +97,8 @@ in
         };
 
         workspace-to-monitor-force-assignment = {
-          "1" = ["LS32R75" "SAMSUNG" "main"];
-          "2" = ["^BenQ" "SAMSUNG" "main"];
+          "1" = [ "LS32R75" "SAMSUNG" "main" ];
+          "2" = [ "^BenQ" "SAMSUNG" "main" ];
           "3" = "built-in";
         };
       };

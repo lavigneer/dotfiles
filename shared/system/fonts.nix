@@ -8,7 +8,7 @@
     noto-fonts-emoji
     noto-fonts-cjk-sans
     noto-fonts-extra
-    
+
     # Nerd Fonts for terminal and development
     nerd-fonts.go-mono
     nerd-fonts.jetbrains-mono

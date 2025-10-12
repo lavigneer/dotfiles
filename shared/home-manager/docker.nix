@@ -7,7 +7,7 @@
       # Confusing, but this disables mouse events
       mouseEvents: true
   '';
-  
+
   # Install lazydocker package
   home.packages = with pkgs; [
     lazydocker

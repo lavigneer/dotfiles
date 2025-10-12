@@ -1,9 +1,8 @@
-{
-  config,
-  pkgs,
-  lib,
-  inputs,
-  ...
+{ config
+, pkgs
+, lib
+, inputs
+, ...
 }:
 
 {
@@ -189,7 +188,7 @@
     extraPlugins = with pkgs.vimPlugins; [
       neotest-golang
       pkgs.vimPlugins.nvim-treesitter
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [plugins.go]))
+      (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))
       (pkgs.vimUtils.buildVimPlugin {
         name = "sidekick.nvim";
         src = pkgs.fetchFromGitHub {

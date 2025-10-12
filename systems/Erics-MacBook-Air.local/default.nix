@@ -1,12 +1,11 @@
-{
-  config,
-  pkgs,
-  lib,
-  inputs,
-  username,
-  userEmail,
-  userFullName,
-  ...
+{ config
+, pkgs
+, lib
+, inputs
+, username
+, userEmail
+, userFullName
+, ...
 }:
 
 {
@@ -38,6 +37,8 @@
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
       ../../shared/home-manager/claude.nix
+      ../../shared/home-manager/copilot.nix
+      ../../shared/home-manager/thunderbird.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix

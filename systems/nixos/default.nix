@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    
+
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
@@ -94,6 +94,6 @@
   # Machine-specific garbage collection settings (override platform defaults)
   nix.gc = {
     dates = "weekly";
-    options = "--delete-older-than 60d";  # More aggressive than default for personal machine
+    options = "--delete-older-than 60d"; # More aggressive than default for personal machine
   };
 }

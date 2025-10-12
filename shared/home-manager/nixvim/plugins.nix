@@ -28,7 +28,7 @@
       };
       html = {
         enable = true;
-        filetypes = ["html" "twig" "hbs" "htmldjango" "templ"];
+        filetypes = [ "html" "twig" "hbs" "htmldjango" "templ" ];
       };
       gopls = {
         enable = true;
@@ -74,9 +74,22 @@
       tailwindcss = {
         enable = true;
         filetypes = [
-          "astro" "html" "css" "scss" "javascript" "javascriptreact"
-          "typescript" "typescriptreact" "vue" "svelte" "rust" "templ"
-          "gohtml" "gohtmltmpl" "markdown" "mdx"
+          "astro"
+          "html"
+          "css"
+          "scss"
+          "javascript"
+          "javascriptreact"
+          "typescript"
+          "typescriptreact"
+          "vue"
+          "svelte"
+          "rust"
+          "templ"
+          "gohtml"
+          "gohtmltmpl"
+          "markdown"
+          "mdx"
         ];
       };
       lua_ls = {
@@ -116,9 +129,24 @@
     enable = true;
     settings = {
       ensure_installed = [
-        "bash" "c" "html" "lua" "markdown" "markdown_inline"
-        "vim" "vimdoc" "go" "rust" "typescript" "javascript"
-        "python" "nix" "json" "yaml" "toml" "starlark"
+        "bash"
+        "c"
+        "html"
+        "lua"
+        "markdown"
+        "markdown_inline"
+        "vim"
+        "vimdoc"
+        "go"
+        "rust"
+        "typescript"
+        "javascript"
+        "python"
+        "nix"
+        "json"
+        "yaml"
+        "toml"
+        "starlark"
       ];
       auto_install = true;
       highlight.enable = true;
@@ -186,7 +214,7 @@
         list.selection.auto_insert = false;
         accept.auto_brackets.enabled = false;
       };
-      sources.default = ["lsp" "path" "snippets" "buffer"];
+      sources.default = [ "lsp" "path" "snippets" "buffer" ];
     };
   };
 
@@ -195,24 +223,24 @@
     enable = true;
     settings = {
       formatters_by_ft = {
-        javascript = ["prettier" "biome"];
-        javascriptreact = ["prettier" "biome"];
-        typescript = ["prettier" "biome"];
-        typescriptreact = ["prettier" "biome"];
-        astro = ["prettier"];
-        vue = ["prettier"];
-        css = ["prettier"];
-        scss = ["prettier"];
-        html = ["rustywind" "prettier"];
-        json = ["prettier" "biome"];
-        jsonc = ["biome"];
-        yaml = ["prettier"];
-        markdown = ["prettier"];
-        lua = ["stylua"];
-        go = ["gopls"];
-        nix = ["nixfmt"];
-        rust = ["rustfmt"];
-        python = ["black"];
+        javascript = [ "prettier" "biome" ];
+        javascriptreact = [ "prettier" "biome" ];
+        typescript = [ "prettier" "biome" ];
+        typescriptreact = [ "prettier" "biome" ];
+        astro = [ "prettier" ];
+        vue = [ "prettier" ];
+        css = [ "prettier" ];
+        scss = [ "prettier" ];
+        html = [ "rustywind" "prettier" ];
+        json = [ "prettier" "biome" ];
+        jsonc = [ "biome" ];
+        yaml = [ "prettier" ];
+        markdown = [ "prettier" ];
+        lua = [ "stylua" ];
+        go = [ "gopls" ];
+        nix = [ "nixfmt" ];
+        rust = [ "rustfmt" ];
+        python = [ "black" ];
       };
     };
   };
@@ -231,7 +259,7 @@
     enable = true;
     modules = {
       # Base16 colorscheme support for stylix
-      base16 = {};
+      base16 = { };
       basics = {
         options = {
           extra_ui = true;
@@ -244,11 +272,11 @@
       ai = {
         n_lines = 500;
       };
-      surround = {};
-      bracketed = {};
-      comment = {};
-      git = {};
-      cursorword = {};
+      surround = { };
+      bracketed = { };
+      comment = { };
+      git = { };
+      cursorword = { };
       diff = {
         view = {
           style = "sign";
@@ -259,13 +287,13 @@
           textobject = "";
         };
       };
-      extra = {};
-      move = {};
-      tabline = {};
-      notify = {};
-      statusline = {};
-      visits = {};
-      icons = {};
+      extra = { };
+      move = { };
+      tabline = { };
+      notify = { };
+      statusline = { };
+      visits = { };
+      icons = { };
       hipatterns = {
         highlighters = {
           fixme = {
@@ -320,7 +348,7 @@
           };
         };
       };
-      bufremove = {};
+      bufremove = { };
       files = {
         options = {
           use_as_default_explorer = true;
@@ -358,7 +386,7 @@
   dap = {
     enable = true;
   };
-  
+
   # DAP UI and extensions
   dap-ui.enable = true;
   dap-go.enable = true;

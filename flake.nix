@@ -34,16 +34,15 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-darwin,
-      home-manager,
-      nix-darwin,
-      stylix,
-      flake-utils,
-      nixvim,
-      ...
+    { self
+    , nixpkgs
+    , nixpkgs-darwin
+    , home-manager
+    , nix-darwin
+    , stylix
+    , flake-utils
+    , nixvim
+    , ...
     }@inputs:
     let
       # Helper functions
@@ -54,8 +53,8 @@
       userFullName = "Eric Lavigne";
 
       # Platform-specific user info
-      linuxUserEmail = "hi_eric@hotmail.com";
-      darwinUserEmail = "eric.lavigne@mongodb.com";
+      personalUserEmail = "hi_eric@hotmail.com";
+      workUserEmail = "eric.lavigne@mongodb.com";
 
       # System configurations
       linuxSystems = [ "x86_64-linux" ];
@@ -66,10 +65,10 @@
 
       # Helper to create system configs
       mkSystem =
-        {
-          system,
-          hostname,
-          isDarwin ? false,
+        { system
+        , hostname
+        , isDarwin ? false
+        ,
         }:
         let
           pkgs =
@@ -85,7 +84,7 @@
           inherit system;
           specialArgs = {
             inherit inputs username userFullName;
-            userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+            userEmail = if isDarwin then workUserEmail else personalUserEmail;
           };
           modules = [
             (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
@@ -103,7 +102,7 @@
                 useUserPackages = true;
                 extraSpecialArgs = {
                   inherit inputs username userFullName;
-                  userEmail = if isDarwin then darwinUserEmail else linuxUserEmail;
+                  userEmail = if isDarwin then workUserEmail else personalUserEmail;
                 };
               };
             }
@@ -129,7 +128,7 @@
           hostname = "M-DX000XV19K";
           isDarwin = true;
         };
-	Erics-MacBook-Air.local = mkSystem {
+        Erics-MacBook-Air.local = mkSystem {
           system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
           hostname = "Erics-MacBook-Air.local";
           isDarwin = true;

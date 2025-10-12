@@ -32,7 +32,7 @@ in
     };
 
     services = {
-      
+
       # Hypridle (replaces swayidle for hyprland)
       hypridle = {
         enable = true;

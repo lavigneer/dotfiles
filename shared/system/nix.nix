@@ -2,7 +2,7 @@
 
 {
   # Core Nix configuration that applies to both NixOS and nix-darwin
-  
+
   # Nix settings
   nix = {
     optimise = {
@@ -10,10 +10,10 @@
     };
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
-      
+
       # Trusted users for nix
       trusted-users = [ "root" "@admin" "@wheel" ];
-      
+
       # Binary caches
       substituters = [
         "https://cache.nixos.org/"
@@ -24,21 +24,21 @@
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
     };
-    
+
     # Garbage collection
     gc = {
       automatic = lib.mkDefault true;
       options = lib.mkDefault "--delete-older-than 30d";
     };
   };
-  
+
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;
-    
+
     # Allow broken packages (use with caution)
     allowBroken = false;
-    
+
     # Permit insecure packages (use sparingly)
     permittedInsecurePackages = [
       # Add specific packages here if needed

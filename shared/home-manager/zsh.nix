@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 
 {
@@ -119,6 +118,7 @@
 
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
 
     oh-my-zsh = {
       enable = true;
@@ -156,6 +156,11 @@
 
     envExtra = ''
       export PATH=$HOME/.local/bin:$PATH
+      
+      # Ensure Nix per-user profile is in PATH early (only if not already present)
+      if [ -d "/etc/profiles/per-user/$USER/bin" ] && [[ ":$PATH:" != *":/etc/profiles/per-user/$USER/bin:"* ]]; then
+        export PATH="/etc/profiles/per-user/$USER/bin:$PATH"
+      fi
     '';
 
     # Additional shell initialization
@@ -221,6 +226,16 @@
       # Nix profile sourcing (for non-NixOS systems)
       if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then 
         . $HOME/.nix-profile/etc/profile.d/nix.sh
+      fi
+
+      # Ensure home-manager profile is in PATH (should be automatic but let's be explicit)
+      if [ -d "/etc/profiles/per-user/$USER/bin" ] && [[ ":$PATH:" != *":/etc/profiles/per-user/$USER/bin:"* ]]; then
+        export PATH="/etc/profiles/per-user/$USER/bin:$PATH"
+      fi
+
+      # Source home-manager session variables if available
+      if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+        . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
       fi
     '';
   };
