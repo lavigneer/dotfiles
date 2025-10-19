@@ -18,6 +18,7 @@
     extraConfig = ''
       # Session management
       bind-key -r f display-popup -E -E "tmux-sessionizer"
+      bind-key -r t display-popup -E -E "tmux-sessionizer-worktree"
 
       # Enable focus events for vim
       set -g focus-events on
@@ -67,5 +68,36 @@
       tmux switch-client -t $selected_name
     '';
     executable = true;
+  };
+
+  home.file.".local/bin/tmux-sessionizer-worktree" = {
+    text = ''
+      #!/usr/bin/env bash
+
+      if [[ $# -eq 1 ]]; then
+          selected=$1
+      else
+          selected=$(git worktree list | fzf)
+      fi
+
+      if [[ -z $selected ]]; then
+          exit 0
+      fi
+
+      selected=$(echo "$selected" | cut -f 1 -d " " -)
+      selected_name=$(basename "$selected" | tr . _)
+      tmux_running=$(pgrep tmux)
+
+      if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+          tmux new-session -s $selected_name -c $selected
+          exit 0
+      fi
+
+      if ! tmux has-session -t=$selected_name 2> /dev/null; then
+          tmux new-session -ds $selected_name -c $selected
+      fi
+
+      tmux switch-client -t $selected_name
+    '';
   };
 }

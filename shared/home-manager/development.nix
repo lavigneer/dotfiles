@@ -40,6 +40,7 @@
     pyright
     black
     ruff
+    uv
 
     # Nix development
     nil

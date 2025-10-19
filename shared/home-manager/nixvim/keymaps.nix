@@ -156,6 +156,19 @@
     };
   }
 
+  # Better indenting
+  {
+    mode = "v";
+    key = "<";
+    action = "<gv";
+  }
+
+  {
+    mode = "v";
+    key = ">";
+    action = ">gv";
+  }
+
   # Clear search highlight
   {
     mode = "n";

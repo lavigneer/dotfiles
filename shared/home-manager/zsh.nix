@@ -156,7 +156,7 @@
     };
 
     envExtra = ''
-      export PATH=$HOME/.local/bin:$PATH
+      export PATH=$HOME/.local/bin:$PATH:$HOME/.rd/bin
 
       # Ensure Nix per-user profile is in PATH early (only if not already present)
       if [ -d "/etc/profiles/per-user/$USER/bin" ] && [[ ":$PATH:" != *":/etc/profiles/per-user/$USER/bin:"* ]]; then

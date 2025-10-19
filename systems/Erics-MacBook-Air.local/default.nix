@@ -17,7 +17,7 @@
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
     ../../darwin/modules/programs/claude.nix
-    ../../darwin/modules/programs/terminals.nix
+    ../../darwin/modules/programs/rancher.nix
     ../../darwin/modules/programs/1password.nix
   ];
 
@@ -40,7 +40,6 @@
       ../../shared/home-manager/browser.nix
       ../../shared/home-manager/claude.nix
       ../../shared/home-manager/copilot.nix
-      ../../shared/home-manager/thunderbird.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix
@@ -74,6 +73,43 @@
           host = "outlook.office365.com";
           port = 993;
           tls.enable = true;
+        };
+        smtp = {
+          authentication = "xoauth2";
+          host = "smtp-mail.outlook.com";
+          port = 587;
+          tls = {
+            enable = true;
+            useStartTls = true;
+          };
+        };
+      };
+      "Gmail" = {
+        primary = false;
+        address = "lavigneer@gmail.com";
+        userName = "lavigneer@gmail.com";
+        realName = userFullName;
+        thunderbird = {
+          enable = true;
+          settings = id: {
+            "mail.server.server_${id}.authMethod" = 10;
+            "mail.smtpserver.smtp_${id}.authMethod" = 10;
+          };
+        };
+        imap = {
+          authentication = "xoauth2";
+          host = "imap.gmail.com";
+          port = 993;
+          tls.enable = true;
+        };
+        smtp = {
+          authentication = "xoauth2";
+          host = "smtp.gmail.com";
+          port = 587;
+          tls = {
+            enable = true;
+            useStartTls = true;
+          };
         };
       };
     };

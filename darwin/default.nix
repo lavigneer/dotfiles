@@ -30,6 +30,12 @@
       largesize = lib.mkDefault 56;
     };
 
+    controlcenter = {
+      BatteryShowPercentage = true;
+      Bluetooth = true;
+      NowPlaying = false;
+    };
+
     finder = {
       _FXShowPosixPathInTitle = lib.mkDefault true;
       FXEnableExtensionChangeWarning = lib.mkDefault false;
@@ -43,7 +49,7 @@
       AppleShowAllExtensions = lib.mkDefault true;
       AppleInterfaceStyle = lib.mkDefault "Dark";
       "com.apple.sound.beep.feedback" = lib.mkDefault 0;
-      _HIHideMenuBar = lib.mkDefault false;
+      _HIHideMenuBar = lib.mkDefault true;
 
       # Keyboard and mouse defaults
       KeyRepeat = lib.mkDefault 2;

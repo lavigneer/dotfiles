@@ -34,6 +34,11 @@ in
       enableZshIntegration = true;
     };
 
+    tealdeer = {
+      enable = true;
+      settings.updates.auto_update = true;
+    };
+
     ripgrep = {
       enable = true;
       arguments = [
@@ -82,4 +87,19 @@ in
     xz
     rebuild-nix
   ];
+
+  home.file.".local/bin/tldr-fuzzy" = {
+    text = ''
+      #!/usr/bin/env bash
+      # Required parameters:
+      # @raycast.schemaVersion 1
+      # @raycast.title tldr
+      # @raycast.mode fullOutput
+
+      # Optional parameters:
+      # @raycast.icon 🤖
+      "${pkgs.tealdeer}/bin/tldr" --list | "${pkgs.fzf}/bin/fzf" | xargs "${pkgs.tealdeer}/bin/tldr"
+    '';
+    executable = true;
+  };
 }
