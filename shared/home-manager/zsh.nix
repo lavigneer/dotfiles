@@ -125,7 +125,6 @@
       enable = true;
       plugins = [
         "git"
-        "sudo"
         "ssh-agent"
       ]
       ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
