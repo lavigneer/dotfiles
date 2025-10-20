@@ -145,10 +145,18 @@
         };
       };
 
-      # Standalone Home Manager configurations removed
-      # Home Manager configuration is now integrated into platform defaults
-      # Use system configurations (nixosConfigurations/darwinConfigurations) instead
-      homeConfigurations = { };
+      # Standalone Home Manager configurations
+      # Container configuration for devcontainers and CI/CD
+      homeConfigurations = {
+        "${username}@container" = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          extraSpecialArgs = {
+            inherit inputs username userFullName;
+            userEmail = personalUserEmail;
+          };
+          modules = [ ./systems/container ];
+        };
+      };
 
       # Development shell
       devShells = flake-utils.lib.eachDefaultSystemMap (system: {
