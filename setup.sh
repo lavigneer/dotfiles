@@ -10,16 +10,16 @@ echo "🚀 Starting dotfiles setup for devcontainer..."
 if command -v nix &> /dev/null; then
     echo "✅ Nix is already installed"
 else
-    echo "📥 Installing Determinate Nix..."
-    # Use Determinate Nix installer (auto-detects container environment)
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+    echo "📥 Installing Nix..."
+    # Use official Nix installer in single-user mode (no systemd required)
+    sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
-    # Source Nix (try both daemon and single-user paths)
-    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-    elif [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
-        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-    fi
+    # Source Nix for single-user install
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+
+    # Enable flakes
+    mkdir -p ~/.config/nix
+    echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 fi
 
 # Get the dotfiles directory (where this script is located)
