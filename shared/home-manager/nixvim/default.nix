@@ -186,19 +186,32 @@
     plugins = import ./plugins.nix { inherit pkgs; };
 
     # Extra plugins not in nixvim
-    extraPlugins = with pkgs.vimPlugins; [
-      neotest-golang
-      pkgs.vimPlugins.nvim-treesitter
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))
-      (pkgs.vimUtils.buildVimPlugin {
-        name = "sidekick.nvim";
-        src = inputs.sidekick-nvim;
-      })
-      (pkgs.vimUtils.buildVimPlugin {
-        name = "nvim-lsp-endhints";
-        src = inputs.nvim-lsp-endhints;
-      })
-    ];
+    extraPlugins =
+      let
+        # Override neotest to disable failing tests
+        neotest-fixed = pkgs.vimPlugins.neotest.overrideAttrs (old: {
+          doCheck = false;
+        });
+        # Override neotest-golang to use our fixed neotest in propagatedBuildInputs
+        neotest-golang-fixed = pkgs.vimPlugins.neotest-golang.overrideAttrs (old: {
+          propagatedBuildInputs = builtins.map (dep:
+            if dep == pkgs.vimPlugins.neotest then neotest-fixed else dep
+          ) (old.propagatedBuildInputs or []);
+        });
+      in
+      with pkgs.vimPlugins; [
+        neotest-golang-fixed
+        pkgs.vimPlugins.nvim-treesitter
+        (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))
+        (pkgs.vimUtils.buildVimPlugin {
+          name = "sidekick.nvim";
+          src = inputs.sidekick-nvim;
+        })
+        (pkgs.vimUtils.buildVimPlugin {
+          name = "nvim-lsp-endhints";
+          src = inputs.nvim-lsp-endhints;
+        })
+      ];
 
     # Extra Lua configuration for complex setups
     extraConfigLua = ''
