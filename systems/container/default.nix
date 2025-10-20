@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
+{ config, pkgs, inputs, username, userEmail, userFullName, lib, ... }:
 
 {
   # Minimal container configuration - only CLI tools and development essentials
@@ -13,6 +13,9 @@
     ../../shared/home-manager/tmux.nix
     ../../shared/home-manager/docker.nix
   ];
+
+  # Disable stylix for container (not available in standalone home-manager)
+  stylix.targets.nixvim.enable = lib.mkForce false;
 
   # Container-specific home configuration
   home.stateVersion = "25.05";
