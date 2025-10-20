@@ -155,7 +155,7 @@
             userEmail = personalUserEmail;
           };
           modules = [
-            stylix.homeManagerModules.stylix
+            stylix.homeModules.stylix
             ./systems/container
           ];
         };

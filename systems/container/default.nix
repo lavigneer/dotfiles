@@ -17,6 +17,8 @@
   # Minimal stylix configuration for container
   stylix = {
     enable = true;
+    autoEnable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/kanagawa.yaml";
   };
 
   # Container-specific home configuration
