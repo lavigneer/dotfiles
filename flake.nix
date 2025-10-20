@@ -154,7 +154,10 @@
             inherit inputs username userFullName;
             userEmail = personalUserEmail;
           };
-          modules = [ ./systems/container ];
+          modules = [
+            stylix.homeManagerModules.stylix
+            ./systems/container
+          ];
         };
       };
 

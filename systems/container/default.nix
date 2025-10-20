@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, username, userEmail, userFullName, lib, ... }:
+{ config, pkgs, inputs, username, userEmail, userFullName, ... }:
 
 {
   # Minimal container configuration - only CLI tools and development essentials
@@ -14,8 +14,10 @@
     ../../shared/home-manager/docker.nix
   ];
 
-  # Disable stylix for container (not available in standalone home-manager)
-  stylix.targets.nixvim.enable = lib.mkForce false;
+  # Minimal stylix configuration for container
+  stylix = {
+    enable = true;
+  };
 
   # Container-specific home configuration
   home.stateVersion = "25.05";
