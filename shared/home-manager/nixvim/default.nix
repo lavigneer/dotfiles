@@ -192,23 +192,11 @@
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))
       (pkgs.vimUtils.buildVimPlugin {
         name = "sidekick.nvim";
-        src = pkgs.fetchFromGitHub {
-          owner = "folke";
-          repo = "sidekick.nvim";
-          rev = "main";
-          sha256 = "sha256-yhKnsUCZWJnPQ+/EuSqhb2fj6KGxuGWpkPsxCiwcO2o=";
-        };
-        doCheck = false;
+        src = inputs.sidekick-nvim;
       })
       (pkgs.vimUtils.buildVimPlugin {
         name = "nvim-lsp-endhints";
-        src = pkgs.fetchFromGitHub {
-          owner = "chrisgrieser";
-          repo = "nvim-lsp-endhints";
-          rev = "main";
-          sha256 = "sha256-gfVE5XSGuf+aC/Pi+sGWsfgmWpQ6RvC9x+SMTRagdSM=";
-        };
-        doCheck = false;
+        src = inputs.nvim-lsp-endhints;
       })
     ];
 

@@ -32,6 +32,16 @@
       url = "github:nix-community/nixvim";
     };
 
+    # Vim plugins (tracked as flake inputs)
+    sidekick-nvim = {
+      url = "github:folke/sidekick.nvim";
+      flake = false;
+    };
+    nvim-lsp-endhints = {
+      url = "github:chrisgrieser/nvim-lsp-endhints";
+      flake = false;
+    };
+
     # treefmt for formatting
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -49,6 +59,8 @@
       stylix,
       flake-utils,
       nixvim,
+      sidekick-nvim,
+      nvim-lsp-endhints,
       treefmt-nix,
       ...
     }@inputs:
