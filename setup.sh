@@ -11,12 +11,12 @@ if command -v nix &> /dev/null; then
     echo "✅ Nix is already installed"
 else
     echo "📥 Installing Determinate Nix..."
-    # Use Determinate Nix installer (better for containers, flakes enabled by default)
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+    # Use Determinate Nix installer for containers (no init system)
+    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm --init none
 
-    # Source Nix
-    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+    # Source Nix for single-user install
+    if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
     fi
 fi
 
