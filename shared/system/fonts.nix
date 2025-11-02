@@ -5,9 +5,8 @@
   fonts.packages = with pkgs; [
     # Basic fonts
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     noto-fonts-cjk-sans
-    noto-fonts-extra
 
     # Nerd Fonts for terminal and development
     nerd-fonts.go-mono

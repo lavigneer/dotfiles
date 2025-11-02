@@ -204,10 +204,6 @@
         pkgs.vimPlugins.nvim-treesitter
         (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))
         (pkgs.vimUtils.buildVimPlugin {
-          name = "sidekick.nvim";
-          src = inputs.sidekick-nvim;
-        })
-        (pkgs.vimUtils.buildVimPlugin {
           name = "nvim-lsp-endhints";
           src = inputs.nvim-lsp-endhints;
         })
@@ -219,16 +215,6 @@
       require('neotest').setup({
         adapters = {
           require('neotest-golang'),
-        },
-      })
-
-      -- Sidekick configuration
-      require('sidekick').setup({
-        cli = {
-          mux = {
-            backend = "tmux",
-            enabled = true,
-          },
         },
       })
 

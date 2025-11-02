@@ -13,10 +13,11 @@ in
 {
   programs.git = {
     enable = true;
-    userName = userFullName;
-    userEmail = userEmail;
-
-    extraConfig = {
+    settings = {
+      user = {
+        name = userFullName;
+        email = userEmail;
+      };
       init.defaultBranch = "main";
       core.editor = "nvim";
       pull.rebase = true;
