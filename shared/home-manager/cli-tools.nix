@@ -74,6 +74,9 @@ in
     asdf
     htop
     curl
+    devbox
+    kubectl
+    tilt
     wget
     unzip
     gawk
