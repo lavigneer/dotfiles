@@ -31,15 +31,16 @@
     };
 
     controlcenter = {
-      BatteryShowPercentage = true;
-      Bluetooth = true;
-      NowPlaying = false;
+      BatteryShowPercentage = lib.mkDefault true;
+      Bluetooth = lib.mkDefault true;
+      NowPlaying = lib.mkDefault false;
     };
 
     finder = {
       _FXShowPosixPathInTitle = lib.mkDefault true;
       FXEnableExtensionChangeWarning = lib.mkDefault false;
       AppleShowAllExtensions = lib.mkDefault true;
+      AppleShowAllFiles = lib.mkDefault true;
       ShowPathbar = lib.mkDefault true;
       ShowStatusBar = lib.mkDefault true;
     };
@@ -55,6 +56,10 @@
       KeyRepeat = lib.mkDefault 2;
       InitialKeyRepeat = lib.mkDefault 15;
       ApplePressAndHoldEnabled = lib.mkDefault false;
+    };
+
+    WindowManager = {
+      EnableStandardClickToShowDesktop = lib.mkDefault false;
     };
 
     trackpad = {
