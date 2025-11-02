@@ -148,7 +148,6 @@
       ZSH_TMUX_AUTOQUIT = "false";
       ZSH_TMUX_AUTOSTART_ONCE = "false";
       ZSH_TMUX_DEFAULT_SESSION_NAME = "scratchpad";
-      PROJECT_PATHS = "${config.home.homeDirectory}/workspace";
       RIPGREP_CONFIG_PATH = "${config.home.homeDirectory}/.ripgreprc";
       XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/Pictures/screenshots";
       PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
@@ -170,13 +169,6 @@
         source ~/.profile
       fi
 
-      # Completion configuration
-      zstyle ':completion:*' use-cache on
-      zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
-
-      # Shell options from original .zshrc
-      setopt NO_AUTOLIST BASH_AUTOLIST NO_MENUCOMPLETE
-
       # Custom functions
       # Conditional tmux autostart (disable in vscode)
       if [[ "$TERM_PROGRAM" != "vscode" ]]; then
@@ -192,50 +184,6 @@
 
       if (( $+commands[kubectl] )); then
         plugins+=(kubectl)
-      fi
-
-      # PATH additions
-      export PATH="$HOME/.local/bin:$PATH"
-      export PATH="$GOPATH/bin:$GOROOT/bin:$PATH"
-
-      # PNPM path setup
-      case ":$PATH:" in
-        *":$PNPM_HOME:"*) ;;
-        *) export PATH="$PNPM_HOME:$PATH" ;;
-      esac
-
-      # Cargo environment
-      [[ ! -r $HOME/.cargo/env ]] || source $HOME/.cargo/env > /dev/null 2> /dev/null
-
-      # Go configuration (fallback if not set by nix)
-      [[ ! -r /usr/local/go ]] || export GOROOT=/usr/local/go
-
-      # OPAM configuration
-      [[ ! -r $HOME/.opam/opam-init/init.zsh ]] || source $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null
-
-      # FZF key bindings and completion
-      if command -v fzf-share >/dev/null; then
-        source "$(fzf-share)/key-bindings.zsh"
-        source "$(fzf-share)/completion.zsh"
-      fi
-
-      # FZF fallback paths (for non-nix systems)
-      [[ ! -r /usr/share/doc/fzf/examples/key-bindings.zsh ]] || source /usr/share/doc/fzf/examples/key-bindings.zsh > /dev/null 2> /dev/null
-      [[ ! -r /usr/share/doc/fzf/examples/completion.zsh ]] || source /usr/share/doc/fzf/examples/completion.zsh > /dev/null 2> /dev/null
-
-      # Nix profile sourcing (for non-NixOS systems)
-      if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then 
-        . $HOME/.nix-profile/etc/profile.d/nix.sh
-      fi
-
-      # Ensure home-manager profile is in PATH (should be automatic but let's be explicit)
-      if [ -d "/etc/profiles/per-user/$USER/bin" ] && [[ ":$PATH:" != *":/etc/profiles/per-user/$USER/bin:"* ]]; then
-        export PATH="/etc/profiles/per-user/$USER/bin:$PATH"
-      fi
-
-      # Source home-manager session variables if available
-      if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
-        . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
       fi
     '';
   };
