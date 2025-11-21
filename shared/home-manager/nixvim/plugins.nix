@@ -456,6 +456,11 @@
           choose_marked = "<C-q>";
           choose_in_vsplit = "";
         };
+        source = {
+          files = {
+            tool = "rg";
+          };
+        };
       };
     };
   };

@@ -148,7 +148,7 @@
       ZSH_TMUX_AUTOQUIT = "false";
       ZSH_TMUX_AUTOSTART_ONCE = "false";
       ZSH_TMUX_DEFAULT_SESSION_NAME = "scratchpad";
-      RIPGREP_CONFIG_PATH = "${config.home.homeDirectory}/.ripgreprc";
+      RIPGREP_CONFIG_PATH = "${config.home.homeDirectory}/.config/ripgrep/ripgreprc";
       XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/Pictures/screenshots";
       PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     };

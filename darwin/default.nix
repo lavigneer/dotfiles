@@ -50,7 +50,7 @@
       AppleShowAllExtensions = lib.mkDefault true;
       AppleInterfaceStyle = lib.mkDefault "Dark";
       "com.apple.sound.beep.feedback" = lib.mkDefault 0;
-      _HIHideMenuBar = lib.mkDefault true;
+      _HIHideMenuBar = lib.mkDefault false;
 
       # Keyboard and mouse defaults
       KeyRepeat = lib.mkDefault 2;
