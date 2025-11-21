@@ -84,7 +84,6 @@ in
     gnused
     less
     tree
-    terraform
     file
     jq
     yq
