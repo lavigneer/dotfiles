@@ -17,7 +17,8 @@ in
     # AeroSpace tiling window manager for macOS with native configuration
     programs.aerospace = {
       enable = true;
-      userSettings = {
+      launchd.enable = true;
+      settings = {
         # Disable normalizations (i3-like behavior)
         enable-normalization-flatten-containers = false;
         enable-normalization-opposite-orientation-for-nested-containers = false;

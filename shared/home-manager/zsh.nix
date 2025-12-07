@@ -19,9 +19,6 @@
       # A minimal left prompt
       format = "$directory$git_branch$character";
 
-      # move the rest of the prompt to the right
-      right_format = "$all";
-
       line_break.disabled = true;
 
       aws.symbol = "  ";
@@ -119,7 +116,7 @@
 
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
+    enableCompletion = false; # oh-my-zsh handles completion
 
     oh-my-zsh = {
       enable = true;
@@ -144,7 +141,7 @@
     sessionVariables = {
       ZSH_TMUX_CONFIG = "${config.home.homeDirectory}/.config/tmux/tmux.conf";
       ZSH_TMUX_AUTOSTART = "true";
-      ZSH_TMUX_AUTOCONNET = "false";
+      ZSH_TMUX_AUTOCONNECT = "true";
       ZSH_TMUX_AUTOQUIT = "false";
       ZSH_TMUX_AUTOSTART_ONCE = "false";
       ZSH_TMUX_DEFAULT_SESSION_NAME = "scratchpad";
