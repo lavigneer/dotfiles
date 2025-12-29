@@ -72,6 +72,7 @@ in
 
   home.packages = with pkgs; [
     asdf
+    baobab
     curl
     devbox
     file

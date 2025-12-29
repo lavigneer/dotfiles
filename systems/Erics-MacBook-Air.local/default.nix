@@ -19,7 +19,6 @@
     ../../darwin/modules/programs/claude.nix
     ../../darwin/modules/programs/rancher.nix
     ../../darwin/modules/programs/1password.nix
-    ../../darwin/modules/programs/baobab.nix
   ];
 
   home-manager.backupFileExtension = "bak";
