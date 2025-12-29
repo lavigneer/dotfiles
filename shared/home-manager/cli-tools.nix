@@ -72,22 +72,25 @@ in
 
   home.packages = with pkgs; [
     asdf
-    htop
     curl
     devbox
-    kubectl
-    tilt
-    wget
-    unzip
+    file
     gawk
     gnugrep
     gnused
-    less
-    tree
-    file
+    htop
     jq
-    yq
+    k0sctl
+    k9s
+    kubectl
+    less
+    ngrok
+    tilt
+    tree
+    unzip
+    wget
     xz
+    yq
     rebuild-nix
   ];
 

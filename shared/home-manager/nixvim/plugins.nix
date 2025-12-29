@@ -113,6 +113,9 @@
           };
         };
       };
+      zls = {
+        enable = true;
+      };
     };
     keymaps = {
       lspBuf = {
@@ -488,7 +491,8 @@
   dap-go.enable = true;
 
   # Find and replace
-  # spectre.enable = true;
+  # TODO: Re-enable once build failure is sorted
+  spectre.enable = false;
 
   # Helm integration
   helm.enable = true;

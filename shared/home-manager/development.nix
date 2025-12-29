@@ -46,6 +46,10 @@
     nil
     nixpkgs-fmt
     nixd
+
+    # Zig development
+    zig
+    zls
   ];
 
   # Development environment variables
