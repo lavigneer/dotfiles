@@ -126,9 +126,6 @@
       ]
       ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
       ++ lib.optionals config.programs.fzf.enable [ "fzf" ]
-      ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "asdf") config.home.packages) [
-        "asdf"
-      ]
       ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "bazelisk") config.home.packages) [
         "bazel"
       ]

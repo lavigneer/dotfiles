@@ -83,6 +83,19 @@
         "aarch64-darwin"
       ];
 
+      # Overlay to fix pre-commit build on darwin (dotnet-sdk tests require Swift which is broken)
+      darwinOverlays = [
+        (final: prev: {
+          pre-commit = prev.pre-commit.overridePythonAttrs (oldAttrs: {
+            doCheck = false;
+            dontUsePytestCheck = true;
+            nativeCheckInputs = [ ];
+            preCheck = null;
+            pytestCheckPhase = null;
+          });
+        })
+      ];
+
       # Helper to create system configs
       mkSystem =
         {
@@ -106,26 +119,29 @@
           specialArgs = {
             inherit inputs username userFullName userEmail;
           };
-          modules = [
-            (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
-            # Platform-specific configuration (provides defaults for the platform)
-            (if isDarwin then ./darwin else ./linux)
+          modules =
+            # Apply darwin overlays to fix broken packages (mkAfter ensures they're applied last)
+            (if isDarwin then [{ nixpkgs.overlays = nixpkgs-darwin.lib.mkAfter darwinOverlays; }] else [])
+            ++ [
+              (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
+              # Platform-specific configuration (provides defaults for the platform)
+              (if isDarwin then ./darwin else ./linux)
 
-            # Machine-specific configuration (can override platform defaults)
-            (./systems + "/${hostname}")
+              # Machine-specific configuration (can override platform defaults)
+              (./systems + "/${hostname}")
 
-            # Home Manager integration (configuration now in platform defaults)
-            homeManagerModule
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = {
-                  inherit inputs username userFullName userEmail;
+              # Home Manager integration (configuration now in platform defaults)
+              homeManagerModule
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = {
+                    inherit inputs username userFullName userEmail;
+                  };
                 };
-              };
-            }
-          ];
+              }
+            ];
         };
     in
     {
