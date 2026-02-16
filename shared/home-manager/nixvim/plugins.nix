@@ -15,6 +15,7 @@
           checkOnSave = true;
         };
       };
+      yamlls.enable = true;
       biome.enable = true;
       ts_ls = {
         enable = true;
@@ -36,6 +37,7 @@
           "templ"
         ];
       };
+      golangci_lint_ls.enable = true;
       gopls = {
         enable = true;
         settings = {
