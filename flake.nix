@@ -47,6 +47,11 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Flox
+    flox = {
+      url = "github:flox/flox/latest";
+    };
   };
 
   outputs =
@@ -62,6 +67,7 @@
       sidekick-nvim,
       nvim-lsp-endhints,
       treefmt-nix,
+      flox,
       ...
     }@inputs:
     let

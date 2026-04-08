@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
@@ -59,6 +59,7 @@ in
     yazi = {
       enable = true;
       enableZshIntegration = true;
+      shellWrapperName = "y";
       settings = {
         manager = {
           show_hidden = true;
@@ -93,6 +94,7 @@ in
     xz
     yq
     rebuild-nix
+    inputs.flox.packages.${pkgs.system}.default
   ];
 
   home.file.".local/bin/tldr-fuzzy" = {

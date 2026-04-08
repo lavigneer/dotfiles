@@ -57,7 +57,6 @@
     # Go configuration
     GOPATH = "${config.home.homeDirectory}/go";
     GOBIN = "${config.home.homeDirectory}/go/bin";
-    GOROOT = "${pkgs.go}/share/go";
 
     # Rust configuration
     RUST_BACKTRACE = "1";
