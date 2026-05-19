@@ -281,9 +281,9 @@
     extraPackages = with pkgs; [
       # Language servers
       nil
-      nodePackages.typescript-language-server
-      nodePackages.bash-language-server
-      nodePackages.vscode-langservers-extracted
+      typescript-language-server
+      bash-language-server
+      vscode-langservers-extracted
       lua-language-server
       gopls
       rust-analyzer
@@ -293,7 +293,7 @@
       # Formatters
       stylua
       nixpkgs-fmt
-      nodePackages.prettier
+      prettier
       black
       rustfmt
 
@@ -302,7 +302,7 @@
       tree-sitter
       ripgrep
       fd
-      nodePackages.neovim
+      neovim
 
       # Additional formatters for conform
       biome

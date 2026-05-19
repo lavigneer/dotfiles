@@ -104,6 +104,13 @@
               CGO_ENABLED = "1";
             };
           });
+          # Fix appstream-1.1.2 build on Darwin: meson incorrectly passes
+          # 'none required' as linker flags for unfound optional dependencies.
+          appstream = prev.appstream.overrideAttrs (oldAttrs: {
+            postConfigure = (oldAttrs.postConfigure or "") + ''
+              find . -name "*.ninja" -exec sed -i 's/ none required//g' {} +
+            '';
+          });
         })
       ];
 

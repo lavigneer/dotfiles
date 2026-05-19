@@ -43,6 +43,7 @@ in
     settings = {
       git = {
         autoFetch = false;
+        overrideGpg = true;
       };
       gui = {
         mouseEvents = false;

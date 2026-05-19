@@ -35,6 +35,11 @@
       bind-key C-Space if-shell "[[ $(tmux display -p '#{pane_width}') -le 5 ]]" \
         "resize-pane -L 999; resize-pane -R 80" \
         "resize-pane -R 999"
+
+      # Better Claude Code support
+      set -g allow-passthrough on
+      set -s extended-keys on
+      set -as terminal-features 'xterm*:extkeys'
     '';
   };
 
