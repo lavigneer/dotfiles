@@ -22,10 +22,32 @@ in
       core.editor = "nvim";
       pull.rebase = true;
       push.autoSetupRemote = true;
-      diff.tool = "nvimdiff";
-      merge.tool = "nvimdiff";
+      diff.tool = "difftastic";
+      merge = {
+        tool = "nvimdiff";
+        conflictStyle = "diff3";
+        mergiraf = {
+          name = "mergiraf";
+          driver = "mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L";
+        };
+      };
+      difftool.difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';
+      pager.difftool = true;
+      mergetool.mergiraf = {
+        cmd = ''mergiraf merge --git "$BASE" "$LOCAL" "$REMOTE" -p "$MERGED"'';
+        trustExitCode = true;
+      };
     };
   };
+
+  programs.git.attributes = [
+    "* merge=mergiraf"
+  ];
+
+  home.packages = with pkgs; [
+    difftastic
+    mergiraf
+  ];
 
   # GitHub CLI
   programs.gh = {
@@ -44,6 +66,12 @@ in
       git = {
         autoFetch = false;
         overrideGpg = true;
+        pagers = [
+          {
+            colorArg = "never";
+            externalDiffCommand = "difft --color=always --display inline";
+          }
+        ];
       };
       gui = {
         mouseEvents = false;
