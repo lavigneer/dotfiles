@@ -40,6 +40,13 @@ in
     };
   };
 
+  programs.git.includes = [
+    {
+      condition = "gitdir:**/.git/worktrees/*/";
+      contents.core.fsmonitor = false;
+    }
+  ];
+
   programs.git.attributes = [
     "* merge=mergiraf"
   ];
