@@ -1,7 +1,7 @@
 {
   config,
-  pkgs,
   lib,
+  username,
   ...
 }:
 
@@ -14,10 +14,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # AeroSpace tiling window manager for macOS with native configuration
-    programs.aerospace = {
+    # Install via homebrew for a stable binary path so macOS Accessibility
+    # permissions survive nix rebuilds (nix store paths change each rebuild,
+    # causing macOS to revoke TCC permissions).
+    homebrew.taps = [ "nikitabobko/tap" ];
+    homebrew.casks = [ "aerospace" ];
+
+    # programs.aerospace generates ~/.aerospace.toml; launchd is disabled because
+    # the homebrew cask manages its own login item via start-at-login = true.
+    home-manager.users.${username}.programs.aerospace = {
       enable = true;
-      launchd.enable = true;
+      launchd.enable = false;
       settings = {
         # Disable normalizations (i3-like behavior)
         enable-normalization-flatten-containers = false;
@@ -27,9 +34,6 @@ in
 
         # macOS app behavior
         automatically-unhide-macos-hidden-apps = false;
-
-        # Startup behavior
-        start-at-login = true;
 
         mode.main.binding = {
           # Terminal launcher

@@ -19,7 +19,10 @@
     ../../darwin/modules/programs/claude.nix
     ../../darwin/modules/programs/rancher.nix
     ../../darwin/modules/programs/1password.nix
+    ../../darwin/modules/window-managers/aerospace.nix
   ];
+
+  windowManagers.aerospace.enable = true;
 
   home-manager.backupFileExtension = "bak";
 
@@ -42,13 +45,7 @@
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix
-      ../../darwin/modules/window-managers/aerospace.nix
     ];
-
-    # Enable specific window managers for this system
-    windowManagers = {
-      aerospace.enable = true;
-    };
 
     # macOS-specific tools and utilities
     home.packages = with pkgs; [ ];
