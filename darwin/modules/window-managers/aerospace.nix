@@ -17,7 +17,14 @@ in
     # Install via homebrew for a stable binary path so macOS Accessibility
     # permissions survive nix rebuilds (nix store paths change each rebuild,
     # causing macOS to revoke TCC permissions).
-    homebrew.taps = [ "nikitabobko/tap" ];
+    # trusted = true adds `trusted: true` to the Brewfile entry so activation
+    # can load casks from this third-party tap (Homebrew 6.0+ requires tap trust).
+    homebrew.taps = [
+      {
+        name = "nikitabobko/tap";
+        trusted = true;
+      }
+    ];
     homebrew.casks = [ "aerospace" ];
 
     # programs.aerospace generates ~/.aerospace.toml; launchd is disabled because

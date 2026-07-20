@@ -16,7 +16,6 @@
     ../../shared/system/fonts.nix
     ../../shared/system/shell.nix
     ../../shared/system/stylix.nix
-    ../../darwin/modules/programs/1password.nix
     ../../darwin/modules/window-managers/aerospace.nix
   ];
 

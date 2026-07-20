@@ -73,7 +73,6 @@ in
 
   home.packages = with pkgs; [
     asdf
-    baobab
     curl
     devbox
     file
@@ -95,7 +94,10 @@ in
     yq
     rebuild-nix
     inputs.flox.packages.${pkgs.system}.default
-  ];
+  ]
+  # baobab (GNOME/GTK) currently fails to link on Darwin: libadwaita crashes
+  # ld64 in the current nixpkgs-darwin pin. Keep it on Linux only for now.
+  ++ pkgs.lib.optional (!isDarwin) pkgs.baobab;
 
   home.file.".local/bin/tldr-fuzzy" = {
     text = ''
