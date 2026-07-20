@@ -33,10 +33,6 @@ in
       enable = true;
       launchd.enable = false;
       settings = {
-        # Disable normalizations (i3-like behavior)
-        enable-normalization-flatten-containers = false;
-        enable-normalization-opposite-orientation-for-nested-containers = false;
-
         on-focused-monitor-changed = [ ];
 
         # macOS app behavior
