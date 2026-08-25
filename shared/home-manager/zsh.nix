@@ -154,6 +154,11 @@
       if [ -d "/etc/profiles/per-user/$USER/bin" ] && [[ ":$PATH:" != *":/etc/profiles/per-user/$USER/bin:"* ]]; then
         export PATH="/etc/profiles/per-user/$USER/bin:$PATH"
       fi
+
+      # Homebrew (Apple Silicon) - nix-darwin does not add this to PATH
+      if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      fi
     '';
 
     # Additional shell initialization

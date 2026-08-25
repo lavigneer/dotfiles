@@ -58,9 +58,6 @@ in
           alt-shift-l = "move right";
 
           # Layout controls
-          alt-b = "split horizontal";
-          alt-v = "split vertical";
-          alt-f = "fullscreen";
           alt-w = "layout h_accordion";
           alt-e = "layout tiles horizontal vertical";
           alt-shift-space = "layout floating tiling";
