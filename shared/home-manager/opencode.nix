@@ -15,7 +15,7 @@ in
 
     "opencode/tui.json".text = builtins.toJSON {
       "$schema" = "https://opencode.ai/tui.json";
-      mouse = false;
+      mouse = true;
     };
 
     "opencode/opencode.json".text = builtins.toJSON {
