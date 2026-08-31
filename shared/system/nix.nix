@@ -44,19 +44,20 @@
     };
 
     # Automatic store optimization
-    optimise = {
-      automatic = true;
-      interval = [ "daily" ];
-    };
+    optimise =
+      {
+        automatic = true;
+      }
+      // (if pkgs.stdenv.hostPlatform.isDarwin then { interval = { Hour = 0; Minute = 0; }; } else { dates = [ "daily" ]; });
 
     # Garbage collection settings
-    gc = {
-      automatic = lib.mkDefault true;
-      # Run garbage collection daily
-      interval = lib.mkDefault "daily";
-      # Keep generations from the last 30 days
-      options = lib.mkDefault "--delete-older-than 30d";
-    };
+    gc =
+      {
+        automatic = lib.mkDefault true;
+        # Keep generations from the last 30 days
+        options = lib.mkDefault "--delete-older-than 30d";
+      }
+      // (if pkgs.stdenv.hostPlatform.isDarwin then { interval = { Hour = 0; Minute = 0; }; } else { dates = lib.mkDefault [ "daily" ]; });
   };
 
   # Allow unfree packages

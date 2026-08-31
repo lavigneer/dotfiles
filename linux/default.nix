@@ -40,6 +40,11 @@
     printing.enable = lib.mkDefault true;
   };
 
+  environment.pathsToLink = [
+    "/share/applications"
+    "/share/xdg-desktop-portal"
+  ];
+
   # Security defaults
   security.rtkit.enable = lib.mkDefault true;
 
