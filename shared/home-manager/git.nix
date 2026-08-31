@@ -73,10 +73,11 @@ in
       git = {
         autoFetch = false;
         overrideGpg = true;
-        pagers = [
+        diffRenderers = [
           {
             colorArg = "never";
-            externalDiffCommand = "difft --color=always --display inline";
+            type = "extDiff";
+            command = "difft --color=always --display inline";
           }
         ];
       };
