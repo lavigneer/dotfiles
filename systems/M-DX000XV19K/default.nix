@@ -40,6 +40,7 @@
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
       ../../shared/home-manager/claude.nix
+      ../../shared/home-manager/opencode.nix
       ../../darwin/modules/programs/karabiner.nix
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix
