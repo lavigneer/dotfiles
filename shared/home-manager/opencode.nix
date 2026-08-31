@@ -13,10 +13,10 @@ in
     # automatically, the same way Claude Code reads ~/.claude/CLAUDE.md).
     "opencode/AGENTS.md".source = ./opencode/AGENTS.md;
 
-    # "opencode/tui.json".text = builtins.toJSON {
-    #   "$schema" = "https://opencode.ai/tui.json";
-    #   mouse = false;
-    # };
+    "opencode/tui.json".text = builtins.toJSON {
+      "$schema" = "https://opencode.ai/tui.json";
+      mouse = false;
+    };
 
     "opencode/opencode.json".text = builtins.toJSON {
       "$schema" = "https://opencode.ai/config.json";
