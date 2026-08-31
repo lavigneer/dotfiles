@@ -53,28 +53,12 @@ in
           enabled = true;
         };
 
-        backstage = {
-          type = "local";
-          command = [ "${home}/workspace/devprod-infra-agent-config/backstage/backstage-mcp" ];
-          enabled = true;
-        };
-
         engflow = {
           type = "local";
           command = [ "${home}/workspace/devprod-infra-agent-config/engflow/engflow-mcp" ];
           environment = {
             ENGFLOW_CLUSTER = "sodalite.cluster.engflow.com";
           };
-          enabled = true;
-        };
-
-        evergreen = {
-          type = "local";
-          command = [
-            "uvx"
-            "--from=git+https://github.com/evergreen-ci/evergreen-mcp-server"
-            "evergreen-mcp-server"
-          ];
           enabled = true;
         };
       };
@@ -118,23 +102,24 @@ in
           "wc *" = "allow";
           "which *" = "allow";
           "jq *" = "allow";
-          "git status*" = "allow";
-          "git diff*" = "allow";
-          "git log*" = "allow";
-          "git show*" = "allow";
+          "git status *" = "allow";
+          "git diff *" = "allow";
+          "git log *" = "allow";
+          "git show *" = "allow";
           "git branch" = "allow";
           "git blame *" = "allow";
-          "gh pr view*" = "allow";
-          "gh pr list*" = "allow";
-          "gh pr diff*" = "allow";
-          "gh run view*" = "allow";
-          "gh run list*" = "allow";
+          "gh pr view *" = "allow";
+          "gh pr list *" = "allow";
+          "gh pr diff *" = "allow";
+          "gh run view *" = "allow";
+          "gh run list *" = "allow";
+          "gh worktree list" = "allow";
 
           # Confirmed before running, as in Claude Code's "ask" list
-          "git push*" = "ask";
-          "gh pr create*" = "ask";
-          "gh pr edit*" = "ask";
-          "git commit*" = "ask";
+          "git push *" = "ask";
+          "gh pr create *" = "ask";
+          "gh pr edit *" = "ask";
+          "git commit *" = "ask";
         };
       };
     };
