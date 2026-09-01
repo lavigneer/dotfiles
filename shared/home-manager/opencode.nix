@@ -18,6 +18,16 @@ in
       mouse = true;
     };
 
+    # Port of Claude Code's pr-review-toolkit plugin. OpenCode loads these
+    # agents and commands globally from its XDG config directory.
+    "opencode/agents/code-reviewer.md".source = ./opencode/agents/code-reviewer.md;
+    "opencode/agents/code-simplifier.md".source = ./opencode/agents/code-simplifier.md;
+    "opencode/agents/comment-analyzer.md".source = ./opencode/agents/comment-analyzer.md;
+    "opencode/agents/pr-test-analyzer.md".source = ./opencode/agents/pr-test-analyzer.md;
+    "opencode/agents/silent-failure-hunter.md".source = ./opencode/agents/silent-failure-hunter.md;
+    "opencode/agents/type-design-analyzer.md".source = ./opencode/agents/type-design-analyzer.md;
+    "opencode/commands/review-pr.md".source = ./opencode/commands/review-pr.md;
+
     "opencode/opencode.json".text = builtins.toJSON {
       "$schema" = "https://opencode.ai/config.json";
 
