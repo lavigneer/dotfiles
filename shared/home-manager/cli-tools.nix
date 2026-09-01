@@ -85,6 +85,7 @@ in
     k9s
     kubectl
     less
+    mermaid-cli
     ngrok
     tilt
     tree
