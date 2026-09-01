@@ -176,6 +176,11 @@
         export ZSH_TMUX_AUTOSTART=false
       fi
 
+      # Enter Herdr automatically on the laptop, but never from a Herdr pane.
+      if [[ "$HERDR_AUTOSTART" == "true" && -z "$HERDR_ENV" && "$TERM_PROGRAM" != "vscode" ]]; then
+        herdr
+      fi
+
       # Additional plugins for tools not managed by nix
       if (( $+commands[brew] )); then
         plugins+=(brew)

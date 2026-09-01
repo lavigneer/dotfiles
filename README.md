@@ -33,6 +33,7 @@ shared/
 │   │   └── plugins.nix       # Plugin configurations
 │   ├── zsh.nix               # Zsh with oh-my-zsh and starship
 │   ├── tmux.nix              # Tmux configuration
+│   ├── herdr.nix             # Herdr terminal multiplexer configuration
 │   ├── terminals.nix         # Terminal emulators (ghostty)
 │   ├── zed.nix               # Zed editor
 │   ├── browser.nix           # Web browser (Chrome)
@@ -197,6 +198,11 @@ nix flake lock --update-input nixpkgs
 - **Polybar** works on Wayland via XWayland
 - **Rofi 2.0.0+** has native Wayland support
 - **Configuration files** are symlinked from dotfiles directory
+
+Herdr is enabled only on `M-DX000XV19K` while it is being evaluated. The Herdr
+module installs and pins the Sessionizer and Auto Title plugins during Home
+Manager activation. After the first install, restart the Herdr server once with
+`herdr server stop`, then run `herdr` to start the plugins.
 
 ## 🤝 Contributing
 

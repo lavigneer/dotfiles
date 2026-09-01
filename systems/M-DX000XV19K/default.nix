@@ -33,7 +33,7 @@
       ../../shared/home-manager/pi.nix
       ../../shared/home-manager/zsh.nix
       ../../shared/home-manager/nixvim
-      ../../shared/home-manager/tmux.nix
+      ../../shared/home-manager/herdr.nix
       ../../shared/home-manager/terminals.nix
       ../../shared/home-manager/zed.nix
       ../../shared/home-manager/docker.nix
