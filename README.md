@@ -191,6 +191,16 @@ To update specific input:
 nix flake lock --update-input nixpkgs
 ```
 
+### FireConnect Claude Setup
+
+The `M-DX000XV19K` Mac configuration installs the pinned FireConnect setup gist
+as `setup-fireconnect`. Run it after applying the configuration to perform the
+interactive Fireworks login and configure Claude:
+
+```bash
+setup-fireconnect
+```
+
 ## 📝 Notes
 
 - **Email configuration** is machine-specific (personal vs work)
