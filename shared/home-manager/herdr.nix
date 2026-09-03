@@ -106,6 +106,9 @@
     [ui.toast]
     delivery = "herdr"
     delay_seconds = 1
+
+    [ui.sound]
+    enabled = false
   '';
 
   # Install with: herdr plugin install andrewchng/herdr-sessionizer --yes
