@@ -9,8 +9,8 @@ let
     ];
     text = builtins.readFile (
       builtins.fetchurl {
-        url = "https://gist.githubusercontent.com/RedBeard0531/87f63f7e5b073dd26a20ef24ef648248/raw";
-        sha256 = "sha256-7qQ3434trCaN31z0Fyl40fPDQ/NMogyvOZrDGLNoPXU=";
+        url = "https://raw.githubusercontent.com/mongodb/Afterburner/04ec398dbc6ed98223491eb25a6a9ca36e687f41/setup-fireconnect.sh";
+        sha256 = "sha256:0spib4afdj9j0x7rmdz2z9vv2a214n4r6sv6m5hnn774p8pavdvd";
       }
     );
   };
