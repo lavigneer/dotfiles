@@ -11,8 +11,8 @@
     feh
     xss-lock
     xclip
-    xorg.xrandr
-    xorg.xset
+    xrandr
+    xset
   ];
 
   services = {

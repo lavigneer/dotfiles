@@ -37,14 +37,10 @@
       ../../linux/modules/programs/desktop-apps.nix
       ../../linux/modules/programs/gaming.nix
       ../../linux/modules/window-managers/i3.nix
-      ../../linux/modules/window-managers/sway.nix
-      ../../linux/modules/window-managers/hyprland.nix
     ];
 
     windowManagers = {
       i3.enable = true;
-      sway.enable = true;
-      hyprland.enable = true;
     };
 
     accounts.email.accounts = {
@@ -97,6 +93,12 @@
   services = {
     # Enable OpenSSH daemon for this machine
     openssh.enable = true;
+    xserver = {
+      enable = true;
+      windowManager = {
+        i3.enable = true;
+      };
+    };
   };
 
   # Machine-specific garbage collection settings (override platform defaults)
