@@ -166,9 +166,11 @@
     initContent = lib.mkMerge [
       # Must run before oh-my-zsh is sourced (order 800): its tmux plugin decides
       # whether to autostart while loading. Skip it in VS Code and in the Herdr
-      # desktop app (TERM_PROGRAM=herdr), which keeps terminals running itself.
+      # desktop app, which keeps terminals running itself. herdr-core sets
+      # HC_TERMINAL_ID in every terminal it runs; TERM_PROGRAM is only "herdr"
+      # for some (others inherit whatever started the core, e.g. "ghostty").
       (lib.mkOrder 500 ''
-        if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "herdr" ]]; then
+        if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "herdr" && -z "$HC_TERMINAL_ID" ]]; then
           ZSH_TMUX_AUTOSTART=true
         else
           ZSH_TMUX_AUTOSTART=false
