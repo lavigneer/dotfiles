@@ -2,7 +2,7 @@
 # for trying the projects/tickets/work mods without touching your own setup.
 #
 #   herdr-demo           start it (creates the demo the first time)
-#   herdr-demo --reset   throw the demo away and start fresh
+#   herdr-demo --reset   throw the demo (repos, app home, spaces) away and start fresh
 #   herdr-demo --stop    quit the demo app and its herdr-core session (Linux)
 #   herdr-demo --prepare create/refresh the demo without starting the app
 #                        (combine with --reset to start over)
@@ -72,6 +72,8 @@ for arg in "$@"; do
   --reset)
     stop >/dev/null
     case "$HERDR_DEMO" in */herdr-demo) rm -rf "$HERDR_DEMO" ;; esac
+    # herdr-core keeps the session's spaces and terminals on its own (Linux path).
+    rm -rf "${XDG_STATE_HOME:-$HOME/.local/state}/herdr-core/$session"
     ;;
   --prepare) prepare_only=1 ;;
   *)

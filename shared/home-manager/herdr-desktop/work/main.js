@@ -4,12 +4,13 @@
 // A row shows the Jira ticket its branch names (key, summary, status), its pull
 // request (review and checks) and the agent status of its space. Click a row to
 // go to its space, or to open one there with the agent. "+" opens the tickets
-// popup to start new work. Refreshes git every 30 s, pull requests every 2 min
-// and tickets every 10 min.
+// popup to start new work. Refreshes git every 30 s (and at once when a space
+// opens on a folder it hasn't listed, e.g. one the tickets popup just made),
+// pull requests every 2 min and tickets every 10 min.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { run, theme } from "herdr";
+import { run, spaces, theme } from "herdr";
 import * as C from "./config.js";
 import { spaceFor } from "./lib.js";
 import {
@@ -33,12 +34,18 @@ export default class Work extends View {
     this.prs = new Map(); // path -> pr | null
     this.prsAt = 0;
     this.folded = new Set();
+    this.checked = new Set(); // space folders already refreshed for
     this.refresh(cx);
     cx.timer.every(GIT_MS, (cx) => this.refresh(cx));
   }
 
+  // Git only: worktrees and branches. Ticket and PR details follow on their own,
+  // so slow Jira/GitHub calls never hold up the next git refresh.
   refresh(cx, force = false) {
-    if (this.loading) return;
+    if (this.loading) {
+      this.again = { force: force || this.again?.force };
+      return;
+    }
     this.loading = true;
     cx.spawn(async (cx) => {
       try {
@@ -59,12 +66,47 @@ export default class Work extends View {
             })),
           }));
         cx.notify();
-        await this.details(cx, force);
       } finally {
         this.loading = false;
       }
       cx.notify();
+      if (this.again) {
+        const again = this.again;
+        this.again = null;
+        this.refresh(cx, again.force);
+      }
+      this.loadDetails(cx, force);
     });
+  }
+
+  loadDetails(cx, force) {
+    if (this.detailing || !this.groups) return;
+    this.detailing = true;
+    cx.spawn(async (cx) => {
+      try {
+        await this.details(cx, force);
+      } finally {
+        this.detailing = false;
+      }
+      cx.notify();
+    });
+  }
+
+  // Render runs whenever spaces change. A local space whose folder isn't one of
+  // our worktrees may be a new one: refresh now instead of at the next poll.
+  // Each folder triggers this once, so ordinary spaces cost one git scan.
+  watchSpaces(cx) {
+    if (!this.groups) return;
+    const known = new Set(
+      this.groups.flatMap((g) => g.worktrees.map((w) => w.path)),
+    );
+    const fresh = spaces()
+      .filter((s) => !s.machine && s.folder)
+      .map((s) => s.folder.replace(/\/+$/, ""))
+      .filter((f) => !known.has(f) && !this.checked.has(f));
+    if (!fresh.length) return;
+    for (const f of fresh) this.checked.add(f);
+    cx.timer.after(0, (cx) => this.refresh(cx));
   }
 
   async details(cx, force) {
@@ -116,7 +158,8 @@ export default class Work extends View {
       });
   }
 
-  render() {
+  render(cx) {
+    this.watchSpaces(cx);
     const t = theme();
     const icon = (name, label, onClick) =>
       div()
