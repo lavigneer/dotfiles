@@ -11,6 +11,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./hardware.nix
 
     ../../shared/system/nix.nix
     ../../shared/system/fonts.nix

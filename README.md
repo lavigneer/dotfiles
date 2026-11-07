@@ -62,7 +62,7 @@ linux/
     │   ├── desktop-apps.nix # Desktop applications
     │   └── gaming.nix       # User gaming tools (lutris)
     └── window-managers/      # Window manager configs
-        ├── wayland.nix      # Wayland ecosystem (mako, grim, slurp)
+        ├── wayland.nix      # Wayland ecosystem (grim, slurp, wl-clipboard)
         ├── x11.nix          # X11 ecosystem (dunst, feh, xss-lock)
         ├── tiling-common.nix # Settings shared by i3 and Sway (keys, focus, startup deps)
         ├── i3.nix           # i3 window manager

@@ -12,7 +12,6 @@
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
 
     # Additional Steam configuration
     gamescopeSession.enable = true;
@@ -21,9 +20,8 @@
 
   # Gaming-related system packages
   environment.systemPackages = with pkgs; [
-    steam
+    # steam itself comes from programs.steam above
     steam-run
-    steam-unwrapped
   ];
 
   # Gaming-related hardware support
