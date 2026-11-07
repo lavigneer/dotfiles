@@ -24,9 +24,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Flake utils for easier multi-system support
-    flake-utils.url = "github:numtide/flake-utils";
-
     # Nixvim for declarative Neovim configuration
     nixvim = {
       url = "github:nix-community/nixvim";
@@ -62,7 +59,6 @@
       home-manager,
       nix-darwin,
       stylix,
-      flake-utils,
       nixvim,
       sidekick-nvim,
       nvim-lsp-endhints,
@@ -71,9 +67,6 @@
       ...
     }@inputs:
     let
-      # Helper functions
-      shared = import ./modules/shared;
-
       # User configuration
       username = "elavigne";
       userFullName = "Eric Lavigne";
@@ -82,17 +75,37 @@
       personalUserEmail = "hi_eric@hotmail.com";
       workUserEmail = "eric.lavigne@mongodb.com";
 
-      # System configurations
+      # Systems used for per-system outputs (devShells, formatter)
       linuxSystems = [ "x86_64-linux" ];
-      darwinSystems = [
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
+      darwinSystems = [ "aarch64-darwin" ];
+      forAllSystems = nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems);
+
+      # treefmt: nixfmt for Nix, prettier for Markdown/JSON
+      treefmtEval = forAllSystems (
+        system:
+        treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} {
+          projectRootFile = "flake.nix";
+          programs = {
+            nixfmt.enable = true;
+            prettier.enable = true;
+          };
+          settings.formatter.prettier = {
+            options = [
+              "--prose-wrap"
+              "always"
+            ];
+            includes = [
+              "*.md"
+              "*.json"
+            ];
+          };
+        }
+      );
 
       # Overlay to fix pre-commit build on darwin (dotnet-sdk tests require Swift which is broken)
       darwinOverlays = [
-        (final: prev: {
-          pre-commit = prev.pre-commit.overridePythonAttrs (oldAttrs: {
+        (_final: prev: {
+          pre-commit = prev.pre-commit.overridePythonAttrs (_oldAttrs: {
             doCheck = false;
             dontUsePytestCheck = true;
             nativeCheckInputs = [ ];
@@ -123,8 +136,6 @@
           userEmail,
         }:
         let
-          pkgs =
-            if isDarwin then nixpkgs-darwin.legacyPackages.${system} else nixpkgs.legacyPackages.${system};
           systemFunc = if isDarwin then nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
           homeManagerModule =
             if isDarwin then
@@ -135,11 +146,16 @@
         systemFunc {
           inherit system;
           specialArgs = {
-            inherit inputs username userFullName userEmail;
+            inherit
+              inputs
+              username
+              userFullName
+              userEmail
+              ;
           };
           modules =
             # Apply darwin overlays to fix broken packages (mkAfter ensures they're applied last)
-            (if isDarwin then [{ nixpkgs.overlays = nixpkgs-darwin.lib.mkAfter darwinOverlays; }] else [])
+            (if isDarwin then [ { nixpkgs.overlays = nixpkgs-darwin.lib.mkAfter darwinOverlays; } ] else [ ])
             ++ [
               (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
               # Platform-specific configuration (provides defaults for the platform)
@@ -155,7 +171,12 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = {
-                    inherit inputs username userFullName userEmail;
+                    inherit
+                      inputs
+                      username
+                      userFullName
+                      userEmail
+                      ;
                   };
                 };
               }
@@ -178,68 +199,32 @@
       darwinConfigurations = {
         # Your work Mac
         M-DX000XV19K = mkSystem {
-          system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
+          system = "aarch64-darwin";
           hostname = "M-DX000XV19K";
           isDarwin = true;
           userEmail = workUserEmail;
         };
         Erics-MacBook-Air.local = mkSystem {
-          system = "aarch64-darwin"; # Change to "aarch64-darwin" if you have Apple Silicon
+          system = "aarch64-darwin";
           hostname = "Erics-MacBook-Air.local";
           isDarwin = true;
           userEmail = personalUserEmail;
         };
       };
 
-      # Standalone Home Manager configurations
-      # Container configuration for devcontainers and CI/CD
-      homeConfigurations = {
-        "${username}@container" = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          extraSpecialArgs = {
-            inherit inputs username userFullName;
-            userEmail = personalUserEmail;
-          };
-          modules = [
-            stylix.homeModules.stylix
-            ./systems/container
-          ];
-        };
-      };
-
-      # Development shell
-      devShells = flake-utils.lib.eachDefaultSystemMap (system: {
+      # Development shell with the tools used by the Makefile (fmt, lint)
+      devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
-          buildInputs = with nixpkgs.legacyPackages.${system}; [
-            nixpkgs-fmt
+          packages = with nixpkgs.legacyPackages.${system}; [
+            nixfmt
             nil
-            git
+            statix
+            deadnix
           ];
         };
       });
 
-      # Formatter configuration
-      formatter = flake-utils.lib.eachDefaultSystemMap (
-        system:
-        treefmt-nix.lib.mkWrapper nixpkgs.legacyPackages.${system} {
-          projectRootFile = "flake.nix";
-          programs = {
-            nixfmt.enable = true;
-            prettier.enable = true;
-          };
-          settings.formatter = {
-            prettier = {
-              options = [
-                "--prose-wrap"
-                "always"
-              ];
-              includes = [
-                "*.md"
-                "*.json"
-              ];
-            };
-          };
-        }
-      );
+      # Formatter (`nix fmt` / `make fmt`)
+      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
     };
 }

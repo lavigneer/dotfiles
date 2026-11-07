@@ -56,7 +56,7 @@ linux/
 └── modules/
     ├── system/               # System-level Linux configs
     │   ├── gaming.nix       # Steam and gaming setup
-    │   ├── polybar.nix      # Status bar (shared across WMs)
+    │   ├── status-bar.nix   # i3status-rust bar (shared by i3 and Sway)
     │   └── rofi.nix         # Application launcher (shared)
     ├── programs/             # User programs (Linux-specific)
     │   ├── desktop-apps.nix # Desktop applications
@@ -64,9 +64,9 @@ linux/
     └── window-managers/      # Window manager configs
         ├── wayland.nix      # Wayland ecosystem (mako, grim, slurp)
         ├── x11.nix          # X11 ecosystem (dunst, feh, xss-lock)
+        ├── tiling-common.nix # Settings shared by i3 and Sway (keys, focus, startup deps)
         ├── i3.nix           # i3 window manager
-        ├── sway.nix         # Sway compositor
-        └── hyprland.nix     # Hyprland compositor
+        └── sway.nix         # Sway compositor
 ```
 
 ### `darwin/` - macOS Platform
@@ -102,9 +102,9 @@ systems/
 
 ### Window Manager Support
 
-- **Linux**: i3 (X11), Sway (Wayland), Hyprland (Wayland)
+- **Linux**: i3 (X11), Sway (Wayland)
 - **macOS**: AeroSpace tiling window manager
-- **Unified tools**: Rofi launcher and Polybar status bar across all WMs
+- **Unified tools**: Rofi launcher and i3status-rust status bar across all WMs
 
 ### Development Environment
 
@@ -150,7 +150,9 @@ nix develop
 
 1. Create new file in `linux/modules/window-managers/`
 2. Import appropriate base module (`wayland.nix` or `x11.nix`)
-3. Import shared components (`../system/polybar.nix`, `../system/rofi.nix`)
+3. For i3-style WMs, import `./tiling-common.nix` (brings in the shared bar and
+   rofi) and use `config.windowManagers.tiling` /
+   `config.windowManagers.statusBar`
 4. Add to system imports in `systems/nixos/default.nix`
 
 ### Customizing Per Machine
@@ -205,7 +207,7 @@ setup-fireconnect
 
 - **Email configuration** is machine-specific (personal vs work)
 - **Gaming setup** is Linux-only
-- **Polybar** works on Wayland via XWayland
+- **Status bar** is i3bar/swaybar driven by one shared i3status-rust config
 - **Rofi 2.0.0+** has native Wayland support
 - **Configuration files** are symlinked from dotfiles directory
 

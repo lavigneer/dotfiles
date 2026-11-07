@@ -1,5 +1,6 @@
 ---
-description: Reviews changed code for bugs, project guidelines, style, and maintainability.
+description:
+  Reviews changed code for bugs, project guidelines, style, and maintainability.
 mode: subagent
 ---
 

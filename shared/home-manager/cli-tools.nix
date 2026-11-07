@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
@@ -71,33 +76,35 @@ in
     };
   };
 
-  home.packages = with pkgs; [
-    asdf
-    curl
-    devbox
-    file
-    gawk
-    gnugrep
-    gnused
-    htop
-    jq
-    k0sctl
-    k9s
-    kubectl
-    less
-    mermaid-cli
-    ngrok
-    tilt
-    tree
-    unzip
-    wget
-    xz
-    yq
-    rebuild-nix
-  ]
-  # baobab (GNOME/GTK) currently fails to link on Darwin: libadwaita crashes
-  # ld64 in the current nixpkgs-darwin pin. Keep it on Linux only for now.
-  ++ pkgs.lib.optional (!isDarwin) pkgs.baobab;
+  home.packages =
+    with pkgs;
+    [
+      asdf
+      curl
+      devbox
+      file
+      gawk
+      gnugrep
+      gnused
+      htop
+      jq
+      k0sctl
+      k9s
+      kubectl
+      less
+      mermaid-cli
+      ngrok
+      tilt
+      tree
+      unzip
+      wget
+      xz
+      yq
+      rebuild-nix
+    ]
+    # baobab (GNOME/GTK) currently fails to link on Darwin: libadwaita crashes
+    # ld64 in the current nixpkgs-darwin pin. Keep it on Linux only for now.
+    ++ pkgs.lib.optional (!isDarwin) pkgs.baobab;
 
   home.file.".local/bin/tldr-fuzzy" = {
     text = ''

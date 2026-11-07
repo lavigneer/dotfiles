@@ -4,7 +4,7 @@
   programs.rofi = {
     enable = true;
     package = pkgs.rofi;
-    extraConfig = {
+    settings = {
       modi = "drun,run,combi";
       combi-modi = "drun,run";
       timeout-action = "kb-cancel";

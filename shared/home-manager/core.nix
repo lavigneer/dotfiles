@@ -14,7 +14,7 @@ in
 {
   # Basic Home Manager configuration
   home = {
-    username = username;
+    inherit username;
     homeDirectory = if isDarwin then "/Users/${username}" else "/home/${username}";
     stateVersion = "25.05";
 

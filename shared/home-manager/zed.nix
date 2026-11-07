@@ -6,7 +6,6 @@
 }:
 
 let
-  cfg = config.programs.zed-editor;
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in
 {

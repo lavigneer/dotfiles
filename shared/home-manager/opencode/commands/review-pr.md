@@ -20,5 +20,5 @@ general code review and any applicable focused reviews:
 Delegate independent reviews with `Task` in parallel when practical. Then
 aggregate the results into Critical Issues, Important Issues, Suggestions,
 Positive Observations, and a short recommended action plan. Include exact file
-and line references. Do not modify code unless the user explicitly asks for
-the simplify aspect to apply changes.
+and line references. Do not modify code unless the user explicitly asks for the
+simplify aspect to apply changes.

@@ -1,7 +1,11 @@
 { lib, pkgs, ... }:
 
 {
-  home.packages = [ pkgs.herdr pkgs.bun pkgs.go ];
+  home.packages = [
+    pkgs.herdr
+    pkgs.bun
+    pkgs.go
+  ];
 
   home.sessionVariables.HERDR_AUTOSTART = "true";
 

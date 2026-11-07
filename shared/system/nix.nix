@@ -36,28 +36,43 @@
         "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
       ];
 
-      # Automatic optimization of nix store
-      auto-optimise-store = true;
-
       # Maximum number of parallel build jobs
       max-jobs = "auto";
     };
 
     # Automatic store optimization
-    optimise =
-      {
-        automatic = true;
-      }
-      // (if pkgs.stdenv.hostPlatform.isDarwin then { interval = { Hour = 0; Minute = 0; }; } else { dates = [ "daily" ]; });
+    optimise = {
+      automatic = true;
+    }
+    // (
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        {
+          interval = {
+            Hour = 0;
+            Minute = 0;
+          };
+        }
+      else
+        { dates = [ "daily" ]; }
+    );
 
     # Garbage collection settings
-    gc =
-      {
-        automatic = lib.mkDefault true;
-        # Keep generations from the last 30 days
-        options = lib.mkDefault "--delete-older-than 30d";
-      }
-      // (if pkgs.stdenv.hostPlatform.isDarwin then { interval = { Hour = 0; Minute = 0; }; } else { dates = lib.mkDefault [ "daily" ]; });
+    gc = {
+      automatic = lib.mkDefault true;
+      # Keep generations from the last 30 days
+      options = lib.mkDefault "--delete-older-than 30d";
+    }
+    // (
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        {
+          interval = {
+            Hour = 0;
+            Minute = 0;
+          };
+        }
+      else
+        { dates = lib.mkDefault [ "daily" ]; }
+    );
   };
 
   # Allow unfree packages

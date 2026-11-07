@@ -188,17 +188,18 @@
     extraPlugins =
       let
         # Override neotest to disable failing tests
-        neotest-fixed = pkgs.vimPlugins.neotest.overrideAttrs (old: {
+        neotest-fixed = pkgs.vimPlugins.neotest.overrideAttrs (_old: {
           doCheck = false;
         });
         # Override neotest-golang to use our fixed neotest in propagatedBuildInputs
         neotest-golang-fixed = pkgs.vimPlugins.neotest-golang.overrideAttrs (old: {
-          propagatedBuildInputs = builtins.map (dep:
-            if dep == pkgs.vimPlugins.neotest then neotest-fixed else dep
-          ) (old.propagatedBuildInputs or []);
+          propagatedBuildInputs = builtins.map (
+            dep: if dep == pkgs.vimPlugins.neotest then neotest-fixed else dep
+          ) (old.propagatedBuildInputs or [ ]);
         });
       in
-      with pkgs.vimPlugins; [
+      with pkgs.vimPlugins;
+      [
         neotest-golang-fixed
         pkgs.vimPlugins.nvim-treesitter
         (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.go ]))

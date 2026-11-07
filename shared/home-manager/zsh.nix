@@ -116,6 +116,8 @@
 
   programs.zsh = {
     enable = true;
+    # Keep .zshrc etc. in $HOME (the current default; silences the upcoming-change warning)
+    dotDir = config.home.homeDirectory;
     enableCompletion = false; # oh-my-zsh handles completion
 
     oh-my-zsh = {

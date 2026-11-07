@@ -7,9 +7,6 @@
   ...
 }:
 
-let
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-in
 {
   programs.git = {
     enable = true;

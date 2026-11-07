@@ -34,13 +34,16 @@
       ../../shared/home-manager/thunderbird.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
+      ../../shared/home-manager/claude.nix
       ../../linux/modules/programs/desktop-apps.nix
       ../../linux/modules/programs/gaming.nix
       ../../linux/modules/window-managers/i3.nix
+      ../../linux/modules/window-managers/sway.nix
     ];
 
     windowManagers = {
       i3.enable = true;
+      sway.enable = true;
     };
 
     accounts.email.accounts = {
@@ -93,17 +96,37 @@
   services = {
     # Enable OpenSSH daemon for this machine
     openssh.enable = true;
+
+    # Graphical login screen (LightDM) that launches the Home Manager-managed
+    # X session. i3 itself (config, startup apps, bar, dunst, etc.) is
+    # configured in ../../linux/modules/window-managers/i3.nix via Home Manager.
     xserver = {
       enable = true;
-      windowManager = {
-        i3.enable = true;
-      };
+      displayManager.lightdm.enable = true;
+      desktopManager.session = [
+        {
+          name = "i3";
+          start = ''
+            ${pkgs.runtimeShell} $HOME/.hm-xsession &
+            waitPID=$!
+          '';
+        }
+      ];
     };
+    displayManager.defaultSession = "i3";
+  };
+
+  # Sway (Wayland). Registers a "Sway" session in the login screen; the sway
+  # config itself comes from ../../linux/modules/window-managers/sway.nix.
+  programs.sway = {
+    enable = true;
+    # Sway refuses to start on the proprietary NVIDIA driver without this flag
+    extraOptions = [ "--unsupported-gpu" ];
   };
 
   # Machine-specific garbage collection settings (override platform defaults)
   nix.gc = {
     dates = "weekly";
-    options = "--delete-older-than 60d"; # More aggressive than default for personal machine
+    options = "--delete-older-than 60d"; # Keep history longer than the 30d platform default
   };
 }
