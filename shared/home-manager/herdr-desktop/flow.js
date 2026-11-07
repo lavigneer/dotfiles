@@ -57,14 +57,34 @@ export function nextSteps(pr, { working = false } = {}) {
     else if (pr.review === "CHANGES_REQUESTED")
       agent("address-comments", "Address review");
   }
-  if (stage === "draft" && pr.checks !== "failed" && pr.checks !== "pending" && !pr.unresolved)
+  if (
+    stage === "draft" &&
+    pr.checks !== "failed" &&
+    pr.checks !== "pending" &&
+    !pr.unresolved
+  )
     steps.push({ id: "ready", label: "Ready", kind: "direct" });
-  if (stage === "approved" && pr.checks !== "failed" && pr.checks !== "pending" && !pr.autoMerge)
+  if (
+    stage === "approved" &&
+    pr.checks !== "failed" &&
+    pr.checks !== "pending" &&
+    !pr.autoMerge
+  )
     steps.push({ id: "merge", label: "Merge", kind: "direct" });
   if (stage === "merged")
-    steps.push({ id: "finish", label: "Finish", kind: "direct", confirm: true });
+    steps.push({
+      id: "finish",
+      label: "Finish",
+      kind: "direct",
+      confirm: true,
+    });
   if (stage === "closed")
-    steps.push({ id: "clean-up", label: "Clean up", kind: "direct", confirm: true });
+    steps.push({
+      id: "clean-up",
+      label: "Clean up",
+      kind: "direct",
+      confirm: true,
+    });
   return steps;
 }
 
@@ -73,8 +93,10 @@ export function stageLabel(pr) {
   const stage = stageOf(pr);
   if (stage === "no-pr") return null;
   if (stage === "draft") return "draft";
-  if (stage === "in-review") return pr.autoMerge ? "in review · auto-merge" : "in review";
-  if (stage === "approved") return pr.autoMerge ? "approved · merging" : "approved";
+  if (stage === "in-review")
+    return pr.autoMerge ? "in review · auto-merge" : "in review";
+  if (stage === "approved")
+    return pr.autoMerge ? "approved · merging" : "approved";
   return stage;
 }
 
@@ -113,7 +135,12 @@ async function tellAgent(w, command) {
       );
     run("space.select", { id: space.id });
   } else if (space)
-    run("tab.new", { space: space.id, folder: w.path, argv: C.AGENT, task: text });
+    run("tab.new", {
+      space: space.id,
+      folder: w.path,
+      argv: C.AGENT,
+      task: text,
+    });
   else
     run("space.new", {
       name: w.key ?? basename(w.path),
@@ -140,7 +167,10 @@ export async function runStep(id, w, pr, others = []) {
     // Auto-merge only waits for what the repo requires; without required
     // reviews it would merge at once, so then leave merging to the Merge step.
     const now = await prDetails(w.repo.slug, pr.number);
-    if (now?.review === "REVIEW_REQUIRED" || now?.review === "CHANGES_REQUESTED") {
+    if (
+      now?.review === "REVIEW_REQUIRED" ||
+      now?.review === "CHANGES_REQUESTED"
+    ) {
       await mergePr(w.repo.slug, pr.number, { auto: true });
       notes.push("auto-merge on approval");
     }
@@ -164,10 +194,13 @@ export async function runStep(id, w, pr, others = []) {
     const notes = ["worktree removed"];
     if (id === "finish" && w.key && C.TRANSITIONS.done) {
       const open = others.filter(
-        (o) => o.w.key === w.key && !["merged", "closed"].includes(stageOf(o.pr)),
+        (o) =>
+          o.w.key === w.key && !["merged", "closed"].includes(stageOf(o.pr)),
       );
       if (open.length)
-        notes.push(`${w.key} left open: ${open.map((o) => basename(o.w.path)).join(", ")} still in progress`);
+        notes.push(
+          `${w.key} left open: ${open.map((o) => basename(o.w.path)).join(", ")} still in progress`,
+        );
       else {
         await moveTicket(w.key, C.TRANSITIONS.done, C.RESOLUTION);
         notes.push(`${w.key} → ${C.TRANSITIONS.done}`);

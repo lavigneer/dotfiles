@@ -3,28 +3,19 @@
     {
       "name": "fern",
       "slug": "10gen/fern",
-      "worktrees": [
-        "lavigneer/WEB-101"
-      ],
-      "branches": [
-        "lavigneer/WEB-101-retry-backoff"
-      ]
+      "worktrees": ["lavigneer/WEB-101"],
+      "branches": ["lavigneer/WEB-101-retry-backoff"]
     },
     {
       "name": "web-app",
       "slug": "10gen/web-app",
-      "worktrees": [
-        "lavigneer/WEB-102",
-        "lavigneer/WEB-103"
-      ],
+      "worktrees": ["lavigneer/WEB-102", "lavigneer/WEB-103"],
       "branches": []
     },
     {
       "name": "api",
       "slug": "otherorg/api",
-      "worktrees": [
-        "lavigneer/API-7"
-      ],
+      "worktrees": ["lavigneer/API-7"],
       "branches": []
     }
   ],
@@ -32,9 +23,7 @@
     {
       "name": "docs",
       "slug": "10gen/docs",
-      "branches": [
-        "lavigneer/WEB-104"
-      ]
+      "branches": ["lavigneer/WEB-104"]
     }
   ],
   "tickets": [
@@ -42,9 +31,7 @@
       "key": "WEB-101",
       "summary": "Retry Fern uploads with backoff",
       "status": "In Progress",
-      "components": [
-        "Fern"
-      ]
+      "components": ["Fern"]
     },
     {
       "key": "WEB-102",
@@ -62,17 +49,13 @@
       "key": "WEB-104",
       "summary": "Document the new auth flow",
       "status": "In Review",
-      "components": [
-        "Docs"
-      ]
+      "components": ["Docs"]
     },
     {
       "key": "WEB-105",
       "summary": "Fern: stream large files",
       "status": "To Do",
-      "components": [
-        "Fern"
-      ]
+      "components": ["Fern"]
     },
     {
       "key": "API-7",

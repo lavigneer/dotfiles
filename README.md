@@ -35,6 +35,7 @@ shared/
 │   ├── tmux.nix              # Tmux configuration
 │   ├── herdr.nix             # Herdr terminal multiplexer configuration
 │   ├── herdr-desktop/        # Herdr desktop app: settings, keys, projects/tickets/work mods
+│   ├── claude.nix            # Claude Code, plus the /draft-pr, /address-comments, /fix-ci commands
 │   ├── terminals.nix         # Terminal emulators (ghostty)
 │   ├── zed.nix               # Zed editor
 │   ├── browser.nix           # Web browser (Chrome)
@@ -216,6 +217,24 @@ Herdr is enabled only on `M-DX000XV19K` while it is being evaluated. The Herdr
 module installs and pins the Sessionizer and Auto Title plugins during Home
 Manager activation. After the first install, restart the Herdr server once with
 `herdr server stop`, then run `herdr` to start the plugins.
+
+### Ticket workflow (herdr-desktop, NixOS)
+
+- **Ctrl+B t** lists your Jira tickets. Enter creates the `lavigneer/KEY`
+  worktree, opens a space, and starts Claude on the ticket; with
+  `herdrDesktop.tickets.transitions.start` set, it also moves the ticket.
+- The **Work** sidebar shows each worktree's PR and offers its next step:
+  - **Draft PR**, **Fix CI**, **Address comments** send `/draft-pr`, `/fix-ci`,
+    `/address-comments` to that space's Claude.
+  - **Ready** marks the PR ready for review and turns on auto-merge (with the
+    merge method GitHub's web UI defaults to) when the repo requires reviews.
+  - **Merge** shows when a PR is approved and green without auto-merge.
+  - **Finish** (click twice) runs after the merge. It closes the space and
+    removes the worktree and local branch, refusing if anything isn't in the PR,
+    then moves the ticket to `transitions.done` (`Resolved` by default).
+- Notifications tell you when CI finishes, review comments or a review arrive,
+  or the PR merges.
+- Try it all against fake data with `herdr-demo`, which prints the steps.
 
 ## 🤝 Contributing
 

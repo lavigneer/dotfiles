@@ -160,7 +160,9 @@ export default class Work extends View {
       const active =
         pr?.state === "OPEN" &&
         (pr.checks === "pending" || pr.autoMerge || pr.review === "APPROVED");
-      return w.repo.slug && due(entry, force, active ? ACTIVE_PR_MS : PR_MS, now);
+      return (
+        w.repo.slug && due(entry, force, active ? ACTIVE_PR_MS : PR_MS, now)
+      );
     });
     await Promise.all([
       pool(
@@ -243,7 +245,11 @@ export default class Work extends View {
     const say = (title, level, body) =>
       notify({ title: `${who}: ${title}`, body, level, action });
     if (was.checks === "pending" && pr.checks === "passed")
-      say("CI passed", "success", pr.draft ? "Ready to mark ready for review." : undefined);
+      say(
+        "CI passed",
+        "success",
+        pr.draft ? "Ready to mark ready for review." : undefined,
+      );
     if (was.checks === "pending" && pr.checks === "failed")
       say("CI failed", "error");
     if ((pr.unresolved ?? 0) > (was.unresolved ?? 0))
@@ -252,11 +258,19 @@ export default class Work extends View {
         "warning",
       );
     if (was.review !== pr.review && pr.review === "APPROVED")
-      say("approved", "success", pr.autoMerge ? "Auto-merge will merge it." : undefined);
+      say(
+        "approved",
+        "success",
+        pr.autoMerge ? "Auto-merge will merge it." : undefined,
+      );
     if (was.review !== pr.review && pr.review === "CHANGES_REQUESTED")
       say("changes requested", "warning");
     if (was.state !== "MERGED" && pr.state === "MERGED")
-      say("merged", "success", "Finish removes the worktree and resolves the ticket.");
+      say(
+        "merged",
+        "success",
+        "Finish removes the worktree and resolves the ticket.",
+      );
   }
 
   // Runs a next step for worktree `w`; one asking for confirmation runs on its
@@ -287,11 +301,19 @@ export default class Work extends View {
         const note = await runStep(step.id, w, pr, others);
         this.steps.set(path, { phase: "done", text: note, at: Date.now() });
         if (step.kind === "direct")
-          notify({ title: `${who}: ${step.label}`, body: note, level: "success" });
+          notify({
+            title: `${who}: ${step.label}`,
+            body: note,
+            level: "success",
+          });
       } catch (e) {
         const text = `${e?.message ?? e}`.split("\n")[0];
         this.steps.set(path, { phase: "failed", text });
-        notify({ title: `${who}: ${step.label} failed`, body: text, level: "error" });
+        notify({
+          title: `${who}: ${step.label} failed`,
+          body: text,
+          level: "error",
+        });
       }
       cx.notify();
       this.refresh(cx, true);
@@ -373,7 +395,7 @@ export default class Work extends View {
         .items_center()
         .rounded(5)
         .border_1()
-        .border_color(confirming ? t.blocked : t.border ?? t.dim)
+        .border_color(confirming ? t.blocked : (t.border ?? t.dim))
         .text_size(10.5)
         .text_color(confirming ? t.blocked : t.foreground)
         .cursor_pointer()
@@ -392,7 +414,6 @@ export default class Work extends View {
       const prValue = this.prs.get(w.path)?.value ?? null;
       const pr = prLabel(prValue);
       const extras = [
-
         prValue?.state === "OPEN" && prValue.autoMerge ? "auto-merge" : null,
       ].filter(Boolean);
       const steps = nextSteps(prValue, {
@@ -404,7 +425,10 @@ export default class Work extends View {
         step?.phase === "done" && Date.now() - step.at > NOTE_MS ? null : step;
       // The row's third line: the last step's note, else these extras.
       const note = last
-        ? { text: last.text, color: last.phase === "failed" ? t.blocked : t.dim }
+        ? {
+            text: last.text,
+            color: last.phase === "failed" ? t.blocked : t.dim,
+          }
         : extras.length
           ? { text: extras.join(" · "), color: t.dim }
           : null;
@@ -492,9 +516,7 @@ export default class Work extends View {
               .gap(4)
               .items_center()
               .children(
-                last?.phase === "running"
-                  ? []
-                  : steps.map((s) => button(w, s)),
+                last?.phase === "running" ? [] : steps.map((s) => button(w, s)),
               )
               .when(Boolean(note), (e) =>
                 e.child(
