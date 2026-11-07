@@ -27,7 +27,7 @@ import {
   setShared,
 } from "herdr";
 import * as C from "./config.js";
-import { score, spaceFor, moveKey } from "./lib.js";
+import { basename, score, spaceFor, moveKey } from "./lib.js";
 import {
   listTickets,
   localRepos,
@@ -181,6 +181,8 @@ export default class Tickets extends View {
 
   // --- Actions ------------------------------------------------------------
 
+  // Clicks and Enter don't redraw by themselves: every change to what's shown
+  // here ends in cx.notify() (act() does it for the async actions).
   choose(r, cx) {
     if (!r || this.busy) return;
     if (r.kind === "ticket") {
@@ -205,12 +207,12 @@ export default class Tickets extends View {
       }
       this.stage = { ticket: r.ticket };
       this.clearFilter();
-      return;
+      return cx.notify();
     }
     if (r.kind === "pick") {
       this.stage = { ticket: r.ticket, pickRepo: true };
       this.clearFilter();
-      return;
+      return cx.notify();
     }
     if (r.kind === "item")
       return this.act(cx, `Opening ${r.ticket.key}…`, (cx) =>
@@ -430,7 +432,7 @@ export default class Tickets extends View {
           ? `Start in ${repoLabel(r.repo)}${r.repo.path ? "" : " (clone)"}`
           : r.kind === "pick"
             ? "Start in another repo…"
-            : `Ask ${C.AGENT[0]} for another branch in ${repoLabel(r.repo)}`;
+            : `Ask ${basename(C.AGENT[0])} for another branch in ${repoLabel(r.repo)}`;
       return line(r, i, [
         div().w(12).flex_none().text_color(t.dim).child("+"),
         div().flex_1().truncate().text_color(t.foreground).child(label),
