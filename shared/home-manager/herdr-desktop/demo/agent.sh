@@ -1,10 +1,12 @@
-# Fake agent for herdr-demo: shows the task it was given (Herdr types it in as
-# the first message), then leaves you a shell in the worktree.
+# Fake agent for herdr-demo: shows the task it was given (Herdr passes it as
+# the last argument, as with `claude "<task>"`), then leaves you a shell in the
+# worktree. Spaces reopened on an existing worktree get no task.
 
 echo "herdr-demo: fake agent in $PWD"
-echo "Waiting for the task (Herdr types it in)…"
-if IFS= read -r task; then
-  echo "Task: $task"
-fi
 echo "Branch: $(git branch --show-current 2>/dev/null || echo '?')"
+if [ $# -gt 0 ]; then
+  echo "Task: ${*: -1}"
+else
+  echo "No task (existing worktree)."
+fi
 exec "${SHELL:-sh}" -i
