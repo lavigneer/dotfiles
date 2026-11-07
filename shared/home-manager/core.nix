@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   inputs,
   username,
@@ -21,7 +22,8 @@ in
     # Essential environment variables
     sessionVariables = {
       EDITOR = "nvim";
-      TERMINAL = "ghostty";
+      # Machines can pick another default terminal (see herdr-desktop.nix)
+      TERMINAL = lib.mkDefault "ghostty";
     };
   };
 

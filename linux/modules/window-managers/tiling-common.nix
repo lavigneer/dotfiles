@@ -35,7 +35,8 @@ in
         # Super/Windows key
         modifier = "Mod4";
 
-        terminal = "ghostty";
+        # Follows $TERMINAL (ghostty by default, herdr-app where herdr-desktop.nix is imported)
+        terminal = config.home.sessionVariables.TERMINAL;
         menu = "\"zsh -c 'rofi -show combi -modes combi'\"";
 
         # Added to the Home Manager default keybindings

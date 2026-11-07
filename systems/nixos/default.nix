@@ -30,6 +30,7 @@
       ../../shared/home-manager/nixvim
       ../../shared/home-manager/tmux.nix
       ../../shared/home-manager/terminals.nix
+      ../../shared/home-manager/herdr-desktop
       ../../shared/home-manager/zed.nix
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/thunderbird.nix

@@ -34,6 +34,7 @@ shared/
 │   ├── zsh.nix               # Zsh with oh-my-zsh and starship
 │   ├── tmux.nix              # Tmux configuration
 │   ├── herdr.nix             # Herdr terminal multiplexer configuration
+│   ├── herdr-desktop/        # Herdr desktop app: settings, keys, projects mod
 │   ├── terminals.nix         # Terminal emulators (ghostty)
 │   ├── zed.nix               # Zed editor
 │   ├── browser.nix           # Web browser (Chrome)

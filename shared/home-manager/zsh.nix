@@ -139,7 +139,6 @@
 
     sessionVariables = {
       ZSH_TMUX_CONFIG = "${config.home.homeDirectory}/.config/tmux/tmux.conf";
-      ZSH_TMUX_AUTOSTART = "true";
       ZSH_TMUX_AUTOCONNECT = "true";
       ZSH_TMUX_AUTOQUIT = "false";
       ZSH_TMUX_AUTOSTART_ONCE = "false";
@@ -164,34 +163,39 @@
     '';
 
     # Additional shell initialization
-    initContent = ''
-      # Source profile if it exists
-      if test -f ~/.profile; then
-        source ~/.profile
-      fi
+    initContent = lib.mkMerge [
+      # Must run before oh-my-zsh is sourced (order 800): its tmux plugin decides
+      # whether to autostart while loading. Skip it in VS Code and in the Herdr
+      # desktop app (TERM_PROGRAM=herdr), which keeps terminals running itself.
+      (lib.mkOrder 500 ''
+        if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "herdr" ]]; then
+          ZSH_TMUX_AUTOSTART=true
+        else
+          ZSH_TMUX_AUTOSTART=false
+        fi
+      '')
 
-      # Custom functions
-      # Conditional tmux autostart (disable in vscode)
-      if [[ "$TERM_PROGRAM" != "vscode" ]]; then
-        export ZSH_TMUX_AUTOSTART=true
-      else
-        export ZSH_TMUX_AUTOSTART=false
-      fi
+      ''
+        # Source profile if it exists
+        if test -f ~/.profile; then
+          source ~/.profile
+        fi
 
-      # Enter Herdr automatically on the laptop, but never from a Herdr pane.
-      if [[ "$HERDR_AUTOSTART" == "true" && -z "$HERDR_ENV" && "$TERM_PROGRAM" != "vscode" ]]; then
-        herdr
-      fi
+        # Enter Herdr automatically on the laptop, but never from a Herdr pane.
+        if [[ "$HERDR_AUTOSTART" == "true" && -z "$HERDR_ENV" && "$TERM_PROGRAM" != "vscode" ]]; then
+          herdr
+        fi
 
-      # Additional plugins for tools not managed by nix
-      if (( $+commands[brew] )); then
-        plugins+=(brew)
-      fi
+        # Additional plugins for tools not managed by nix
+        if (( $+commands[brew] )); then
+          plugins+=(brew)
+        fi
 
-      if (( $+commands[kubectl] )); then
-        plugins+=(kubectl)
-      fi
-    '';
+        if (( $+commands[kubectl] )); then
+          plugins+=(kubectl)
+        fi
+      ''
+    ];
   };
 
 }
