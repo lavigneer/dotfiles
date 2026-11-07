@@ -4,9 +4,19 @@
 // A row shows the Jira ticket its branch names (key, summary, status), its pull
 // request (review and checks) and the agent status of its space. Click a row to
 // go to its space, or to open one there with the agent. "+" opens the tickets
-// popup to start new work. Refreshes git every 30 s (and at once when a space
-// opens on a folder it hasn't listed, e.g. one the tickets popup just made),
-// pull requests every 2 min and tickets every 10 min.
+// popup to start new work; ↻ refreshes everything now.
+//
+// State:
+//   git refresh, details   each runs one at a time; a request during a run
+//                          queues one more (serial()), merging "force"
+//   tickets, prs           caches of { state: "found" | "none" | "failed",
+//                          value, at }; "failed" (Jira/GitHub unreachable) is
+//                          retried after a minute and never shown as "none"
+//   watched                folders of spaces not yet listed as worktrees,
+//                          rechecked a few times (the tickets popup makes the
+//                          worktree first; an agent may make it later)
+// Git refreshes every 30 s and at once for a new space; PRs every 2 min,
+// tickets every 10 min.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
@@ -26,125 +36,168 @@ import {
 const GIT_MS = 30_000;
 const PR_MS = 120_000;
 const TICKET_MS = 600_000;
+const RETRY_MS = 60_000; // after a failed Jira/GitHub lookup
+const WATCH_MS = 3_000; // between rechecks of a new space's folder
+const WATCH_TRIES = 3;
+
+// Runs `body(cx, force)` one at a time. Asked again while running, it runs once
+// more afterwards (forced if any of the requests was), rather than dropping it.
+function serial(body) {
+  let running = false;
+  let queued = null; // null | { force }
+  const start = (cx, force = false) => {
+    if (running) {
+      queued = { force: force || Boolean(queued?.force) };
+      return;
+    }
+    running = true;
+    cx.spawn(async (cx) => {
+      try {
+        await body(cx, force);
+      } finally {
+        running = false;
+        const next = queued;
+        queued = null;
+        if (next) start(cx, next.force);
+      }
+    });
+  };
+  return start;
+}
+
+// A cache entry is due when missing, forced, failed a while ago, or old.
+const due = (entry, force, maxAge, now) =>
+  !entry ||
+  force ||
+  now - entry.at > (entry.state === "failed" ? RETRY_MS : maxAge);
+
+// Looks something up into `cache[id]`: found / none (null) / failed. A failure
+// keeps the last good value so a blip doesn't blank the row.
+async function lookup(cache, id, f) {
+  try {
+    const value = await f();
+    cache.set(id, { state: value ? "found" : "none", value, at: Date.now() });
+  } catch {
+    const last = cache.get(id);
+    cache.set(id, {
+      state: "failed",
+      value: last?.value ?? null,
+      at: Date.now(),
+    });
+  }
+}
 
 export default class Work extends View {
   init(_props, cx) {
-    this.groups = null; // [{ repo, worktrees: [{ path, branch, key }] }]
-    this.tickets = new Map(); // key -> ticket | null, with .at
-    this.prs = new Map(); // path -> pr | null
-    this.prsAt = 0;
+    this.groups = null; // null until the first scan; [{ repo, worktrees: [{ path, branch, key }] }]
+    this.mainCheckouts = new Set();
+    this.tickets = new Map(); // key -> entry (see lookup)
+    this.prs = new Map(); // worktree path -> entry
     this.folded = new Set();
-    this.checked = new Set(); // space folders already refreshed for
+    this.watched = new Map(); // space folder -> tries
+    this.watchTimer = false;
+    this.refresh = serial((cx, force) => this.scan(cx, force));
+    this.details = serial((cx, force) => this.lookups(cx, force));
     this.refresh(cx);
     cx.timer.every(GIT_MS, (cx) => this.refresh(cx));
   }
 
-  // Git only: worktrees and branches. Ticket and PR details follow on their own,
+  // Git only: worktrees and branches. Ticket and PR details follow separately,
   // so slow Jira/GitHub calls never hold up the next git refresh.
-  refresh(cx, force = false) {
-    if (this.loading) {
-      this.again = { force: force || this.again?.force };
-      return;
-    }
-    this.loading = true;
-    cx.spawn(async (cx) => {
-      try {
-        const repos = (await localRepos()).filter((r) => r.path);
-        const states = await pool(
-          repos.map((repo) => async () => ({
-            repo,
-            ...(await repoState(repo)),
-          })),
-        );
-        this.groups = states
-          .filter((s) => s?.worktrees.length)
-          .map((s) => ({
-            repo: s.repo,
-            worktrees: s.worktrees.map((w) => ({
-              ...w,
-              key: keysIn(w.branch)[0] ?? null,
-            })),
-          }));
-        cx.notify();
-      } finally {
-        this.loading = false;
-      }
-      cx.notify();
-      if (this.again) {
-        const again = this.again;
-        this.again = null;
-        this.refresh(cx, again.force);
-      }
-      this.loadDetails(cx, force);
-    });
-  }
-
-  loadDetails(cx, force) {
-    if (this.detailing || !this.groups) return;
-    this.detailing = true;
-    cx.spawn(async (cx) => {
-      try {
-        await this.details(cx, force);
-      } finally {
-        this.detailing = false;
-      }
-      cx.notify();
-    });
-  }
-
-  // Render runs whenever spaces change. A local space whose folder isn't one of
-  // our worktrees may be a new one: refresh now instead of at the next poll.
-  // Each folder triggers this once, so ordinary spaces cost one git scan.
-  watchSpaces(cx) {
-    if (!this.groups) return;
-    const known = new Set(
-      this.groups.flatMap((g) => g.worktrees.map((w) => w.path)),
+  async scan(cx, force) {
+    const repos = (await localRepos()).filter((r) => r.path);
+    const states = await pool(
+      repos.map((repo) => async () => ({
+        repo,
+        ...(await repoState(repo)),
+      })),
     );
-    const fresh = spaces()
-      .filter((s) => !s.machine && s.folder)
-      .map((s) => s.folder.replace(/\/+$/, ""))
-      .filter((f) => !known.has(f) && !this.checked.has(f));
-    if (!fresh.length) return;
-    for (const f of fresh) this.checked.add(f);
-    cx.timer.after(0, (cx) => this.refresh(cx));
+    this.mainCheckouts = new Set(repos.map((r) => r.path));
+    this.groups = states
+      .filter((s) => s?.worktrees.length)
+      .map((s) => ({
+        repo: s.repo,
+        worktrees: s.worktrees.map((w) => ({
+          ...w,
+          key: keysIn(w.branch)[0] ?? null,
+        })),
+      }));
+    this.recheckWatched(cx);
+    cx.notify();
+    this.details(cx, force);
   }
 
-  async details(cx, force) {
+  async lookups(cx, force) {
+    if (!this.groups) return;
     const now = Date.now();
     const all = this.groups.flatMap((g) =>
       g.worktrees.map((w) => ({ ...w, repo: g.repo })),
     );
     const keys = [...new Set(all.map((w) => w.key).filter(Boolean))].filter(
-      (k) =>
-        force ||
-        !this.tickets.has(k) ||
-        now - this.tickets.get(k).at > TICKET_MS,
+      (k) => due(this.tickets.get(k), force, TICKET_MS, now),
     );
-    const prsDue =
-      force ||
-      now - this.prsAt > PR_MS ||
-      all.some((w) => !this.prs.has(w.path));
+    const prs = all.filter(
+      (w) => w.repo.slug && due(this.prs.get(w.path), force, PR_MS, now),
+    );
     await Promise.all([
       pool(
         keys.map((key) => async () => {
-          this.tickets.set(key, {
-            ticket: await viewTicket(key),
-            at: Date.now(),
-          });
+          await lookup(this.tickets, key, () => viewTicket(key));
           cx.notify();
         }),
       ),
-      prsDue
-        ? pool(
-            all
-              .filter((w) => w.repo.slug)
-              .map((w) => async () => {
-                this.prs.set(w.path, await prDetails(w.repo.slug, w.branch));
-                cx.notify();
-              }),
-          ).then(() => (this.prsAt = Date.now()))
-        : null,
+      pool(
+        prs.map((w) => async () => {
+          await lookup(this.prs, w.path, () =>
+            prDetails(w.repo.slug, w.branch),
+          );
+          cx.notify();
+        }),
+      ),
     ]);
+  }
+
+  // Render runs whenever spaces change. A local space whose folder isn't one of
+  // our worktrees (nor a main checkout) may be a new worktree: refresh now
+  // rather than at the next poll, and recheck a few times in case it appears
+  // a little later.
+  watchSpaces(cx) {
+    if (!this.groups) return;
+    const known = this.knownFolders();
+    const fresh = spaces()
+      .filter((s) => !s.machine && s.folder)
+      .map((s) => s.folder.replace(/\/+$/, ""))
+      .filter((f) => !known.has(f) && !this.watched.has(f));
+    if (!fresh.length) return;
+    for (const f of fresh) this.watched.set(f, 0);
+    cx.timer.after(0, (cx) => this.refresh(cx));
+  }
+
+  knownFolders() {
+    return new Set([
+      ...this.mainCheckouts,
+      ...this.groups.flatMap((g) => g.worktrees.map((w) => w.path)),
+    ]);
+  }
+
+  // After a scan: folders now listed are done; the rest get another try soon.
+  recheckWatched(cx) {
+    const known = this.knownFolders();
+    let again = false;
+    for (const [f, tries] of this.watched) {
+      if (known.has(f)) this.watched.delete(f);
+      else if (tries + 1 < WATCH_TRIES) {
+        this.watched.set(f, tries + 1);
+        again = true;
+      } else this.watched.set(f, WATCH_TRIES); // given up: the 30 s poll covers it
+    }
+    if (again && !this.watchTimer) {
+      this.watchTimer = true;
+      cx.timer.after(WATCH_MS, (cx) => {
+        this.watchTimer = false;
+        this.refresh(cx);
+      });
+    }
   }
 
   open(w) {
@@ -213,14 +266,23 @@ export default class Work extends View {
 
     const row = (w) => {
       const space = spaceFor(w.path);
-      const ticket = w.key ? this.tickets.get(w.key)?.ticket : null;
-      const pr = prLabel(this.prs.get(w.path));
+      const entry = w.key ? this.tickets.get(w.key) : null;
+      const ticket = entry?.value ?? null;
+      const pr = prLabel(this.prs.get(w.path)?.value);
       const prColor =
         pr?.tone === "bad" ? t.blocked : pr?.tone === "good" ? t.done : t.muted;
-      // A key Jira doesn't know (e.g. "UTF-8" in "fix-utf-8") isn't a ticket: show the branch.
-      const known = w.key && this.tickets.get(w.key)?.ticket !== null;
-      const title = known ? w.key : w.branch;
-      const sub = ticket ? ticket.summary : known ? w.branch : "";
+      // Only a key Jira says it doesn't know (e.g. "UTF-8" in "fix-utf-8") isn't
+      // a ticket: then show the branch. Not looked up yet, or Jira unreachable:
+      // still the key.
+      const isTicket = Boolean(w.key) && entry?.state !== "none";
+      const title = isTicket ? w.key : w.branch;
+      const sub = ticket
+        ? ticket.summary
+        : isTicket
+          ? entry?.state === "failed"
+            ? `${w.branch} · Jira unreachable`
+            : w.branch
+          : "";
       return v_flex()
         .id(`work-${w.path}`)
         .mx(6)

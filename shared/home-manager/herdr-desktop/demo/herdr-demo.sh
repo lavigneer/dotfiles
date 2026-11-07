@@ -7,6 +7,9 @@
 #   herdr-demo --prepare create/refresh the demo without starting the app
 #                        (combine with --reset to start over)
 #
+# To see how the mods cope with Jira being down: touch $HERDR_DEMO/jira-down
+# (remove it to bring Jira back).
+#
 # Everything lives in $HERDR_DEMO (~/.local/state/herdr-demo): demo repos in
 # ws/, their "GitHub" remotes in remotes/, the app's home in app/. The app runs
 # with its own HERDR_APP_HOME and herdr-core session (HC_SESSION=herdr-demo), so
@@ -14,7 +17,9 @@
 # agent are fakes answering from data.json. Wrapped by Nix, which defines
 # HERDR_DEMO, HERDR_DEMO_DATA, install_mods and install_app_files.
 
-session=herdr-demo
+# The herdr-core session is named after the demo folder, so a second demo
+# (HERDR_DEMO=…/herdr-demo-2) never stops or resets the first one's.
+session=$(basename "$HERDR_DEMO")
 
 stop() {
   found=0
@@ -48,6 +53,12 @@ setup() {
       rm -rf "$seed"
     done
 
+  # PRs from forks: only GitHub's refs/pull/<n>/head, no branch on origin.
+  jq -r '.prs[] | select(.fork) | [(.repo | split("/")[1]), .number] | @tsv' "$HERDR_DEMO_DATA" |
+    while IFS=$'\t' read -r name number; do
+      g -C "$HERDR_DEMO/remotes/$name.git" update-ref "refs/pull/$number/head" refs/heads/main
+    done
+
   # Local clones with worktrees and branches, as if you'd been working on them.
   jq -r '.repos[] | [.name, .slug, (.worktrees | join(" ")), (.branches | join(" "))] | @tsv' "$HERDR_DEMO_DATA" |
     while IFS=$'\t' read -r name slug worktrees branches; do
@@ -71,7 +82,7 @@ for arg in "$@"; do
     ;;
   --reset)
     stop >/dev/null
-    case "$HERDR_DEMO" in */herdr-demo) rm -rf "$HERDR_DEMO" ;; esac
+    case "$HERDR_DEMO" in */herdr-demo*) rm -rf "$HERDR_DEMO" ;; esac
     # herdr-core keeps the session's spaces and terminals on its own (Linux path).
     rm -rf "${XDG_STATE_HOME:-$HOME/.local/state}/herdr-core/$session"
     ;;

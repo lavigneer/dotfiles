@@ -11,8 +11,21 @@
 // Repos that aren't cloned yet are cloned into the first root with gh.
 //
 // Keys: type to filter, Up/Down or Ctrl+N/Ctrl+P to move, Enter to choose,
-// Esc to go back or close, Ctrl+O to open the ticket in the browser, Ctrl+R to reload.
+// Backspace (in an empty search) or the header's ‹ to go back, Esc to close,
+// Ctrl+O to open the ticket in the browser, Ctrl+R to reload.
 // Opened with mod.open:tickets (prefix+t).
+//
+// State, each in one field and changed only through its setter (which redraws):
+//   screen  list -> ticket -> pick                 go(); back() goes back one
+//   data    tickets -> work -> ready | failed      load(); a reload supersedes
+//           an older load, whose results are then dropped (gen)
+//   action  idle -> running -> idle | failed       act(); while running, keys
+//           and clicks are ignored. Esc is Herdr's: it always closes a popup,
+//           which stops the action after its current step (every step leaves
+//           a usable state: cloned, or cloned with its worktree), so choosing
+//           it again carries on.
+// A ticket's own screens wait for `ready`: until then its existing work is
+// unknown, and starting could clash with a worktree that's already there.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
@@ -46,201 +59,274 @@ const REMEMBER = "tickets.repo"; // shared: ticket key -> repo slug or path
 
 const repoId = (repo) => repo.slug || repo.path;
 const repoLabel = (repo) => repo.slug || repo.name;
+const errorText = (e) =>
+  firstLine(`${e?.message ?? e}`) || "Something went wrong";
 
 export default class Tickets extends View {
   init(_props, cx) {
+    this.screen = { name: "list" }; // | { name: "ticket" | "pick", ticket }
+    this.data = { phase: "tickets", gen: 0 };
+    this.action = { phase: "idle" }; // | { phase: "running", message } | { phase: "failed", error }
     this.filter = "";
     this.at = 0;
-    this.stage = null; // null: the ticket list; else { ticket, pickRepo? }
-    this.tickets = null; // null while loading
-    this.repos = [];
-    this.work = new Map(); // key -> [{ repo, branch, worktree, pr }]
-    this.workLoaded = false;
-    this.error = null;
-    this.busy = null;
     this.input = InputState.new({ placeholder: "Find a ticket…" });
     this.input.on("change", (_e, cx) => {
       this.filter = this.input.value();
       this.at = 0;
       cx.notify();
     });
-    this.input.on("submit", (_e, cx) => this.choose(this.rows()[this.at], cx));
+    this.input.on("submit", (_e, cx) => this.choose(this.selected(), cx));
     this.input.focus();
     cx.timer.after(600, () => this.input.focus());
     this.handle = cx.focus_handle();
     this.load(cx);
   }
 
+  // --- State --------------------------------------------------------------
+
+  go(screen, cx) {
+    this.screen = screen;
+    this.filter = "";
+    this.input.set_value("");
+    this.at = 0;
+    if (this.action.phase === "failed") this.action = { phase: "idle" };
+    cx.notify();
+  }
+
+  back(cx) {
+    if (this.screen.name === "list") return this.dismiss();
+    this.go(
+      this.screen.name === "pick"
+        ? { name: "ticket", ticket: this.screen.ticket }
+        : { name: "list" },
+      cx,
+    );
+  }
+
+  setData(data, cx) {
+    this.data = data;
+    cx.notify();
+  }
+
+  setAction(action, cx) {
+    this.action = action;
+    cx.notify();
+  }
+
+  get running() {
+    return this.action.phase === "running";
+  }
+
+  // The ticket list first, then each ticket's work. A newer load (Ctrl+R)
+  // supersedes this one: its results are dropped.
   load(cx) {
-    this.tickets = null;
-    this.workLoaded = false;
-    this.error = null;
+    const gen = this.data.gen + 1;
+    const shown = this.data.tickets; // kept on screen if the reload fails
+    this.setData({ phase: "tickets", gen }, cx);
     const cwd = focused()?.cwd ?? null;
     cx.spawn(async (cx) => {
+      const current = () => this.data.gen === gen;
+      let base = null;
       try {
         const [tickets, repos, here] = await Promise.all([
           listTickets(),
           localRepos(),
           repoRoot(cwd),
         ]);
-        this.tickets = tickets;
-        this.repos = repos;
-        this.here = here;
-        cx.notify();
-        this.work = await workFor(
+        if (!current()) return;
+        base = { gen, tickets, repos, here };
+        this.setData({ ...base, phase: "work", work: new Map() }, cx);
+        const work = await workFor(
           tickets.map((t) => t.key),
           repos,
         );
-        this.workLoaded = true;
+        if (!current()) return;
+        this.setData({ ...base, phase: "ready", work }, cx);
       } catch (e) {
-        this.error = `${e.message ?? e}`;
-        this.tickets ??= [];
+        if (!current()) return;
+        this.setData(
+          {
+            tickets: shown ?? [],
+            repos: [],
+            here: null,
+            ...(base ?? {}),
+            gen,
+            phase: "failed",
+            work: new Map(),
+            error: errorText(e),
+          },
+          cx,
+        );
       }
-      cx.notify();
     });
   }
 
-  close() {
+  // Runs an async action; keys are ignored meanwhile, and any error shown after.
+  act(cx, message, f) {
+    if (this.running) return;
+    this.setAction({ phase: "running", message }, cx);
+    cx.spawn(async (cx) => {
+      try {
+        await f(cx);
+        this.setAction({ phase: "idle" }, cx);
+      } catch (e) {
+        this.setAction({ phase: "failed", error: errorText(e) }, cx);
+      }
+    });
+  }
+
+  // Not named close(): Herdr calls a View's close() itself when the overlay goes.
+  dismiss() {
     closeOverlay(props().overlay);
   }
 
-  clearFilter() {
-    this.filter = "";
-    this.input.set_value("");
-    this.at = 0;
-  }
-
-  back() {
-    if (!this.stage) return this.close();
-    this.stage = this.stage.pickRepo ? { ticket: this.stage.ticket } : null;
-    this.clearFilter();
-  }
-
   // --- Rows ---------------------------------------------------------------
+  //
+  // Each row carries what it shows and what Enter or a click does (`run`), so
+  // a label and its action can't disagree.
 
   rows() {
-    const f = this.filter;
+    const d = this.data;
     const keep = (rows, text) =>
       rows
-        .map((r) => ({ r, s: score(text(r), f) }))
+        .map((r) => ({ r, s: score(text(r), this.filter) }))
         .filter((x) => x.s !== null)
         .sort((a, b) => a.s - b.s)
         .map((x) => x.r);
-    if (!this.stage) {
+    if (this.screen.name === "list") {
       return keep(
-        (this.tickets ?? []).map((t) => ({
+        (d.tickets ?? []).map((ticket) => ({
           kind: "ticket",
-          ticket: t,
-          work: this.work.get(t.key) ?? [],
+          ticket,
+          work: d.work?.get(ticket.key) ?? [],
+          run: (cx) => this.openTicket(ticket, cx),
         })),
         (r) => `${r.ticket.key} ${r.ticket.summary}`,
       );
     }
-    const t = this.stage.ticket;
-    if (this.stage.pickRepo) {
+    // A ticket's screens need its work: wait for it (see the header).
+    if (d.phase !== "ready") return [];
+    const t = this.screen.ticket;
+    if (this.screen.name === "pick") {
       return keep(
-        this.repos.map((repo) => ({
-          kind: "start",
-          ticket: t,
-          repo,
-          why: repo.path === this.here ? "current repo" : "",
-        })),
-        (r) => `${r.repo.name} ${r.repo.slug ?? ""}`,
+        d.repos.map((repo) =>
+          this.startRow(t, repo, repo.path === d.here ? "current repo" : ""),
+        ),
+        (r) => r.text,
       );
     }
-    const work = this.work.get(t.key) ?? [];
-    const rows = work.map((item) => ({ kind: "item", ticket: t, item }));
+    const work = d.work.get(t.key) ?? [];
+    const rows = work.map((item) => this.itemRow(t, item));
     const used = new Set(work.map((w) => repoId(w.repo)));
-    for (const s of suggestRepos(
-      t,
-      this.repos,
-      this.here,
-      (shared(REMEMBER) ?? {})[t.key],
-    )) {
-      if (!used.has(repoId(s.repo)))
-        rows.push({ kind: "start", ticket: t, repo: s.repo, why: s.why });
-    }
-    rows.push({ kind: "pick", ticket: t });
+    for (const s of this.suggestions(t))
+      if (!used.has(repoId(s.repo))) rows.push(this.startRow(t, s.repo, s.why));
+    rows.push({
+      kind: "action",
+      label: "Start in another repo…",
+      text: "start in another repo",
+      run: (cx) => this.go({ name: "pick", ticket: t }, cx),
+    });
     for (const repo of new Map(
       work.filter((w) => w.repo.path).map((w) => [w.repo.path, w.repo]),
     ).values()) {
-      rows.push({ kind: "another", ticket: t, repo });
+      const label = `Ask ${basename(C.AGENT[0])} for another branch in ${repoLabel(repo)}`;
+      rows.push({
+        kind: "action",
+        label,
+        text: label,
+        run: () => this.another(t, repo),
+      });
     }
-    return keep(rows, (r) => this.rowText(r));
+    return keep(rows, (r) => r.text);
   }
 
-  rowText(r) {
-    if (r.kind === "item")
-      return `${repoLabel(r.item.repo)} ${r.item.branch ?? ""} ${r.item.pr ? `#${r.item.pr.number}` : ""}`;
-    if (r.kind === "start")
-      return `start in ${repoLabel(r.repo)} ${r.why ?? ""}`;
-    if (r.kind === "pick") return "start in another repo";
-    if (r.kind === "another") return `another branch in ${repoLabel(r.repo)}`;
-    return "";
+  selected() {
+    const rows = this.rows();
+    return rows[Math.max(0, Math.min(this.at, rows.length - 1))];
+  }
+
+  suggestions(ticket) {
+    return suggestRepos(
+      ticket,
+      this.data.repos,
+      this.data.here,
+      (shared(REMEMBER) ?? {})[ticket.key],
+    );
+  }
+
+  startRow(ticket, repo, why) {
+    const label = `Start in ${repoLabel(repo)}${repo.path ? "" : " (clone)"}`;
+    return {
+      kind: "action",
+      label,
+      why,
+      text: `${label} ${repo.name} ${why ?? ""}`,
+      run: (cx) =>
+        this.act(
+          cx,
+          `Creating worktree for ${ticket.key} in ${repoLabel(repo)}…`,
+          (cx) => this.start(ticket, repo, cx),
+        ),
+    };
+  }
+
+  // What a piece of existing work shows (`tag`) and does, decided together.
+  itemRow(ticket, item) {
+    const name = this.spaceName(ticket, item.repo);
+    let tag, run;
+    if (item.worktree) {
+      tag = spaceFor(item.worktree) ? "open" : "worktree";
+      run = () => this.openSpace(name, item.worktree);
+    } else if (item.branch) {
+      tag = item.repo.path ? "branch" : "not cloned";
+      run = (cx) =>
+        this.act(cx, `Opening ${ticket.key}…`, async (cx) => {
+          const repo = await this.local(item.repo, cx);
+          const path = await addWorktree(repo, item.branch, {
+            pr: item.pr?.number ?? null,
+          });
+          this.remember(ticket, repo);
+          this.openSpace(name, path);
+        });
+    } else {
+      // A PR whose branch we don't know: show it instead.
+      tag = "PR";
+      run = () => {
+        if (item.pr?.url) openUrl(item.pr.url);
+        this.dismiss();
+      };
+    }
+    return {
+      kind: "item",
+      item,
+      tag,
+      text: `${repoLabel(item.repo)} ${item.branch ?? ""} ${item.pr ? `#${item.pr.number}` : ""}`,
+      run,
+    };
   }
 
   // --- Actions ------------------------------------------------------------
 
-  // Clicks and Enter don't redraw by themselves: every change to what's shown
-  // here ends in cx.notify() (act() does it for the async actions).
   choose(r, cx) {
-    if (!r || this.busy) return;
-    if (r.kind === "ticket") {
-      const suggestions = suggestRepos(
-        r.ticket,
-        this.repos,
-        this.here,
-        (shared(REMEMBER) ?? {})[r.ticket.key],
-      );
-      // A fresh ticket with one clear home: just start.
-      if (
-        this.workLoaded &&
-        !r.work.length &&
-        // The current repo is only a hint; a single mapped/remembered repo decides.
-        suggestions.filter((x) => x.why !== "current repo").length === 1 &&
-        suggestions[0].why !== "current repo" &&
-        suggestions[0].repo.path
-      ) {
-        return this.act(cx, `Creating worktree for ${r.ticket.key}…`, (cx) =>
-          this.start(r.ticket, suggestions[0].repo, cx),
-        );
-      }
-      this.stage = { ticket: r.ticket };
-      this.clearFilter();
-      return cx.notify();
-    }
-    if (r.kind === "pick") {
-      this.stage = { ticket: r.ticket, pickRepo: true };
-      this.clearFilter();
-      return cx.notify();
-    }
-    if (r.kind === "item")
-      return this.act(cx, `Opening ${r.ticket.key}…`, (cx) =>
-        this.openItem(r.ticket, r.item, cx),
-      );
-    if (r.kind === "start")
-      return this.act(
-        cx,
-        `Creating worktree for ${r.ticket.key} in ${repoLabel(r.repo)}…`,
-        (cx) => this.start(r.ticket, r.repo, cx),
-      );
-    if (r.kind === "another") return this.another(r.ticket, r.repo);
+    if (r && !this.running) r.run(cx);
   }
 
-  // Runs an async action, showing `busy` meanwhile and any error after.
-  act(cx, busy, f) {
-    this.busy = busy;
-    this.error = null;
-    cx.notify();
-    cx.spawn(async (cx) => {
-      try {
-        await f(cx);
-      } catch (e) {
-        this.error = `${e.message ?? e}`;
-      }
-      this.busy = null;
-      cx.notify();
-    });
+  openTicket(ticket, cx) {
+    // A fresh ticket with one clear home: just start. Only once its work is
+    // known; before that, its screen waits (and says so).
+    if (
+      this.data.phase === "ready" &&
+      !this.data.work.get(ticket.key)?.length
+    ) {
+      const s = this.suggestions(ticket);
+      // The current repo is only a hint; a single mapped/remembered repo decides.
+      const decided = s.filter((x) => x.why !== "current repo");
+      if (decided.length === 1 && s[0] === decided[0] && s[0].repo.path)
+        return this.act(cx, `Creating worktree for ${ticket.key}…`, (cx) =>
+          this.start(ticket, s[0].repo, cx),
+        );
+    }
+    this.go({ name: "ticket", ticket }, cx);
   }
 
   remember(ticket, repo) {
@@ -250,17 +336,17 @@ export default class Tickets extends View {
     });
   }
 
+  // The repo, cloned first if it isn't local yet.
   async local(repo, cx) {
     if (repo.path) return repo;
-    this.busy = `Cloning ${repo.slug}…`;
-    cx.notify();
+    this.setAction({ phase: "running", message: `Cloning ${repo.slug}…` }, cx);
     const cloned = await cloneRepo(repo.slug);
-    this.repos.push(cloned);
+    this.data.repos.push(cloned);
     return cloned;
   }
 
   openSpace(name, folder, task) {
-    this.close();
+    this.dismiss();
     const open = spaceFor(folder);
     if (open) run("space.select", { id: open.id });
     else
@@ -273,19 +359,21 @@ export default class Tickets extends View {
   }
 
   spaceName(ticket, repo) {
-    const others = (this.work.get(ticket.key) ?? []).filter(
+    const others = (this.data.work.get(ticket.key) ?? []).filter(
       (w) => repoId(w.repo) !== repoId(repo),
     );
     return others.length ? `${ticket.key} ${repo.name}` : ticket.key;
   }
 
+  // New work on the ticket's own branch (BRANCH_PREFIX + key) in `target`.
   async start(ticket, target, cx) {
     const repo = await this.local(target, cx);
     const branch = C.BRANCH_PREFIX + ticket.key;
-    const existing = (this.work.get(ticket.key) ?? []).find(
+    const existing = (this.data.work.get(ticket.key) ?? []).find(
       (w) => w.repo.path === repo.path && w.branch === branch && w.worktree,
     );
-    const path = existing?.worktree ?? (await addWorktree(repo, branch));
+    const path =
+      existing?.worktree ?? (await addWorktree(repo, branch, { create: true }));
     this.remember(ticket, repo);
     this.openSpace(
       this.spaceName(ticket, repo),
@@ -296,23 +384,9 @@ export default class Tickets extends View {
     );
   }
 
-  async openItem(ticket, item, cx) {
-    if (item.worktree)
-      return this.openSpace(this.spaceName(ticket, item.repo), item.worktree);
-    if (!item.branch) {
-      // A PR whose branch we can't check out: show it instead.
-      if (item.pr?.url) await openUrl(item.pr.url);
-      return this.close();
-    }
-    const repo = await this.local(item.repo, cx);
-    const path = await addWorktree(repo, item.branch);
-    this.remember(ticket, repo);
-    this.openSpace(this.spaceName(ticket, repo), path);
-  }
-
   // The agent names and creates the extra branch itself (BRANCH_PREFIX + key + short description).
   another(ticket, repo) {
-    this.close();
+    this.dismiss();
     run("space.new", {
       name: `${ticket.key} ${repo.name}+`,
       folder: repo.path,
@@ -336,13 +410,58 @@ export default class Tickets extends View {
     });
   }
 
+  // Returns true when the popup handled the key.
+  onKey(e, rows, sel, cx) {
+    if (this.running) return true; // nothing but the action until it finishes
+    const ticket = this.screen.ticket ?? sel?.ticket;
+    if (e.modifiers.control && e.key === "o" && ticket)
+      this.openInBrowser(ticket.key, cx);
+    else if (e.modifiers.control && e.key === "r") this.load(cx);
+    else if (
+      e.key === "backspace" &&
+      !this.filter &&
+      this.screen.name !== "list"
+    )
+      this.back(cx);
+    else if (moveKey(e, this, rows.length, () => {})) cx.notify();
+    else return false;
+    return true;
+  }
+
+  // The line under the search box: [text, isError], or null for none.
+  status(rows) {
+    const a = this.action;
+    if (a.phase === "running") return [a.message, false];
+    if (a.phase === "failed") return [a.error, true];
+    const d = this.data;
+    if (d.phase === "failed") return [`${d.error} (Ctrl+R to retry)`, true];
+    if (d.phase === "tickets") return ["Loading tickets…", false];
+    const onList = this.screen.name === "list";
+    if (d.phase === "work")
+      return [
+        onList
+          ? "Looking for branches and pull requests…"
+          : "Looking for this ticket's branches and pull requests…",
+        false,
+      ];
+    if (!rows.length)
+      return [
+        !onList
+          ? "Nothing matches"
+          : d.tickets.length
+            ? "No matching ticket"
+            : "No tickets for this query",
+        false,
+      ];
+    return null;
+  }
+
   // --- Drawing ------------------------------------------------------------
 
   render() {
     const t = theme();
     const rows = this.rows();
-    this.at = Math.max(0, Math.min(this.at, rows.length - 1));
-    const sel = rows[this.at];
+    const sel = rows[Math.max(0, Math.min(this.at, rows.length - 1))];
     const tone = (label) =>
       label?.tone === "bad"
         ? t.blocked
@@ -401,7 +520,6 @@ export default class Tickets extends View {
       }
       if (r.kind === "item") {
         const pr = prLabel(r.item.pr);
-        const open = r.item.worktree && spaceFor(r.item.worktree);
         return line(r, i, [
           dot(Boolean(r.item.worktree)),
           div()
@@ -416,43 +534,29 @@ export default class Tickets extends View {
             .text_color(t.muted)
             .child(r.item.branch ?? r.item.pr?.title ?? ""),
           pr ? small(pr.text, tone(pr)) : null,
-          small(
-            open
-              ? "open"
-              : r.item.worktree
-                ? "worktree"
-                : r.item.repo.path
-                  ? "branch"
-                  : "not cloned",
-          ),
+          small(r.tag),
         ]);
       }
-      const label =
-        r.kind === "start"
-          ? `Start in ${repoLabel(r.repo)}${r.repo.path ? "" : " (clone)"}`
-          : r.kind === "pick"
-            ? "Start in another repo…"
-            : `Ask ${basename(C.AGENT[0])} for another branch in ${repoLabel(r.repo)}`;
       return line(r, i, [
         div().w(12).flex_none().text_color(t.dim).child("+"),
-        div().flex_1().truncate().text_color(t.foreground).child(label),
+        div().flex_1().truncate().text_color(t.foreground).child(r.label),
         r.why ? small(r.why) : null,
       ]);
     };
 
-    const title = this.stage
-      ? `${this.stage.ticket.key}  ${this.stage.ticket.summary}`
-      : "Tickets";
-    let message = this.busy ?? this.error;
-    if (!message && this.tickets === null) message = "Loading tickets…";
-    else if (!message && !rows.length)
-      message = this.stage
-        ? "Nothing matches"
-        : this.tickets.length
-          ? "No matching ticket"
-          : "No tickets for this query";
-    else if (!message && !this.stage && !this.workLoaded)
-      message = "Looking for branches and pull requests…";
+    const title =
+      this.screen.name === "list"
+        ? "Tickets"
+        : `${this.screen.ticket.key}  ${this.screen.ticket.summary}`;
+    // Esc mid-action closes the popup and stops after the current step (a
+    // clone or fetch that has started finishes); doing it again carries on.
+    const hint = this.running
+      ? "working… · Esc stops after this step"
+      : this.screen.name === "list"
+        ? "Ctrl+O browser · Ctrl+R reload · Esc"
+        : "⌫ back · Esc";
+    const onList = this.screen.name === "list";
+    const status = this.status(rows);
 
     return v_flex()
       .id("tickets")
@@ -464,18 +568,29 @@ export default class Tickets extends View {
       .bg(t.popover)
       .text_size(13)
       .on_key_down((e, cx) => {
-        const ticket = this.stage?.ticket ?? sel?.ticket;
-        if (e.modifiers.control && e.key === "o" && ticket)
-          this.openInBrowser(ticket.key, cx);
-        else if (e.modifiers.control && e.key === "r") this.load(cx);
-        else if (!moveKey(e, this, rows.length, () => this.back())) return;
-        cx.stop_propagation();
-        cx.notify();
+        if (this.onKey(e, rows, sel, cx)) cx.stop_propagation();
       })
       .child(
         h_flex()
           .gap(10)
           .items_center()
+          .when(!onList, (el) =>
+            el.child(
+              div()
+                .id("tk-back")
+                .px(6)
+                .rounded(5)
+                .flex_none()
+                .text_size(15)
+                .text_color(t.dim)
+                .cursor_pointer()
+                .hover((s) => s.bg(t.hover).text_color(t.foreground))
+                .on_click((_e, cx) => {
+                  if (!this.running) this.back(cx);
+                })
+                .child("‹"),
+            ),
+          )
           .child(
             div()
               .flex_1()
@@ -485,11 +600,7 @@ export default class Tickets extends View {
               .text_color(t.foreground)
               .child(title),
           )
-          .child(
-            small(
-              this.stage ? "Esc back" : "Ctrl+O browser · Ctrl+R reload · Esc",
-            ),
-          ),
+          .child(small(hint)),
       )
       .child(
         h_flex()
@@ -513,13 +624,13 @@ export default class Tickets extends View {
               .text_color(t.foreground),
           ),
       )
-      .when(Boolean(message), (el) =>
+      .when(Boolean(status), (el) =>
         el.child(
           div()
             .px(10)
             .py(4)
-            .text_color(this.error && !this.busy ? t.blocked : t.dim)
-            .child(firstLine(message)),
+            .text_color(status[1] ? t.blocked : t.dim)
+            .child(status[0]),
         ),
       )
       .when(rows.length > 0, (el) =>

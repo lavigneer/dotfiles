@@ -110,6 +110,17 @@
       "draft": false,
       "review": "REVIEW_REQUIRED",
       "checks": "SUCCESS"
+    },
+    {
+      "repo": "10gen/web-app",
+      "number": 35,
+      "branch": "contributor/WEB-103-fix",
+      "title": "WEB-103: rate-limit signups (from a fork)",
+      "body": "",
+      "draft": false,
+      "review": "REVIEW_REQUIRED",
+      "checks": "SUCCESS",
+      "fork": true
     }
   ]
 }

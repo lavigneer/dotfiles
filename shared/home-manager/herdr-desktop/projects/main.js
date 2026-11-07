@@ -12,9 +12,12 @@ import { exec, home, run, theme, props, closeOverlay } from "herdr";
 import { ROOTS, DEPTH } from "./config.js";
 import { basename, score, spaceFor, moveKey } from "./lib.js";
 
-// Repos at exactly DEPTH below a root: <root>/<repo>/.git (a dir, or a file for worktrees).
+// Repos at exactly DEPTH below a root: <root>/<repo>/.git (a dir, or a file for
+// worktrees). Returns { repos, problems }: a root that couldn't be read (missing,
+// no permission) is a problem to show, not just "no repos".
 async function scan() {
   const found = new Set();
+  const problems = [];
   for (const root of ROOTS) {
     const depth = String(DEPTH + 1);
     try {
@@ -31,11 +34,18 @@ async function scan() {
       for (const line of r.stdout.split("\n")) {
         if (line.endsWith("/.git")) found.add(line.slice(0, -"/.git".length));
       }
-    } catch {
-      // A missing root just contributes nothing.
+      if (r.code !== 0)
+        problems.push(
+          (r.stderr || "").trim().split("\n")[0] || `couldn't read ${root}`,
+        );
+    } catch (e) {
+      problems.push(`couldn't scan ${root}: ${e?.message ?? e}`);
     }
   }
-  return [...found].sort((a, b) => basename(a).localeCompare(basename(b)));
+  return {
+    repos: [...found].sort((a, b) => basename(a).localeCompare(basename(b))),
+    problems,
+  };
 }
 
 export default class Projects extends View {
@@ -43,6 +53,7 @@ export default class Projects extends View {
     this.filter = "";
     this.at = 0;
     this.repos = null; // null while the first scan runs
+    this.problems = [];
     this.input = InputState.new({ placeholder: "Open a project…" });
     this.input.on("change", (_e, cx) => {
       this.filter = this.input.value();
@@ -54,12 +65,15 @@ export default class Projects extends View {
     cx.timer.after(600, () => this.input.focus());
     this.handle = cx.focus_handle();
     cx.spawn(async (cx) => {
-      this.repos = await scan();
+      const { repos, problems } = await scan();
+      this.repos = repos;
+      this.problems = problems;
       cx.notify();
     });
   }
 
-  close() {
+  // Not named close(): Herdr calls a View's close() itself when the overlay goes.
+  dismiss() {
     closeOverlay(props().overlay);
   }
 
@@ -83,7 +97,7 @@ export default class Projects extends View {
 
   go(r) {
     if (!r) return;
-    this.close();
+    this.dismiss();
     const open = spaceFor(r.path);
     if (open) run("space.select", { id: open.id });
     else run("space.new", { name: r.name, folder: r.path });
@@ -136,14 +150,15 @@ export default class Projects extends View {
           el.child(div().text_size(11).text_color(t.dim).child("open")),
         );
 
+    const problem = this.problems[0] ? tilde(this.problems[0]) : null;
     const empty =
       this.repos === null
         ? "Scanning…"
         : rows.length
-          ? null
+          ? problem
           : this.repos.length
             ? "No matching project"
-            : `No git repos in ${ROOTS.map(tilde).join(", ")}`;
+            : (problem ?? `No git repos in ${ROOTS.map(tilde).join(", ")}`);
 
     return v_flex()
       .id("projects")
@@ -155,7 +170,7 @@ export default class Projects extends View {
       .bg(t.popover)
       .text_size(13)
       .on_key_down((e, cx) => {
-        if (!moveKey(e, this, rows.length, () => this.close())) return;
+        if (!moveKey(e, this, rows.length, () => this.dismiss())) return;
         cx.stop_propagation();
         cx.notify();
       })

@@ -162,8 +162,19 @@ export async function repoState(repo) {
 export const worktreePath = (repo, branch) =>
   `${repo.path}/${C.WORKTREE_DIR}/${branch.split("/").pop()}`;
 
-// Adds a worktree for `branch` (local, else origin's, else new from origin's default branch).
-export async function addWorktree(repo, branch) {
+// Adds a worktree for `branch` and returns its path. Where the branch comes from:
+//   1. a local branch of that name;
+//   2. origin's branch of that name (tracked);
+//   3. with `pr` (a PR number): the PR's head, refs/pull/<pr>/head — for a PR
+//      from a fork, or one whose branch was deleted after merging;
+//   4. with `create`: a new branch from origin's default branch (new work).
+// Anything else is an error: an existing PR or branch never silently becomes an
+// empty look-alike branch cut from main.
+export async function addWorktree(
+  repo,
+  branch,
+  { create = false, pr = null } = {},
+) {
   const path = worktreePath(repo, branch);
   // Keep worktrees out of the main checkout's `git status`.
   const rel = path.slice(repo.path.length + 1);
@@ -184,24 +195,30 @@ export async function addWorktree(repo, branch) {
       `/${C.WORKTREE_DIR}/`,
     ]);
   }
-  await git(repo.path, "fetch", "--quiet", "origin"); // best effort: offline still works
+  // Best effort: offline, local branches still work and new ones start from
+  // the last fetched default branch.
+  await git(repo.path, "fetch", "--quiet", "origin");
   const has = async (ref) =>
     (await git(repo.path, "show-ref", "--verify", "--quiet", ref)).code === 0;
+  const add = (...args) => git(repo.path, "worktree", "add", ...args);
   let r;
-  if (await has(`refs/heads/${branch}`))
-    r = await git(repo.path, "worktree", "add", path, branch);
+  if (await has(`refs/heads/${branch}`)) r = await add(path, branch);
   else if (await has(`refs/remotes/origin/${branch}`))
-    r = await git(
+    r = await add("--track", "-b", branch, path, `origin/${branch}`);
+  else if (pr) {
+    const f = await git(
       repo.path,
-      "worktree",
-      "add",
-      "--track",
-      "-b",
-      branch,
-      path,
-      `origin/${branch}`,
+      "fetch",
+      "--quiet",
+      "origin",
+      `pull/${pr}/head:refs/heads/${branch}`,
     );
-  else {
+    if (f.code !== 0)
+      throw new Error(
+        `${branch} isn't on origin and PR #${pr}'s head couldn't be fetched: ${firstLine(f.stderr)}`,
+      );
+    r = await add(path, branch);
+  } else if (create) {
     const head = await git(
       repo.path,
       "symbolic-ref",
@@ -209,17 +226,14 @@ export async function addWorktree(repo, branch) {
       "--short",
       "refs/remotes/origin/HEAD",
     );
-    r = await git(
-      repo.path,
-      "worktree",
-      "add",
+    r = await add(
       "--no-track",
       "-b",
       branch,
       path,
       head.code === 0 ? head.stdout.trim() : "HEAD",
     );
-  }
+  } else throw new Error(`${branch} isn't a local branch or on origin`);
   if (r.code !== 0)
     throw new Error(firstLine(r.stderr) || "git worktree add failed");
   return path;
@@ -263,17 +277,21 @@ export async function listTickets() {
   return JSON.parse(r.stdout || "[]").map(ticketOf);
 }
 
-// One ticket by key (null if Jira doesn't know it, e.g. a key-like branch name).
+// Jira or GitHub saying "there's no such thing" (as opposed to failing).
+const NOT_FOUND =
+  /does not exist|not found|404|no pull requests? found|could not resolve/i;
+
+// One ticket by key: the ticket, or null when Jira doesn't know the key (e.g. a
+// key-like branch name such as "fix-utf-8"). Throws when Jira can't be asked,
+// so callers can tell "not a ticket" from "Jira is down".
 export async function viewTicket(key) {
-  const r = await exec(C.JIRA, ["issue", "view", key, "--raw"]).catch(
-    () => null,
-  );
-  if (r?.code !== 0) return null;
-  try {
-    return ticketOf(JSON.parse(r.stdout));
-  } catch {
-    return null;
+  const r = await exec(C.JIRA, ["issue", "view", key, "--raw"]);
+  if (r.code !== 0) {
+    const why = firstLine(r.stderr) || firstLine(r.stdout);
+    if (NOT_FOUND.test(why)) return null;
+    throw new Error(why || `jira issue view ${key} failed`);
   }
+  return ticketOf(JSON.parse(r.stdout));
 }
 
 // --- GitHub -----------------------------------------------------------------
@@ -326,6 +344,7 @@ export async function searchPRs(keys, who) {
     }));
 }
 
+const OK = ["SUCCESS", "NEUTRAL", "SKIPPED", "COMPLETED"];
 const BAD = [
   "FAILURE",
   "ERROR",
@@ -334,16 +353,8 @@ const BAD = [
   "ACTION_REQUIRED",
   "STARTUP_FAILURE",
 ];
-const WAIT = [
-  "PENDING",
-  "IN_PROGRESS",
-  "QUEUED",
-  "EXPECTED",
-  "WAITING",
-  "REQUESTED",
-];
-
 // Details for a PR (number or branch) in `slug`, or null when there is none.
+// Throws when GitHub can't be asked, so callers can tell "no PR" from "failed".
 export async function prDetails(slug, ref) {
   const r = await exec(C.GH, [
     "pr",
@@ -353,19 +364,24 @@ export async function prDetails(slug, ref) {
     slug,
     "--json",
     "number,url,title,state,isDraft,reviewDecision,statusCheckRollup,headRefName",
-  ]).catch(() => null);
-  if (r?.code !== 0) return null;
+  ]);
+  if (r.code !== 0) {
+    const why = firstLine(r.stderr);
+    if (NOT_FOUND.test(why)) return null;
+    throw new Error(why || `gh pr view ${ref} --repo ${slug} failed`);
+  }
   const pr = JSON.parse(r.stdout);
   const results = (pr.statusCheckRollup ?? []).map(
     (c) => c.conclusion || c.state || c.status || "",
   );
+  // A result we don't recognise counts as still running, never as passed.
   const checks = !results.length
     ? null
     : results.some((x) => BAD.includes(x))
       ? "failed"
-      : results.some((x) => WAIT.includes(x))
-        ? "pending"
-        : "passed";
+      : results.every((x) => OK.includes(x))
+        ? "passed"
+        : "pending";
   return {
     slug,
     number: pr.number,
@@ -460,6 +476,7 @@ export async function workFor(keys, repos, { prs = true } = {}) {
     }
   }
   const details = await pool(
+    // A failed lookup just leaves that item without PR details here.
     lookups.map((l) => () => prDetails(l.slug, l.ref)),
   );
   lookups.forEach((l, i) => {
