@@ -8,38 +8,9 @@
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import {
-  exec,
-  home,
-  panes,
-  spaces,
-  run,
-  theme,
-  props,
-  closeOverlay,
-} from "herdr";
+import { exec, home, run, theme, props, closeOverlay } from "herdr";
 import { ROOTS, DEPTH } from "./config.js";
-
-const basename = (p) => p.replace(/\/+$/, "").split("/").pop();
-const inside = (dir, repo) => dir === repo || dir.startsWith(repo + "/");
-
-// Subsequence match ("dtf" matches "dotfiles"); a lower score is a better match.
-function score(text, query) {
-  if (!query) return 0;
-  const t = text.toLowerCase();
-  const q = query.toLowerCase();
-  const direct = t.indexOf(q);
-  if (direct >= 0) return direct;
-  let at = -1;
-  let gaps = 0;
-  for (const ch of q) {
-    const next = t.indexOf(ch, at + 1);
-    if (next < 0) return null;
-    gaps += next - at - 1;
-    at = next;
-  }
-  return 100 + gaps;
-}
+import { basename, score, spaceFor, moveKey } from "./lib.js";
 
 // Repos at exactly DEPTH below a root: <root>/<repo>/.git (a dir, or a file for worktrees).
 async function scan() {
@@ -65,18 +36,6 @@ async function scan() {
     }
   }
   return [...found].sort((a, b) => basename(a).localeCompare(basename(b)));
-}
-
-// The local space already working in a repo: its start folder, else any of its terminals.
-function spaceFor(repo) {
-  const local = spaces().filter((s) => !s.machine);
-  const byFolder = local.find((s) => s.folder && inside(s.folder, repo));
-  if (byFolder) return byFolder;
-  const live = panes();
-  return local.find((s) => {
-    const tabs = new Set(s.tabs.map((t) => t.id));
-    return live.some((p) => tabs.has(p.tab) && p.cwd && inside(p.cwd, repo));
-  });
 }
 
 export default class Projects extends View {
@@ -196,14 +155,7 @@ export default class Projects extends View {
       .bg(t.popover)
       .text_size(13)
       .on_key_down((e, cx) => {
-        const k = e.key;
-        const n = rows.length || 1;
-        if (k === "escape") return this.close();
-        if (k === "down" || (k === "n" && e.modifiers.control))
-          this.at = (this.at + 1) % n;
-        else if (k === "up" || (k === "p" && e.modifiers.control))
-          this.at = (this.at + n - 1) % n;
-        else return;
+        if (!moveKey(e, this, rows.length, () => this.close())) return;
         cx.stop_propagation();
         cx.notify();
       })
