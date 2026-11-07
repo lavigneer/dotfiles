@@ -7,6 +7,14 @@
 #   herdr-demo --prepare create/refresh the demo without starting the app
 #                        (combine with --reset to start over)
 #
+# Playing the reviewers and CI (KEY: a ticket key, for its newest open PR, or
+# owner/repo#number):
+#   herdr-demo approve KEY             approve it (auto-merge then merges it)
+#   herdr-demo comment KEY [N]         leave N unresolved review comments (default 2)
+#   herdr-demo request-changes KEY [N] request changes, with N comments
+#   herdr-demo fail-ci KEY             fail its running CI (or the next run)
+#   herdr-demo status                  the demo's PRs and tickets
+#
 # To see how the mods cope with Jira being down: touch $HERDR_DEMO/jira-down
 # (remove it to bring Jira back).
 #
@@ -14,8 +22,9 @@
 # ws/, their "GitHub" remotes in remotes/, the app's home in app/. The app runs
 # with its own HERDR_APP_HOME and herdr-core session (HC_SESSION=herdr-demo), so
 # your real spaces, settings and layouts are never touched. jira, gh and the
-# agent are fakes answering from data.json. Wrapped by Nix, which defines
-# HERDR_DEMO, HERDR_DEMO_DATA, install_mods and install_app_files.
+# agent are fakes working on state.json (a copy of data.json). Wrapped by Nix,
+# which defines HERDR_DEMO, HERDR_DEMO_DATA, install_mods, install_app_files
+# and the state_* helpers (state.sh).
 
 # The herdr-core session is named after the demo folder, so a second demo
 # (HERDR_DEMO=…/herdr-demo-2) never stops or resets the first one's.
@@ -71,7 +80,70 @@ setup() {
       for b in $worktrees; do g -C "$repo" worktree add --quiet -b "$b" "$repo/.claude/worktrees/${b##*/}" origin/main; done
       for b in $branches; do g -C "$repo" branch --quiet --no-track "$b" origin/main; done
     done
+
+  # Branches with a PR are on "GitHub" too (fork PRs only as refs/pull/<n>/head).
+  jq -r '.prs[] | select(.fork | not) | [(.repo | split("/")[1]), .branch] | @tsv' "$HERDR_DEMO_DATA" |
+    while IFS=$'\t' read -r name branch; do
+      if [ -d "$HERDR_DEMO/ws/$name" ] && g -C "$HERDR_DEMO/ws/$name" show-ref --verify --quiet "refs/heads/$branch"; then
+        g -C "$HERDR_DEMO/ws/$name" push --quiet origin "$branch"
+      fi
+    done
+
+  # The demo's "Jira and GitHub", changed as you work. CI already running
+  # finishes in a minute.
+  install -m 644 "$HERDR_DEMO_DATA" "$HERDR_DEMO/state.json"
+  state_set '(.prs[] | select(.checks == "IN_PROGRESS")) |= (.checksDoneAt = (now + 60) | .checksResult = "SUCCESS")'
 }
+
+# The open PR for KEY (by branch or title; the newest if several), or for an
+# exact "owner/repo#number", as "repo<TAB>number".
+pr_for() {
+  state_tick
+  state_jq -r --arg key "$1" '
+    [.prs[] | select((.state // "OPEN") == "OPEN"
+                     and ("\(.repo)#\(.number)" == $key
+                          or (.branch | ascii_upcase | contains($key))
+                          or (.title | contains($key))))]
+    | max_by(.number) // empty | [.repo, .number] | @tsv'
+}
+
+# Reviewer and CI commands (see the top).
+review() {
+  local cmd="$1" key="${2:-}" n="${3:-2}" pr repo number
+  if [ "$cmd" = status ]; then
+    state_tick
+    state_jq -r '.prs[] | "\(.repo)#\(.number)  \(.branch)  \(.state // "OPEN")\(if .draft then " draft" else "" end)  review:\(.review)  checks:\(.checks)\(if .autoMerge then " auto-merge" else "" end)  comments:\(.unresolved // 0)"'
+    echo
+    state_jq -r '.tickets[] | "\(.key)  \(.status)  \(.summary)"'
+    return
+  fi
+  [ -n "$key" ] || {
+    echo "usage: herdr-demo $cmd KEY" >&2
+    exit 2
+  }
+  pr="$(pr_for "$key")"
+  [ -n "$pr" ] || {
+    echo "herdr-demo: no open PR for $key" >&2
+    exit 1
+  }
+  IFS=$'\t' read -r repo number <<<"$pr"
+  local sel=".repo == \"$repo\" and .number == $number"
+  case "$cmd" in
+  approve) state_set "(.prs[] | select($sel)).review = \"APPROVED\"" ;;
+  comment) state_set "(.prs[] | select($sel)).unresolved += $n" ;;
+  request-changes) state_set "(.prs[] | select($sel)) |= (.review = \"CHANGES_REQUESTED\" | .unresolved += $n)" ;;
+  fail-ci) state_set "(.prs[] | select($sel)) |= (if .checks == \"IN_PROGRESS\" then .checksResult = \"FAILURE\" else .failNext = true end)" ;;
+  esac
+  state_tick
+  echo "herdr-demo: $cmd $repo#$number"
+}
+
+case "${1:-}" in
+approve | comment | request-changes | fail-ci | status)
+  review "$@"
+  exit 0
+  ;;
+esac
 
 prepare_only=0
 for arg in "$@"; do
@@ -88,7 +160,7 @@ for arg in "$@"; do
     ;;
   --prepare) prepare_only=1 ;;
   *)
-    echo "usage: herdr-demo [--reset] [--prepare] | --stop" >&2
+    echo "usage: herdr-demo [--reset] [--prepare] | --stop | approve|comment|request-changes|fail-ci KEY | status" >&2
     exit 2
     ;;
   esac
@@ -106,7 +178,7 @@ if [ "$prepare_only" = 1 ]; then
 fi
 
 export HERDR_APP_HOME="$HERDR_DEMO/app" HC_SESSION="$session" HERDR_APP_ID="$session" GIT_TERMINAL_PROMPT=0
-cd "$HERDR_DEMO/ws"
+cd "$HERDR_DEMO/ws" || exit 1
 setsid herdr-app >"$HERDR_DEMO/app.log" 2>&1 </dev/null &
 
 # Switch the demo window to the work layout once it's listening.
@@ -122,7 +194,11 @@ herdr-demo: started (log: $HERDR_DEMO/app.log).
   Ctrl+B t   tickets popup: WEB-105 starts straight away (component Fern),
              WEB-101 has two branches and a PR, WEB-104's PR is in an uncloned
              repo (clones it), PLAT-9 has no repo (pick one).
-  Sidebar    "Work" outline between Spaces and Agents.
+  Sidebar    "Work": each worktree with its next step (Draft PR, Fix CI,
+             Address comments, Ready, Merge, Finish).
   Ctrl+B f   projects picker over the demo repos.
+The whole flow with WEB-105: start it, Draft PR, wait for CI (${DEMO_CI_SECONDS:-20}s),
+  herdr-demo comment WEB-105 → Address comments → Ready →
+  herdr-demo approve WEB-105 (auto-merge merges it) → Finish.
 Stop with: herdr-demo --stop     Start over with: herdr-demo --reset
 EOF

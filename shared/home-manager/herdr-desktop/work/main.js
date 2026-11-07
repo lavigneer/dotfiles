@@ -6,23 +6,31 @@
 // go to its space, or to open one there with the agent. "+" opens the tickets
 // popup to start new work; ↻ refreshes everything now.
 //
+// Under each row, buttons for its next step in the ticket workflow (Draft PR,
+// Fix CI, Address comments, Ready, Merge, Finish; see flow.js). Finish and
+// Clean up ask for a second click. Notifies you when CI finishes, review
+// comments or a review arrive, or the PR merges.
+//
 // State:
 //   git refresh, details   each runs one at a time; a request during a run
 //                          queues one more (serial()), merging "force"
 //   tickets, prs           caches of { state: "found" | "none" | "failed",
 //                          value, at }; "failed" (Jira/GitHub unreachable) is
 //                          retried after a minute and never shown as "none"
+//   steps                  per worktree: the last step run from here
+//                          (running / done / failed, with a note)
+//   confirming             the step waiting for its second click, if any
 //   watched                folders of spaces not yet listed as worktrees,
 //                          rechecked a few times (the tickets popup makes the
 //                          worktree first; an agent may make it later)
-// Git refreshes every 30 s and at once for a new space; PRs every 2 min,
-// tickets every 10 min.
+// Git refreshes every 30 s and at once for a new space; PRs every 2 min (20 s
+// while CI runs or a merge is pending), tickets every 10 min.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { run, spaces, theme } from "herdr";
+import { notify, run, spaces, theme } from "herdr";
 import * as C from "./config.js";
-import { spaceFor } from "./lib.js";
+import { basename, spaceFor } from "./lib.js";
 import {
   localRepos,
   repoState,
@@ -31,10 +39,16 @@ import {
   prDetails,
   prLabel,
   pool,
+  unresolvedThreads,
 } from "./data.js";
+import { nextSteps, runStep } from "./flow.js";
 
 const GIT_MS = 30_000;
 const PR_MS = 120_000;
+const ACTIVE_PR_MS = 20_000; // CI running, or waiting to merge
+const DUE_CHECK_MS = 10_000; // how often to look for due lookups
+const CONFIRM_MS = 4_000;
+const NOTE_MS = 60_000; // how long a step's success note stays
 const TICKET_MS = 600_000;
 const RETRY_MS = 60_000; // after a failed Jira/GitHub lookup
 const WATCH_MS = 3_000; // between rechecks of a new space's folder
@@ -95,11 +109,15 @@ export default class Work extends View {
     this.prs = new Map(); // worktree path -> entry
     this.folded = new Set();
     this.watched = new Map(); // space folder -> tries
+    this.steps = new Map(); // worktree path -> { phase, text }
+    this.confirming = null; // `${path}:${step id}`
     this.watchTimer = false;
     this.refresh = serial((cx, force) => this.scan(cx, force));
     this.details = serial((cx, force) => this.lookups(cx, force));
     this.refresh(cx);
     cx.timer.every(GIT_MS, (cx) => this.refresh(cx));
+    // Ticket/PR lookups that are due, between git scans (only due ones run).
+    cx.timer.every(DUE_CHECK_MS, (cx) => this.details(cx));
   }
 
   // Git only: worktrees and branches. Ticket and PR details follow separately,
@@ -136,9 +154,14 @@ export default class Work extends View {
     const keys = [...new Set(all.map((w) => w.key).filter(Boolean))].filter(
       (k) => due(this.tickets.get(k), force, TICKET_MS, now),
     );
-    const prs = all.filter(
-      (w) => w.repo.slug && due(this.prs.get(w.path), force, PR_MS, now),
-    );
+    const prs = all.filter((w) => {
+      const entry = this.prs.get(w.path);
+      const pr = entry?.value;
+      const active =
+        pr?.state === "OPEN" &&
+        (pr.checks === "pending" || pr.autoMerge || pr.review === "APPROVED");
+      return w.repo.slug && due(entry, force, active ? ACTIVE_PR_MS : PR_MS, now);
+    });
     await Promise.all([
       pool(
         keys.map((key) => async () => {
@@ -148,9 +171,19 @@ export default class Work extends View {
       ),
       pool(
         prs.map((w) => async () => {
-          await lookup(this.prs, w.path, () =>
-            prDetails(w.repo.slug, w.branch),
-          );
+          const before = this.prs.get(w.path)?.value;
+          await lookup(this.prs, w.path, async () => {
+            const pr = await prDetails(w.repo.slug, w.branch);
+            if (pr?.state === "OPEN")
+              pr.unresolved = await unresolvedThreads(
+                w.repo.slug,
+                pr.number,
+              ).catch(() => before?.unresolved ?? null);
+            return pr;
+          });
+          const entry = this.prs.get(w.path);
+          if (entry.state === "found" && before)
+            this.tell(w, before, entry.value);
           cx.notify();
         }),
       ),
@@ -198,6 +231,71 @@ export default class Work extends View {
         this.refresh(cx);
       });
     }
+  }
+
+  // A notification when something you'd wait for changes on a PR.
+  tell(w, was, pr) {
+    const who = w.key ?? basename(w.path);
+    const space = spaceFor(w.path);
+    const action = space
+      ? { name: "space.select", args: { id: space.id } }
+      : undefined;
+    const say = (title, level, body) =>
+      notify({ title: `${who}: ${title}`, body, level, action });
+    if (was.checks === "pending" && pr.checks === "passed")
+      say("CI passed", "success", pr.draft ? "Ready to mark ready for review." : undefined);
+    if (was.checks === "pending" && pr.checks === "failed")
+      say("CI failed", "error");
+    if ((pr.unresolved ?? 0) > (was.unresolved ?? 0))
+      say(
+        `${pr.unresolved - (was.unresolved ?? 0)} new review comment${pr.unresolved - (was.unresolved ?? 0) === 1 ? "" : "s"}`,
+        "warning",
+      );
+    if (was.review !== pr.review && pr.review === "APPROVED")
+      say("approved", "success", pr.autoMerge ? "Auto-merge will merge it." : undefined);
+    if (was.review !== pr.review && pr.review === "CHANGES_REQUESTED")
+      say("changes requested", "warning");
+    if (was.state !== "MERGED" && pr.state === "MERGED")
+      say("merged", "success", "Finish removes the worktree and resolves the ticket.");
+  }
+
+  // Runs a next step for worktree `w`; one asking for confirmation runs on its
+  // second click (within a few seconds).
+  step(cx, w, step) {
+    const path = w.path;
+    if (this.steps.get(path)?.phase === "running") return;
+    const id = `${path}:${step.id}`;
+    if (step.confirm && this.confirming !== id) {
+      this.confirming = id;
+      cx.timer.after(CONFIRM_MS, (cx) => {
+        if (this.confirming === id) this.confirming = null;
+        cx.notify();
+      });
+      return cx.notify();
+    }
+    this.confirming = null;
+    this.steps.set(path, { phase: "running", text: `${step.label}…` });
+    cx.notify();
+    const pr = this.prs.get(path)?.value ?? null;
+    const others = this.groups
+      .flatMap((g) => g.worktrees.map((o) => ({ ...o, repo: g.repo })))
+      .filter((o) => o.path !== path)
+      .map((o) => ({ w: o, pr: this.prs.get(o.path)?.value ?? null }));
+    cx.spawn(async (cx) => {
+      const who = w.key ?? basename(path);
+      try {
+        const note = await runStep(step.id, w, pr, others);
+        this.steps.set(path, { phase: "done", text: note, at: Date.now() });
+        if (step.kind === "direct")
+          notify({ title: `${who}: ${step.label}`, body: note, level: "success" });
+      } catch (e) {
+        const text = `${e?.message ?? e}`.split("\n")[0];
+        this.steps.set(path, { phase: "failed", text });
+        notify({ title: `${who}: ${step.label} failed`, body: text, level: "error" });
+      }
+      cx.notify();
+      this.refresh(cx, true);
+    });
   }
 
   open(w) {
@@ -264,11 +362,52 @@ export default class Work extends View {
         .child("●");
     };
 
+    const button = (w, s) => {
+      const confirming = this.confirming === `${w.path}:${s.id}`;
+      return div()
+        .id(`work-step-${w.path}-${s.id}`)
+        .flex_none()
+        .h(18)
+        .px(6)
+        .flex()
+        .items_center()
+        .rounded(5)
+        .border_1()
+        .border_color(confirming ? t.blocked : t.border ?? t.dim)
+        .text_size(10.5)
+        .text_color(confirming ? t.blocked : t.foreground)
+        .cursor_pointer()
+        .hover((st) => st.bg(t.hover))
+        .on_click((_e, cx) => {
+          cx.stop_propagation();
+          this.step(cx, w, s);
+        })
+        .child(confirming ? `${s.label}? click again` : s.label);
+    };
+
     const row = (w) => {
       const space = spaceFor(w.path);
       const entry = w.key ? this.tickets.get(w.key) : null;
       const ticket = entry?.value ?? null;
-      const pr = prLabel(this.prs.get(w.path)?.value);
+      const prValue = this.prs.get(w.path)?.value ?? null;
+      const pr = prLabel(prValue);
+      const extras = [
+
+        prValue?.state === "OPEN" && prValue.autoMerge ? "auto-merge" : null,
+      ].filter(Boolean);
+      const steps = nextSteps(prValue, {
+        working: space?.status === "working",
+      });
+      const step = this.steps.get(w.path);
+      // A success note fades after a minute; a failure stays until the next step.
+      const last =
+        step?.phase === "done" && Date.now() - step.at > NOTE_MS ? null : step;
+      // The row's third line: the last step's note, else these extras.
+      const note = last
+        ? { text: last.text, color: last.phase === "failed" ? t.blocked : t.dim }
+        : extras.length
+          ? { text: extras.join(" · "), color: t.dim }
+          : null;
       const prColor =
         pr?.tone === "bad" ? t.blocked : pr?.tone === "good" ? t.done : t.muted;
       // Only a key Jira says it doesn't know (e.g. "UTF-8" in "fix-utf-8") isn't
@@ -302,6 +441,7 @@ export default class Work extends View {
             .child(
               div()
                 .flex_1()
+                .min_w(64)
                 .truncate()
                 .text_size(12.5)
                 .text_color(t.foreground)
@@ -311,7 +451,9 @@ export default class Work extends View {
             .when(Boolean(pr), (el) =>
               el.child(
                 div()
-                  .flex_none()
+                  .flex_shrink(1)
+                  .min_w(0)
+                  .truncate()
                   .text_size(10.5)
                   .text_color(prColor)
                   .child(pr.text),
@@ -338,6 +480,30 @@ export default class Work extends View {
                     .text_size(10.5)
                     .text_color(t.dim)
                     .child(ticket.status),
+                ),
+              ),
+          ),
+        )
+        .when(steps.length > 0 || Boolean(note), (el) =>
+          el.child(
+            h_flex()
+              .pl(18)
+              .pt(2)
+              .gap(4)
+              .items_center()
+              .children(
+                last?.phase === "running"
+                  ? []
+                  : steps.map((s) => button(w, s)),
+              )
+              .when(Boolean(note), (e) =>
+                e.child(
+                  div()
+                    .flex_1()
+                    .truncate()
+                    .text_size(10.5)
+                    .text_color(note.color)
+                    .child(note.text),
                 ),
               ),
           ),
@@ -389,7 +555,9 @@ export default class Work extends View {
                 .child(String(g.worktrees.length)),
             ),
         )
-        .when(open, (el) => el.children(g.worktrees.map(row)));
+        .when(open, (el) =>
+          el.children(g.worktrees.map((w) => row({ ...w, repo: g.repo }))),
+        );
     };
 
     const body =

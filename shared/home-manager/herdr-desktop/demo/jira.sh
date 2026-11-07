@@ -1,24 +1,35 @@
 # Fake jira-cli for herdr-demo: answers the calls the tickets/work mods make
-# from $HERDR_DEMO_DATA. Wrapped by Nix (writeShellApplication).
-
-data="${HERDR_DEMO_DATA:?}"
-issue='{key, fields: {summary, status: {name: .status}, components: (.components | map({name: .}))}}'
+# from the demo's state (state.sh). Wrapped by Nix (writeShellApplication).
+# `touch $HERDR_DEMO/jira-down` makes every call fail like an unreachable server.
 
 if [ -e "${HERDR_DEMO:?}/jira-down" ]; then
   echo "Error: Get \"https://jira.example.invalid/rest/api/2/...\": dial tcp: connection refused" >&2
   exit 1
 fi
 
+issue='{key, fields: {summary, status: {name: .status}, components: (.components | map({name: .}))}}'
+
 case "${1:-} ${2:-}" in
 "issue list")
-  jq ".tickets | map($issue)" "$data"
+  # The default JQL lists unresolved tickets.
+  state_jq ".tickets | map(select(.status != \"Resolved\") | $issue)"
   ;;
 "issue view")
-  jq -e --arg key "${3:-}" ".tickets[] | select(.key == \$key) | $issue" "$data" ||
+  state_jq -e --arg key "${3:-}" ".tickets[] | select(.key == \$key) | $issue" ||
     {
       echo "Error: issue ${3:-} does not exist" >&2
       exit 1
     }
+  ;;
+"issue move")
+  key="${3:-}"
+  to="${4:-}"
+  state_jq -e --arg key "$key" '.tickets | any(.key == $key)' >/dev/null || {
+    echo "Error: issue $key does not exist" >&2
+    exit 1
+  }
+  state_set --arg key "$key" --arg to "$to" '(.tickets[] | select(.key == $key)).status = $to'
+  echo "✓ Issue transitioned to \"$to\""
   ;;
 "open "*)
   echo "https://jira.example.invalid/browse/${2:-}"

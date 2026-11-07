@@ -36,6 +36,7 @@ import {
   theme,
   props,
   closeOverlay,
+  notify,
   shared,
   setShared,
 } from "herdr";
@@ -52,6 +53,7 @@ import {
   prLabel,
   fill,
   firstLine,
+  moveTicket,
   openUrl,
 } from "./data.js";
 
@@ -375,6 +377,23 @@ export default class Tickets extends View {
     const path =
       existing?.worktree ?? (await addWorktree(repo, branch, { create: true }));
     this.remember(ticket, repo);
+    // Work has started: move the ticket (TRANSITIONS.start) unless it's there.
+    // Before opening the space, which closes this popup and with it any work
+    // still to do here. A failure is reported and doesn't stop anything.
+    const to = C.TRANSITIONS.start;
+    if (to && ticket.status !== to) {
+      this.setAction(
+        { phase: "running", message: `Moving ${ticket.key} to ${to}…` },
+        cx,
+      );
+      await moveTicket(ticket.key, to).catch((e) =>
+        notify({
+          title: `${ticket.key}: couldn't move to ${to}`,
+          body: errorText(e),
+          level: "warning",
+        }),
+      );
+    }
     this.openSpace(
       this.spaceName(ticket, repo),
       path,

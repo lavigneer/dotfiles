@@ -82,7 +82,7 @@ let
   # Our mods. Installed as real files, not links: herdr-app resolves module
   # imports to their real path and refuses ones outside the mod folder (a
   # /nix/store link is), and it writes jsconfig.json and typings into the
-  # folder. So the shared modules (lib.js, data.js, config.js) are copied into
+  # folder. So the shared modules (lib.js, data.js, flow.js, config.js) are copied into
   # each mod.
   configValues = {
     ROOTS = [ "${config.home.homeDirectory}/workspace" ];
@@ -90,6 +90,7 @@ let
     JIRA = lib.getExe pkgs.jira-cli-go;
     GH = lib.getExe config.programs.gh.package;
     GIT = lib.getExe config.programs.git.package;
+    HC = lib.getExe' pkgs.herdr-core "hc";
     JQL = cfg.tickets.jql;
     BRANCH_PREFIX = cfg.tickets.branchPrefix;
     WORKTREE_DIR = cfg.tickets.worktreeDir;
@@ -99,6 +100,8 @@ let
     AGENT = cfg.tickets.agent;
     TASK = cfg.tickets.task;
     EXTRA_BRANCH_TASK = cfg.tickets.extraBranchTask;
+    TRANSITIONS = cfg.tickets.transitions;
+    RESOLUTION = cfg.tickets.resolution;
   };
   configJs =
     name: values:
@@ -122,6 +125,7 @@ let
       "config.js" = configFile;
       "lib.js" = ./lib.js;
       "data.js" = ./data.js;
+      "flow.js" = ./flow.js;
       "main.js" = dir + "/main.js";
       "mod.json" = dir + "/mod.json";
     }) mods;
@@ -219,19 +223,30 @@ let
     : "''${HERDR_DEMO_DATA:=${./demo/data.json}}"
     export HERDR_DEMO HERDR_DEMO_DATA
   '';
+  # The fake Jira/GitHub state every demo tool reads and changes.
+  demoState = demoVars + builtins.readFile ./demo/state.sh;
+  demoInputs = with pkgs; [
+    jq
+    config.programs.git.package
+    coreutils
+    util-linux # flock, setsid
+  ];
   demoTool =
     name: inputs:
     pkgs.writeShellApplication {
       inherit name;
-      runtimeInputs = inputs;
-      text = demoVars + builtins.readFile (./demo + "/${name}.sh");
+      runtimeInputs = demoInputs ++ inputs;
+      # SC2016: jq filters use $vars inside single quotes on purpose.
+      excludeShellChecks = [ "SC2016" ];
+      text = demoState + builtins.readFile (./demo + "/${name}.sh");
     };
-  demoJira = demoTool "jira" [ pkgs.jq ];
-  demoGh = demoTool "gh" [
-    pkgs.jq
-    config.programs.git.package
+  demoJira = demoTool "jira" [ ];
+  demoGh = demoTool "gh" [ ];
+  demoAgent = demoTool "agent" [
+    pkgs.herdr-core # hc, to label its terminal
+    pkgs.gnugrep
+    pkgs.gnused
   ];
-  demoAgent = demoTool "agent" [ config.programs.git.package ];
   demoConfig = configJs "herdr-demo-config.js" (
     configValues
     // {
@@ -248,21 +263,26 @@ let
         WEB = "10gen/web-app";
         API = "otherorg/api";
       };
+      # All three moves, to show them off.
+      TRANSITIONS = {
+        start = "In Progress";
+        review = "In Review";
+        done = "Resolved";
+      };
     }
   );
   herdrDemo = pkgs.writeShellApplication {
     name = "herdr-demo";
-    runtimeInputs = with pkgs; [
-      herdr-desktop
-      jq
-      config.programs.git.package
-      coreutils
-      gnused
-      procps
-      util-linux # setsid
-    ];
+    excludeShellChecks = [ "SC2016" ];
+    runtimeInputs =
+      demoInputs
+      ++ (with pkgs; [
+        herdr-desktop
+        gnused
+        procps
+      ]);
     text =
-      demoVars
+      demoState
       + ''
         install_mods() {
           ${installModsLines "" (modFilesWith demoConfig)}
@@ -339,6 +359,34 @@ in
       type = lib.types.str;
       default = "Work on Jira ticket {key}: {summary}\n\nRun `jira issue view {key} --plain --comments 20` for the description and comments.";
       description = "First message to the agent for a new worktree; {key} and {summary} are filled in.";
+    };
+    transitions = {
+      start = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "In Progress";
+        description = "Jira transition when work on a ticket starts (tickets popup), or null for none.";
+      };
+      review = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "In Review";
+        description = "Jira transition when its PR is marked ready for review (Work sidebar), or null.";
+      };
+      done = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = "Resolved";
+        description = ''
+          Jira transition after the PR merged and Finish cleaned up its worktree,
+          or null. Skipped while other work on the ticket is still open.
+        '';
+      };
+    };
+    resolution = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "Fixed";
+      description = "Resolution set with the `done` transition, if its screen asks for one.";
     };
     extraBranchTask = lib.mkOption {
       type = lib.types.str;

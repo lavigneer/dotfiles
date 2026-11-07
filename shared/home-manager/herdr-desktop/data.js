@@ -363,7 +363,7 @@ export async function prDetails(slug, ref) {
     "--repo",
     slug,
     "--json",
-    "number,url,title,state,isDraft,reviewDecision,statusCheckRollup,headRefName",
+    "number,url,title,state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid,autoMergeRequest",
   ]);
   if (r.code !== 0) {
     const why = firstLine(r.stderr);
@@ -392,7 +392,121 @@ export async function prDetails(slug, ref) {
     review: pr.reviewDecision || null,
     checks,
     branch: pr.headRefName,
+    head: pr.headRefOid,
+    autoMerge: Boolean(pr.autoMergeRequest),
   };
+}
+
+// Unresolved review threads on an open PR (a number), or null if unknown.
+export async function unresolvedThreads(slug, number) {
+  const [owner, name] = slug.split("/");
+  const r = await exec(C.GH, [
+    "api",
+    "graphql",
+    "-F",
+    `owner=${owner}`,
+    "-F",
+    `name=${name}`,
+    "-F",
+    `number=${number}`,
+    "-f",
+    "query=query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { reviewThreads(first: 100) { nodes { isResolved } } } } }",
+    "--jq",
+    "[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved | not)] | length",
+  ]);
+  if (r.code !== 0)
+    throw new Error(firstLine(r.stderr) || "gh api graphql failed");
+  return Number(r.stdout.trim());
+}
+
+const gh = async (args, what) => {
+  const r = await exec(C.GH, args);
+  if (r.code !== 0) throw new Error(firstLine(r.stderr) || `${what} failed`);
+  return r.stdout;
+};
+
+export const markReady = (slug, number) =>
+  gh(["pr", "ready", String(number), "--repo", slug], "gh pr ready");
+
+// The merge method GitHub's web UI offers you first for this repo.
+const mergeMethods = new Map();
+async function defaultMergeMethod(slug) {
+  if (!mergeMethods.has(slug)) {
+    const out = await gh(
+      [
+        "repo",
+        "view",
+        slug,
+        "--json",
+        "viewerDefaultMergeMethod",
+        "--jq",
+        ".viewerDefaultMergeMethod",
+      ],
+      "gh repo view",
+    );
+    mergeMethods.set(slug, out.trim().toLowerCase() || "merge");
+  }
+  return mergeMethods.get(slug);
+}
+
+// Merges a PR now, or with `auto` once its requirements (reviews, checks) are
+// met, using the web UI's default merge method. GitHub deletes the branch.
+export async function mergePr(slug, number, { auto = false } = {}) {
+  const method = await defaultMergeMethod(slug);
+  await gh(
+    [
+      "pr",
+      "merge",
+      String(number),
+      "--repo",
+      slug,
+      `--${method}`,
+      ...(auto ? ["--auto"] : []),
+    ],
+    "gh pr merge",
+  );
+}
+
+// Moves a Jira ticket to `state` (a transition name), with a resolution if given.
+export async function moveTicket(key, state, resolution = null) {
+  const r = await exec(C.JIRA, [
+    "issue",
+    "move",
+    key,
+    state,
+    ...(resolution ? ["--resolution", resolution] : []),
+  ]);
+  if (r.code !== 0)
+    throw new Error(
+      `${key} → ${state}: ${firstLine(r.stderr) || firstLine(r.stdout) || "jira issue move failed"}`,
+    );
+}
+
+// After a merge: removes the worktree and deletes the local branch. Refuses
+// (assertClean) if the worktree has uncommitted changes or commits that aren't
+// in the PR (its head is `prHead`), so nothing unpushed is lost. GitHub has
+// already deleted the remote branch.
+export async function assertClean(path, prHead) {
+  const status = await git(path, "status", "--porcelain");
+  if (status.code !== 0)
+    throw new Error(firstLine(status.stderr) || `can't read ${path}`);
+  if (status.stdout.trim())
+    throw new Error(`${basename(path)} has uncommitted changes`);
+  const head = (await git(path, "rev-parse", "HEAD")).stdout.trim();
+  if (prHead && head !== prHead)
+    throw new Error(
+      `${basename(path)} has commits that aren't in the PR (push or drop them first)`,
+    );
+}
+
+export async function removeWorktree(repo, path, branch, prHead) {
+  await assertClean(path, prHead);
+  const rm = await git(repo.path, "worktree", "remove", path);
+  if (rm.code !== 0)
+    throw new Error(firstLine(rm.stderr) || "git worktree remove failed");
+  // -D: a squash or rebase merge leaves the branch "unmerged" to git.
+  await git(repo.path, "branch", "-D", branch);
+  await git(repo.path, "fetch", "--quiet", "--prune", "origin");
 }
 
 // "#881 draft approved ✓" and a tone for coloring: "bad" | "good" | null.
