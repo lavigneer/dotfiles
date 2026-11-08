@@ -33,6 +33,11 @@
     # of just the bare essentials.
     powerManagement.enable = true;
 
+    # nixpkgs defaults this on for open modules >= 595, replacing the
+    # nvidia-suspend/resume systemd services. That path left the display
+    # dead after resume from S3 on this machine, so use the services instead.
+    powerManagement.kernelSuspendNotifier = false;
+
     # Fine-grained power management. Turns off GPU when not in use.
     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = false;
