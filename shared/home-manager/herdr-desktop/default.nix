@@ -87,7 +87,13 @@ let
   # (Ctrl+Shift+J/F) are left out: those open under the Ctrl+B prefix above.
   sheltieKeys = lib.importJSON "${inputs.sheltie}/keys.json";
 
-  defaultKeys = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/keys.json";
+  # nixpkgs' herdr-desktop omits zstd, which its zstd-sys crate links via
+  # pkg-config. Drop this once the upstream package lists it.
+  herdr-desktop = pkgs.herdr-desktop.overrideAttrs (old: {
+    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.zstd ];
+  });
+
+  defaultKeys = lib.importJSON "${herdr-desktop.src}/defaults/keys.json";
   keys = lib.recursiveUpdate defaultKeys {
     global = tuiKeys;
     "layout:sheltie" = sheltieKeys."layout:sheltie";
@@ -291,7 +297,7 @@ in
 
   config = {
     home.packages = [
-      pkgs.herdr-desktop
+      herdr-desktop
       # Jira Server/Data Center access for the tickets mod. Log in once with
       # `jira init --installation local --auth-type bearer` and a personal access
       # token (kept in JIRA_API_TOKEN, ~/.netrc or the OS keychain).
