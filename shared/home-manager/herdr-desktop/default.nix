@@ -102,6 +102,10 @@ let
       gh = lib.getExe config.programs.gh.package;
       jira = lib.getExe pkgs.jira-cli-go;
       hc = lib.getExe' pkgs.herdr-core "hc";
+      jq = lib.getExe pkgs.jq;
+      curl = lib.getExe pkgs.curl;
+      # Only for opencode's usage (its SQLite database).
+      sqlite3 = lib.getExe pkgs.sqlite;
     };
     inherit (cfg.tickets) tracker github;
     jira = {

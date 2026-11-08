@@ -485,11 +485,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794117038,
-        "narHash": "sha256-ZyKV0a/XxwOFw23V89p4V4FBiCP8KTGJr5DeQ35lqu4=",
+        "lastModified": 1794121584,
+        "narHash": "sha256-t+nsmgz7yp+UYmOBrdY7ttghCNWgMreDR/71cObyz6E=",
         "ref": "refs/heads/main",
-        "rev": "e1c2f2d6098baa5b76c80fe34e2ae61c72ea626c",
-        "revCount": 59,
+        "rev": "736c15c790fe6b8c4cef589bb95fcea13588278a",
+        "revCount": 85,
         "type": "git",
         "url": "ssh://git@github.com/lavigneer/sheltie"
       },
