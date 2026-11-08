@@ -265,11 +265,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794096289,
-        "narHash": "sha256-a8oaB1gf9gUxruw4kKJ8kINa+FqziogffvzWIYpH0J0=",
+        "lastModified": 1794105338,
+        "narHash": "sha256-1SG5fDc84yXdkEEaPDw/a7vSk4fKSKGDt3OGPUuGnX0=",
         "ref": "refs/heads/main",
-        "rev": "9c7b6e62673184428cee274f96c3ec1aaccc77c8",
-        "revCount": 6,
+        "rev": "d700b72df7c4c2dab11edd5e38e9f4e4120a64af",
+        "revCount": 28,
         "type": "git",
         "url": "ssh://git@github.com/lavigneer/herdr-ticket-flow"
       },

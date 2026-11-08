@@ -77,13 +77,20 @@ let
     ))
   ];
 
-  defaultKeys = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/keys.json";
-  keys = lib.recursiveUpdate defaultKeys { global = tuiKeys; };
-
   # The projects, tickets and work mods (and the Claude commands and demo) come
   # from github.com/lavigneer/herdr-ticket-flow; this module only configures them.
   ticketFlow = inputs.herdr-ticket-flow.packages.${pkgs.stdenv.hostPlatform.system}.default;
   ticketFlowShare = "${ticketFlow}/share/herdr-ticket-flow";
+
+  # herdr-ticket-flow's Work sidebar keys (Alt+Shift+arrows/Enter/O/P/T), as
+  # its keys.json ships them. Its popup keys (Ctrl+Shift+J/F) are left out:
+  # those open under the Ctrl+B prefix above.
+  workKeys = lib.filterAttrs (
+    _: action: lib.hasPrefix "work." action
+  ) (lib.importJSON "${inputs.herdr-ticket-flow}/keys.json").global;
+
+  defaultKeys = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/keys.json";
+  keys = lib.recursiveUpdate defaultKeys { global = workKeys // tuiKeys; };
 
   # The mods' settings (ticket-flow.json in the app home), from the options below.
   ticketFlowSettings = {
