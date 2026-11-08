@@ -141,6 +141,8 @@
   # Machine-specific garbage collection settings (override platform defaults)
   nix.gc = {
     dates = "weekly";
-    options = "--delete-older-than 60d"; # Keep history longer than the 30d platform default
+    # Shorter than the 30d platform default: the gaming/NVIDIA closures are
+    # large and 60d of generations filled the 183G root disk.
+    options = "--delete-older-than 14d";
   };
 }
