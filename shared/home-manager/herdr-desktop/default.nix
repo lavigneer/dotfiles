@@ -120,8 +120,9 @@ let
     builtins.toJSON {
       font = "JetBrainsMono Nerd Font";
       font_size = 12;
-      # Dark half of the layout's theme; pick Kanagawa once with the theme
-      # picker (or `herdr-app do app.theme --name kanagawa`).
+      # Kanagawa (themes/kanagawa.json, below), for the layouts without a
+      # theme of their own (main, sheltie).
+      theme = "kanagawa";
       appearance = "dark";
       # The Nix build never sends telemetry (only release builds do); this
       # keeps it off if the binary ever changes.
@@ -334,12 +335,20 @@ in
     };
 
     home.activation.herdrAppMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      # sheltie's layout (Herdr with the Work sidebar): switch to it once with
-      # `herdr-app do layout.switch --name sheltie`.
+      # sheltie's layout (Herdr with the Work sidebar), shown by default: the
+      # shown layout is "layout" in shared.json, the app's own state file.
       layouts="${config.xdg.configHome}/herdr-app/layouts"
       run mkdir -p "$layouts"
       run rm -f "$layouts/work.json"
       run install -m 644 ${sheltieShare}/layouts/sheltie.json ${sheltieShare}/layouts/sheltie.svg "$layouts/"
+      shared="${config.xdg.configHome}/herdr-app/shared.json"
+      if [ -f "$shared" ]; then
+        tmp="$(mktemp "$shared.XXXXXX")"
+        ${lib.getExe pkgs.jq} '.layout = "sheltie"' "$shared" > "$tmp"
+        run mv "$tmp" "$shared"
+      else
+        run install -m 644 ${pkgs.writeText "herdr-app-shared.json" (builtins.toJSON { layout = "sheltie"; })} "$shared"
+      fi
 
       # Real copies, not links: herdr-app resolves module imports to their real
       # path and refuses ones outside the mod folder (a /nix/store link is), and
