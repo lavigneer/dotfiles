@@ -77,23 +77,24 @@ let
     ))
   ];
 
-  # The projects, tickets and work mods (and the Claude commands and demo) come
-  # from github.com/lavigneer/herdr-ticket-flow; this module only configures them.
-  ticketFlow = inputs.herdr-ticket-flow.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  ticketFlowShare = "${ticketFlow}/share/herdr-ticket-flow";
+  # The projects, tickets and work mods (and the agent skills and demo) come
+  # from github.com/lavigneer/sheltie; this module only configures them.
+  sheltie = inputs.sheltie.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  sheltieShare = "${sheltie}/share/sheltie";
 
-  # herdr-ticket-flow's Work sidebar keys (Alt+Shift+arrows/Enter/O/P/T), as
-  # its keys.json ships them. Its popup keys (Ctrl+Shift+J/F) are left out:
-  # those open under the Ctrl+B prefix above.
-  workKeys = lib.filterAttrs (
-    _: action: lib.hasPrefix "work." action
-  ) (lib.importJSON "${inputs.herdr-ticket-flow}/keys.json").global;
+  # sheltie's keys.json: its Work sidebar keys (Alt+Shift+arrows/Enter/O/P/T)
+  # live in the "layout:sheltie" section. Its global popup keys
+  # (Ctrl+Shift+J/F) are left out: those open under the Ctrl+B prefix above.
+  sheltieKeys = lib.importJSON "${inputs.sheltie}/keys.json";
 
   defaultKeys = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/keys.json";
-  keys = lib.recursiveUpdate defaultKeys { global = workKeys // tuiKeys; };
+  keys = lib.recursiveUpdate defaultKeys {
+    global = tuiKeys;
+    "layout:sheltie" = sheltieKeys."layout:sheltie";
+  };
 
-  # The mods' settings (ticket-flow.json in the app home), from the options below.
-  ticketFlowSettings = {
+  # The mods' settings (sheltie.json in the app home), from the options below.
+  sheltieSettings = {
     roots = [ "${config.home.homeDirectory}/workspace" ];
     depth = 1;
     programs = {
@@ -113,33 +114,6 @@ let
     branch = "${cfg.tickets.branchPrefix}{ref}";
     agent.argv = cfg.tickets.agent;
   };
-
-  # The shipped main layout with the work outline between Spaces and Agents.
-  # A copy, so it won't pick up changes to Herdr's main layout; regenerated
-  # from the installed version on every rebuild.
-  mainLayout = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/layouts/main.json";
-  addWork =
-    node:
-    if node.id or null == "sidebar-lists" then
-      node
-      // {
-        children = lib.concatMap (
-          child:
-          [ child ]
-          ++ lib.optional (child.id or null == "spaces") {
-            id = "work-outline";
-            type = "block";
-            content.mod = "work";
-            size.weight = 1;
-            min = 90;
-          }
-        ) node.children;
-      }
-    else if node ? children then
-      node // { children = map addWork node.children; }
-    else
-      node;
-  workLayout = pkgs.writeText "herdr-app-work-layout.json" (builtins.toJSON (addWork mainLayout));
 
   # Settings Nix owns; merged into settings.json on every activation (below).
   managedSettings = pkgs.writeText "herdr-app-settings.json" (
@@ -200,7 +174,7 @@ in
       repos = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
-        example = [ "lavigneer/herdr-ticket-flow" ];
+        example = [ "lavigneer/sheltie" ];
         description = "With the GitHub tracker: only issues in these repos (owner/repo); empty: anywhere.";
       };
       assignee = lib.mkOption {
@@ -318,8 +292,8 @@ in
       # token (kept in JIRA_API_TOKEN, ~/.netrc or the OS keychain).
       pkgs.jira-cli-go
       # herdr-demo (the mods against fake tickets/PRs/repos in a separate Herdr
-      # app) and herdr-ticket-flow-install.
-      ticketFlow
+      # app) and sheltie-install.
+      sheltie
     ];
 
     # Default terminal for the window managers (Super+Return) and $TERMINAL.
@@ -356,21 +330,23 @@ in
       "herdr-app/themes/kanagawa.json".text = builtins.toJSON kanagawa;
 
       # The mods only read their settings.
-      "herdr-app/ticket-flow.json".text = builtins.toJSON ticketFlowSettings;
+      "herdr-app/sheltie.json".text = builtins.toJSON sheltieSettings;
     };
 
     home.activation.herdrAppMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      # The "work" layout: switch to it once with `herdr-app do layout.switch --name work`.
+      # sheltie's layout (Herdr with the Work sidebar): switch to it once with
+      # `herdr-app do layout.switch --name sheltie`.
       layouts="${config.xdg.configHome}/herdr-app/layouts"
       run mkdir -p "$layouts"
-      run install -m 644 ${workLayout} "$layouts/work.json"
+      run rm -f "$layouts/work.json"
+      run install -m 644 ${sheltieShare}/layouts/sheltie.json ${sheltieShare}/layouts/sheltie.svg "$layouts/"
 
       # Real copies, not links: herdr-app resolves module imports to their real
       # path and refuses ones outside the mod folder (a /nix/store link is), and
       # writes jsconfig.json and typings into it.
       mods="${config.xdg.configHome}/herdr-app/mods"
       run mkdir -p "$mods"
-      for mod in ${ticketFlowShare}/mods/*; do
+      for mod in ${sheltieShare}/mods/*; do
         name="$(basename "$mod")"
         run rm -rf "$mods/$name"
         run cp -R "$mod" "$mods/$name"

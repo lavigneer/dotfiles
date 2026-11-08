@@ -5,24 +5,24 @@
   ...
 }:
 let
-  # Slash commands for the ticket workflow (/draft-pr, /address-comments,
-  # /fix-ci), from github.com/lavigneer/herdr-ticket-flow. The herdr-desktop
-  # Work sidebar sends them to a ticket's Claude session; they work the same
-  # typed by hand.
+  # Agent skills for the ticket workflow (/draft-pr, /address-comments,
+  # /fix-ci, /resolve-conflicts), from github.com/lavigneer/sheltie. The
+  # herdr-desktop Work sidebar sends them to a ticket's Claude session; they
+  # work the same typed by hand.
   # From the repo's source (listing a built package's files would make Nix
   # build it while evaluating).
-  commandsDir = inputs.herdr-ticket-flow + "/agents/claude";
-  commands = lib.mapAttrs' (
+  skillsDir = inputs.sheltie + "/skills";
+  skills = lib.mapAttrs' (
     name: _:
-    lib.nameValuePair ".claude/commands/${name}" {
-      source = commandsDir + "/${name}";
+    lib.nameValuePair ".claude/skills/${name}" {
+      source = skillsDir + "/${name}";
     }
-  ) (builtins.readDir commandsDir);
+  ) (builtins.readDir skillsDir);
 in
 {
   home.packages = with pkgs; [
     claude-code
   ];
 
-  home.file = commands;
+  home.file = skills;
 }

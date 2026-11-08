@@ -35,7 +35,7 @@ shared/
 │   ├── tmux.nix              # Tmux configuration
 │   ├── herdr.nix             # Herdr terminal multiplexer configuration
 │   ├── herdr-desktop/        # Herdr desktop app: settings, keys, projects/tickets/work mods
-│   ├── claude.nix            # Claude Code, plus the herdr-ticket-flow commands
+│   ├── claude.nix            # Claude Code, plus the sheltie skills
 │   ├── terminals.nix         # Terminal emulators (ghostty)
 │   ├── zed.nix               # Zed editor
 │   ├── browser.nix           # Web browser (Chrome)
@@ -221,10 +221,10 @@ Manager activation. After the first install, restart the Herdr server once with
 ### Ticket workflow (herdr-desktop, NixOS)
 
 The tickets popup (Ctrl+B t), Work sidebar, projects picker (Ctrl+B f), the
-Claude commands (`/draft-pr`, `/address-comments`, `/fix-ci`) and `herdr-demo`
-come from [herdr-ticket-flow](https://github.com/lavigneer/herdr-ticket-flow), a
+Claude skills (`/draft-pr`, `/address-comments`, `/fix-ci`, `/resolve-conflicts`), the `sheltie` layout and `herdr-demo`
+come from [sheltie](https://github.com/lavigneer/sheltie), a
 flake input. `shared/home-manager/herdr-desktop` installs its mods and writes
-their settings (`~/.config/herdr-app/ticket-flow.json`) from the
+their settings (`~/.config/herdr-app/sheltie.json`) from the
 `herdrDesktop.tickets` options; that repo's README documents the workflow.
 `rebuild-nix` fetches the (private) input as you before the root rebuild.
 

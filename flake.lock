@@ -258,26 +258,6 @@
         "type": "gitlab"
       }
     },
-    "herdr-ticket-flow": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1794105338,
-        "narHash": "sha256-1SG5fDc84yXdkEEaPDw/a7vSk4fKSKGDt3OGPUuGnX0=",
-        "ref": "refs/heads/main",
-        "rev": "d700b72df7c4c2dab11edd5e38e9f4e4120a64af",
-        "revCount": 28,
-        "type": "git",
-        "url": "ssh://git@github.com/lavigneer/herdr-ticket-flow"
-      },
-      "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/lavigneer/herdr-ticket-flow"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -469,13 +449,13 @@
     "root": {
       "inputs": {
         "flox": "flox",
-        "herdr-ticket-flow": "herdr-ticket-flow",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-darwin": "nixpkgs-darwin",
         "nixvim": "nixvim",
         "nvim-lsp-endhints": "nvim-lsp-endhints",
+        "sheltie": "sheltie",
         "sidekick-nvim": "sidekick-nvim",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix"
@@ -496,6 +476,26 @@
         "ref": "nightly",
         "repo": "rust-analyzer",
         "type": "github"
+      }
+    },
+    "sheltie": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794117038,
+        "narHash": "sha256-ZyKV0a/XxwOFw23V89p4V4FBiCP8KTGJr5DeQ35lqu4=",
+        "ref": "refs/heads/main",
+        "rev": "e1c2f2d6098baa5b76c80fe34e2ae61c72ea626c",
+        "revCount": 59,
+        "type": "git",
+        "url": "ssh://git@github.com/lavigneer/sheltie"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/lavigneer/sheltie"
       }
     },
     "sidekick-nvim": {
