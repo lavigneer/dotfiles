@@ -17,6 +17,10 @@ let
 
     echo "Rebuilding system: $HOSTNAME"
 
+    # Fetch every flake input into the store as you first: the rebuild runs as
+    # root, which can't fetch private inputs over your SSH key.
+    nix flake archive "$FLAKE_PATH" >/dev/null
+
     if [[ "${toString isDarwin}" == "1" ]]; then
       echo "Detected Darwin system - running darwin-rebuild..."
       sudo darwin-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"

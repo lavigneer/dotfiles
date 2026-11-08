@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -79,72 +80,32 @@ let
   defaultKeys = lib.importJSON "${pkgs.herdr-desktop.src}/defaults/keys.json";
   keys = lib.recursiveUpdate defaultKeys { global = tuiKeys; };
 
-  # Our mods. Installed as real files, not links: herdr-app resolves module
-  # imports to their real path and refuses ones outside the mod folder (a
-  # /nix/store link is), and it writes jsconfig.json and typings into the
-  # folder. So the shared modules (lib.js, data.js, flow.js, config.js) are copied into
-  # each mod.
-  configValues = {
-    ROOTS = [ "${config.home.homeDirectory}/workspace" ];
-    DEPTH = 1;
-    JIRA = lib.getExe pkgs.jira-cli-go;
-    GH = lib.getExe config.programs.gh.package;
-    GIT = lib.getExe config.programs.git.package;
-    HC = lib.getExe' pkgs.herdr-core "hc";
-    JQL = cfg.tickets.jql;
-    BRANCH_PREFIX = cfg.tickets.branchPrefix;
-    WORKTREE_DIR = cfg.tickets.worktreeDir;
-    GITHUB_OWNERS = cfg.tickets.githubOwners;
-    PROJECTS = cfg.tickets.projects;
-    COMPONENTS = cfg.tickets.components;
-    AGENT = cfg.tickets.agent;
-    TASK = cfg.tickets.task;
-    EXTRA_BRANCH_TASK = cfg.tickets.extraBranchTask;
-    TRANSITIONS = cfg.tickets.transitions;
-    RESOLUTION = cfg.tickets.resolution;
-  };
-  configJs =
-    name: values:
-    pkgs.writeText name (
-      "// Written by Nix (shared/home-manager/herdr-desktop/default.nix).\n"
-      + lib.concatStrings (
-        lib.mapAttrsToList (k: v: "export const ${k} = ${builtins.toJSON v};\n") values
-      )
-    );
-  mods = {
-    # Sessionizer-style project picker (prefix+f)
-    projects = ./projects;
-    # Jira ticket -> worktree -> agent popup (prefix+t)
-    tickets = ./tickets;
-    # Repo -> worktree outline for the sidebar (in the "work" layout)
-    work = ./work;
-  };
-  modFilesWith =
-    configFile:
-    lib.mapAttrs (_: dir: {
-      "config.js" = configFile;
-      "lib.js" = ./lib.js;
-      "data.js" = ./data.js;
-      "flow.js" = ./flow.js;
-      "main.js" = dir + "/main.js";
-      "mod.json" = dir + "/mod.json";
-    }) mods;
+  # The projects, tickets and work mods (and the Claude commands and demo) come
+  # from github.com/lavigneer/herdr-ticket-flow; this module only configures them.
+  ticketFlow = inputs.herdr-ticket-flow.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  ticketFlowShare = "${ticketFlow}/share/herdr-ticket-flow";
 
-  # Shell lines copying the mods into "$1"/<mod>/ as real files; `run` is
-  # Home Manager's dry-run-aware wrapper, or nothing for the demo.
-  installModsLines =
-    run: modFiles:
-    lib.concatStrings (
-      lib.mapAttrsToList (mod: files: ''
-        ${run} mkdir -p "$1/${mod}"
-        ${lib.concatStrings (
-          lib.mapAttrsToList (name: source: ''
-            if [[ -L "$1/${mod}/${name}" ]]; then ${run} rm "$1/${mod}/${name}"; fi
-            ${run} install -m 644 ${source} "$1/${mod}/${name}"
-          '') files
-        )}
-      '') modFiles
-    );
+  # The mods' settings (ticket-flow.json in the app home), from the options below.
+  ticketFlowSettings = {
+    roots = [ "${config.home.homeDirectory}/workspace" ];
+    depth = 1;
+    programs = {
+      git = lib.getExe config.programs.git.package;
+      gh = lib.getExe config.programs.gh.package;
+      jira = lib.getExe pkgs.jira-cli-go;
+      hc = lib.getExe' pkgs.herdr-core "hc";
+    };
+    tracker = "jira";
+    jira = {
+      inherit (cfg.tickets) jql transitions resolution;
+    };
+    inherit (cfg.tickets) githubOwners worktreeDir;
+    repoRules =
+      lib.mapAttrsToList (component: repo: { inherit component repo; }) cfg.tickets.components
+      ++ lib.mapAttrsToList (project: repo: { inherit project repo; }) cfg.tickets.projects;
+    branch = "${cfg.tickets.branchPrefix}{ref}";
+    agent.argv = cfg.tickets.agent;
+  };
 
   # The shipped main layout with the work outline between Spaces and Agents.
   # A copy, so it won't pick up changes to Herdr's main layout; regenerated
@@ -217,86 +178,6 @@ let
       ];
     };
 
-  # herdr-demo: a separate Herdr app over fake tickets, PRs and repos (see demo/).
-  demoVars = ''
-    : "''${HERDR_DEMO:=''${XDG_STATE_HOME:-$HOME/.local/state}/herdr-demo}"
-    : "''${HERDR_DEMO_DATA:=${./demo/data.json}}"
-    export HERDR_DEMO HERDR_DEMO_DATA
-  '';
-  # The fake Jira/GitHub state every demo tool reads and changes.
-  demoState = demoVars + builtins.readFile ./demo/state.sh;
-  demoInputs = with pkgs; [
-    jq
-    config.programs.git.package
-    coreutils
-    util-linux # flock, setsid
-  ];
-  demoTool =
-    name: inputs:
-    pkgs.writeShellApplication {
-      inherit name;
-      runtimeInputs = demoInputs ++ inputs;
-      # SC2016: jq filters use $vars inside single quotes on purpose.
-      excludeShellChecks = [ "SC2016" ];
-      text = demoState + builtins.readFile (./demo + "/${name}.sh");
-    };
-  demoJira = demoTool "jira" [ ];
-  demoGh = demoTool "gh" [ ];
-  demoAgent = demoTool "agent" [
-    pkgs.herdr-core # hc, to label its terminal
-    pkgs.gnugrep
-    pkgs.gnused
-  ];
-  demoConfig = configJs "herdr-demo-config.js" (
-    configValues
-    // {
-      ROOTS = [ "@HERDR_DEMO@/ws" ];
-      JIRA = lib.getExe demoJira;
-      GH = lib.getExe demoGh;
-      AGENT = [ (lib.getExe demoAgent) ];
-      GITHUB_OWNERS = [ "10gen" ];
-      COMPONENTS = {
-        Fern = "10gen/fern";
-        Docs = "10gen/docs";
-      };
-      PROJECTS = {
-        WEB = "10gen/web-app";
-        API = "otherorg/api";
-      };
-      # All three moves, to show them off.
-      TRANSITIONS = {
-        start = "In Progress";
-        review = "In Review";
-        done = "Resolved";
-      };
-    }
-  );
-  herdrDemo = pkgs.writeShellApplication {
-    name = "herdr-demo";
-    excludeShellChecks = [ "SC2016" ];
-    runtimeInputs =
-      demoInputs
-      ++ (with pkgs; [
-        herdr-desktop
-        gnused
-        procps
-      ]);
-    text =
-      demoState
-      + ''
-        install_mods() {
-          ${installModsLines "" (modFilesWith demoConfig)}
-        }
-        install_app_files() {
-          mkdir -p "$1/layouts" "$1/themes"
-          install -m 644 ${pkgs.writeText "keys.json" (builtins.toJSON keys)} "$1/keys.json"
-          install -m 644 ${managedSettings} "$1/settings.json"
-          install -m 644 ${pkgs.writeText "kanagawa.json" (builtins.toJSON kanagawa)} "$1/themes/kanagawa.json"
-          install -m 644 ${workLayout} "$1/layouts/work.json"
-        }
-      ''
-      + builtins.readFile ./demo/herdr-demo.sh;
-  };
 in
 {
   options.herdrDesktop.tickets = {
@@ -355,11 +236,6 @@ in
       default = [ "claude" ];
       description = "Agent started in a ticket's space.";
     };
-    task = lib.mkOption {
-      type = lib.types.str;
-      default = "Work on Jira ticket {key}: {summary}\n\nRun `jira issue view {key} --plain --comments 20` for the description and comments.";
-      description = "First message to the agent for a new worktree; {key} and {summary} are filled in.";
-    };
     transitions = {
       start = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
@@ -388,15 +264,6 @@ in
       example = "Fixed";
       description = "Resolution set with the `done` transition, if its screen asks for one.";
     };
-    extraBranchTask = lib.mkOption {
-      type = lib.types.str;
-      default = "Start another piece of work for Jira ticket {key}: {summary}\n\nCreate a git worktree under {worktreeDir}/ in this repo on a new branch named {prefix}{key}-<short-description> (pick a short kebab-case description of the change), then work in it. Run `jira issue view {key} --plain --comments 20` for the description and comments.";
-      description = ''
-        First message to the agent asked for another branch of a ticket in a repo
-        that already has one; it names and creates the branch itself. {key},
-        {summary}, {prefix} and {worktreeDir} are filled in.
-      '';
-    };
   };
 
   config = {
@@ -406,8 +273,9 @@ in
       # `jira init --installation local --auth-type bearer` and a personal access
       # token (kept in JIRA_API_TOKEN, ~/.netrc or the OS keychain).
       pkgs.jira-cli-go
-      # Try the mods against fake tickets/PRs/repos in a separate Herdr app.
-      herdrDemo
+      # herdr-demo (the mods against fake tickets/PRs/repos in a separate Herdr
+      # app) and herdr-ticket-flow-install.
+      ticketFlow
     ];
 
     # Default terminal for the window managers (Super+Return) and $TERMINAL.
@@ -442,6 +310,9 @@ in
       };
 
       "herdr-app/themes/kanagawa.json".text = builtins.toJSON kanagawa;
+
+      # The mods only read their settings.
+      "herdr-app/ticket-flow.json".text = builtins.toJSON ticketFlowSettings;
     };
 
     home.activation.herdrAppMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
@@ -450,10 +321,17 @@ in
       run mkdir -p "$layouts"
       run install -m 644 ${workLayout} "$layouts/work.json"
 
-      install_mods() {
-        ${installModsLines "run" (modFilesWith (configJs "herdr-app-mods-config.js" configValues))}
-      }
-      install_mods "${config.xdg.configHome}/herdr-app/mods"
+      # Real copies, not links: herdr-app resolves module imports to their real
+      # path and refuses ones outside the mod folder (a /nix/store link is), and
+      # writes jsconfig.json and typings into it.
+      mods="${config.xdg.configHome}/herdr-app/mods"
+      run mkdir -p "$mods"
+      for mod in ${ticketFlowShare}/mods/*; do
+        name="$(basename "$mod")"
+        run rm -rf "$mods/$name"
+        run cp -R "$mod" "$mods/$name"
+        run chmod -R u+w "$mods/$name"
+      done
     '';
   };
 }

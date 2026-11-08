@@ -35,7 +35,7 @@ shared/
 │   ├── tmux.nix              # Tmux configuration
 │   ├── herdr.nix             # Herdr terminal multiplexer configuration
 │   ├── herdr-desktop/        # Herdr desktop app: settings, keys, projects/tickets/work mods
-│   ├── claude.nix            # Claude Code, plus the /draft-pr, /address-comments, /fix-ci commands
+│   ├── claude.nix            # Claude Code, plus the herdr-ticket-flow commands
 │   ├── terminals.nix         # Terminal emulators (ghostty)
 │   ├── zed.nix               # Zed editor
 │   ├── browser.nix           # Web browser (Chrome)
@@ -220,21 +220,13 @@ Manager activation. After the first install, restart the Herdr server once with
 
 ### Ticket workflow (herdr-desktop, NixOS)
 
-- **Ctrl+B t** lists your Jira tickets. Enter creates the `lavigneer/KEY`
-  worktree, opens a space, and starts Claude on the ticket; with
-  `herdrDesktop.tickets.transitions.start` set, it also moves the ticket.
-- The **Work** sidebar shows each worktree's PR and offers its next step:
-  - **Draft PR**, **Fix CI**, **Address comments** send `/draft-pr`, `/fix-ci`,
-    `/address-comments` to that space's Claude.
-  - **Ready** marks the PR ready for review and turns on auto-merge (with the
-    merge method GitHub's web UI defaults to) when the repo requires reviews.
-  - **Merge** shows when a PR is approved and green without auto-merge.
-  - **Finish** (click twice) runs after the merge. It closes the space and
-    removes the worktree and local branch, refusing if anything isn't in the PR,
-    then moves the ticket to `transitions.done` (`Resolved` by default).
-- Notifications tell you when CI finishes, review comments or a review arrive,
-  or the PR merges.
-- Try it all against fake data with `herdr-demo`, which prints the steps.
+The tickets popup (Ctrl+B t), Work sidebar, projects picker (Ctrl+B f), the
+Claude commands (`/draft-pr`, `/address-comments`, `/fix-ci`) and `herdr-demo`
+come from [herdr-ticket-flow](https://github.com/lavigneer/herdr-ticket-flow), a
+flake input. `shared/home-manager/herdr-desktop` installs its mods and writes
+their settings (`~/.config/herdr-app/ticket-flow.json`) from the
+`herdrDesktop.tickets` options; that repo's README documents the workflow.
+`rebuild-nix` fetches the (private) input as you before the root rebuild.
 
 ## 🤝 Contributing
 

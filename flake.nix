@@ -49,6 +49,13 @@
     flox = {
       url = "github:flox/flox/latest";
     };
+
+    # Herdr desktop mods: ticket -> worktree -> agent -> PR (private repo, so
+    # over SSH; rebuild-nix fetches inputs as you before the sudo rebuild).
+    herdr-ticket-flow = {
+      url = "git+ssh://git@github.com/lavigneer/herdr-ticket-flow";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
