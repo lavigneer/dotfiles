@@ -126,7 +126,9 @@
   # via the "i3lock" PAM service. The custom i3 session above doesn't enable
   # NixOS's i3 module, so nothing creates it and PAM falls back to "other",
   # which denies every password. (Sway's programs.sway adds swaylock's.)
-  security.pam.services.i3lock = { };
+  # nixpkgs gates the PAM service on programs.i3lock.enable (mkDefault), so
+  # declaring security.pam.services.i3lock alone leaves it disabled.
+  programs.i3lock.enable = true;
 
   # Sway (Wayland). Registers a "Sway" session in the login screen; the sway
   # config itself comes from ../../linux/modules/window-managers/sway.nix.
