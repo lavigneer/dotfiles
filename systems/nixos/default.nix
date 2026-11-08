@@ -48,6 +48,10 @@
       sway.enable = true;
     };
 
+    # Personal projects track their work in GitHub issues (open ones assigned
+    # to me, in any repo); branches are lavigneer/issue-<number>.
+    herdrDesktop.tickets.tracker = "github";
+
     accounts.email.accounts = {
       "Hotmail" = {
         primary = true;

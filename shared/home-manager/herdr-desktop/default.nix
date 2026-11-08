@@ -95,7 +95,7 @@ let
       jira = lib.getExe pkgs.jira-cli-go;
       hc = lib.getExe' pkgs.herdr-core "hc";
     };
-    tracker = "jira";
+    inherit (cfg.tickets) tracker github;
     jira = {
       inherit (cfg.tickets) jql transitions resolution;
     };
@@ -181,6 +181,43 @@ let
 in
 {
   options.herdrDesktop.tickets = {
+    tracker = lib.mkOption {
+      type = lib.types.enum [
+        "jira"
+        "github"
+      ];
+      default = "jira";
+      description = "Where tickets come from: Jira (jira-cli) or GitHub issues (gh).";
+    };
+    github = {
+      repos = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        example = [ "lavigneer/herdr-ticket-flow" ];
+        description = "With the GitHub tracker: only issues in these repos (owner/repo); empty: anywhere.";
+      };
+      assignee = lib.mkOption {
+        type = lib.types.str;
+        default = "@me";
+        description = "With the GitHub tracker: list open issues assigned to this user.";
+      };
+      search = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        example = "label:bug";
+        description = "With the GitHub tracker: extra GitHub search terms.";
+      };
+      ref = lib.mkOption {
+        type = lib.types.str;
+        default = "issue-{number}";
+        description = "With the GitHub tracker: an issue's part of a branch name.";
+      };
+      closeOnFinish = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "With the GitHub tracker: close the issue at Finish if merging didn't.";
+      };
+    };
     components = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
