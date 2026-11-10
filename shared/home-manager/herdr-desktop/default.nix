@@ -83,7 +83,7 @@ let
   sheltieShare = "${sheltie}/share/sheltie";
 
   # sheltie's keys.json: its Work sidebar keys (Alt+Shift+arrows/Enter/O/P/T)
-  # live in the "layout:sheltie" section. Its global popup keys
+  # live in the "layout:work" section (plus "layout:review"). Its global popup keys
   # (Ctrl+Shift+J/F) are left out: those open under the Ctrl+B prefix above.
   sheltieKeys = lib.importJSON "${inputs.sheltie}/keys.json";
 
@@ -96,7 +96,8 @@ let
   defaultKeys = lib.importJSON "${herdr-desktop.src}/defaults/keys.json";
   keys = lib.recursiveUpdate defaultKeys {
     global = tuiKeys;
-    "layout:sheltie" = sheltieKeys."layout:sheltie";
+    "layout:work" = sheltieKeys."layout:work";
+    "layout:review" = sheltieKeys."layout:review";
   };
 
   # The mods' settings (sheltie.json in the app home), from the options below.
@@ -345,19 +346,20 @@ in
     };
 
     home.activation.herdrAppMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      # sheltie's layout (Herdr with the Work sidebar), shown by default: the
+      # sheltie's layouts (Work, shown by default, and Review; Herdr with the Work sidebar), shown by default: the
       # shown layout is "layout" in shared.json, the app's own state file.
       layouts="${config.xdg.configHome}/herdr-app/layouts"
       run mkdir -p "$layouts"
-      run rm -f "$layouts/work.json"
-      run install -m 644 ${sheltieShare}/layouts/sheltie.json ${sheltieShare}/layouts/sheltie.svg "$layouts/"
+      run rm -f "$layouts/sheltie.json" "$layouts/sheltie.svg"
+      run install -m 644 ${sheltieShare}/layouts/work.json ${sheltieShare}/layouts/work.svg \
+        ${sheltieShare}/layouts/review.json ${sheltieShare}/layouts/review.svg "$layouts/"
       shared="${config.xdg.configHome}/herdr-app/shared.json"
       if [ -f "$shared" ]; then
         tmp="$(mktemp "$shared.XXXXXX")"
-        ${lib.getExe pkgs.jq} '.layout = "sheltie"' "$shared" > "$tmp"
+        ${lib.getExe pkgs.jq} '.layout = "work"' "$shared" > "$tmp"
         run mv "$tmp" "$shared"
       else
-        run install -m 644 ${pkgs.writeText "herdr-app-shared.json" (builtins.toJSON { layout = "sheltie"; })} "$shared"
+        run install -m 644 ${pkgs.writeText "herdr-app-shared.json" (builtins.toJSON { layout = "work"; })} "$shared"
       fi
 
       # Real copies, not links: herdr-app resolves module imports to their real

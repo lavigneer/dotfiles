@@ -265,11 +265,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793979366,
-        "narHash": "sha256-7OoWDsYO9teiPxl0QdlS5lYE20Pue8/5mpscSL32FUA=",
+        "lastModified": 1794278858,
+        "narHash": "sha256-rkrJwLgLSHBnXfgoSKIDa+2LLGdTqynsV3GAxOTGhUU=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2c0c1f01521469cf0271180c453c79782d53c2f6",
+        "rev": "82ce401aa350502897c3f2e85f384d61cd3b0b6d",
         "type": "github"
       },
       "original": {
@@ -485,11 +485,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794177373,
-        "narHash": "sha256-GDEqCpIZsYMAZ9roCySWDs9oOaPc38OWh1aaL6bl0pk=",
+        "lastModified": 1794284688,
+        "narHash": "sha256-dZh+nJ3UNMvPJyBbiwQYAqlocmOh8RgeU3/QU0MwYzU=",
         "ref": "refs/heads/main",
-        "rev": "d79917ca42a75142baa81ef5bfc773f1e433b0ef",
-        "revCount": 189,
+        "rev": "98020c91387440455693346099f09884372d5861",
+        "revCount": 284,
         "type": "git",
         "url": "ssh://git@github.com/lavigneer/sheltie"
       },
