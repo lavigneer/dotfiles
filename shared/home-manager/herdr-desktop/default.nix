@@ -7,8 +7,8 @@
 }:
 
 # Herdr desktop app (herdr-app): a GUI for persistent terminals and coding
-# agents, backed by its own herdr-core server. Separate from the `herdr` TUI
-# configured in ../herdr.nix. Imported per machine; becomes the default terminal.
+# agents, backed by its own herdr-core server. Imported per machine; becomes
+# the default terminal.
 #
 # Docs for everything under ~/.config/herdr-app:
 # https://github.com/herdrdev/herdr-app/blob/main/defaults/AGENTS.md
@@ -16,7 +16,7 @@
 let
   cfg = config.herdrDesktop;
 
-  # Bindings resembling the herdr TUI (../herdr.nix plus the TUI's defaults),
+  # Bindings resembling the herdr TUI (its defaults plus our old tmux-style keys),
   # added on top of herdr-app's own default keys. Prefix keys are GPUI key
   # sequences ("ctrl-b h": Ctrl+B, then H). Shifted punctuation is bound under
   # both spellings ("ctrl-b %" and "ctrl-b shift-%"), as herdr-app's own
@@ -359,7 +359,9 @@ in
         ${lib.getExe pkgs.jq} '.layout = "work"' "$shared" > "$tmp"
         run mv "$tmp" "$shared"
       else
-        run install -m 644 ${pkgs.writeText "herdr-app-shared.json" (builtins.toJSON { layout = "work"; })} "$shared"
+        run install -m 644 ${
+          pkgs.writeText "herdr-app-shared.json" (builtins.toJSON { layout = "work"; })
+        } "$shared"
       fi
 
       # Real copies, not links: herdr-app resolves module imports to their real

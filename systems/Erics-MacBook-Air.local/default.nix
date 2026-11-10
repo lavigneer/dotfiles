@@ -35,8 +35,8 @@
       ../../shared/home-manager/git.nix
       ../../shared/home-manager/zsh.nix
       ../../shared/home-manager/nixvim
-      ../../shared/home-manager/tmux.nix
       ../../shared/home-manager/terminals.nix
+      ../../shared/home-manager/herdr-desktop
       ../../shared/home-manager/docker.nix
       ../../shared/home-manager/discord.nix
       ../../shared/home-manager/browser.nix
@@ -46,6 +46,9 @@
       ../../darwin/modules/programs/raycast.nix
       ../../darwin/modules/programs/pinentry.nix
     ];
+
+    # Personal projects track their work in GitHub issues, as on NixOS.
+    herdrDesktop.tickets.tracker = "github";
 
     # macOS-specific tools and utilities
     home.packages = with pkgs; [ ];

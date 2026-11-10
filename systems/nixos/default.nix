@@ -28,7 +28,6 @@
       ../../shared/home-manager/git.nix
       ../../shared/home-manager/zsh.nix
       ../../shared/home-manager/nixvim
-      ../../shared/home-manager/tmux.nix
       ../../shared/home-manager/terminals.nix
       ../../shared/home-manager/herdr-desktop
       ../../shared/home-manager/zed.nix

@@ -126,7 +126,6 @@
         "git"
         "ssh-agent"
       ]
-      ++ lib.optionals config.programs.tmux.enable [ "tmux" ]
       ++ lib.optionals config.programs.fzf.enable [ "fzf" ]
       ++ lib.optionals (lib.any (pkg: pkg.pname or pkg.name or "" == "bazelisk") config.home.packages) [
         "bazel"
@@ -138,11 +137,6 @@
     };
 
     sessionVariables = {
-      ZSH_TMUX_CONFIG = "${config.home.homeDirectory}/.config/tmux/tmux.conf";
-      ZSH_TMUX_AUTOCONNECT = "true";
-      ZSH_TMUX_AUTOQUIT = "false";
-      ZSH_TMUX_AUTOSTART_ONCE = "false";
-      ZSH_TMUX_DEFAULT_SESSION_NAME = "scratchpad";
       RIPGREP_CONFIG_PATH = "${config.home.homeDirectory}/.config/ripgrep/ripgreprc";
       XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/Pictures/screenshots";
       PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
@@ -164,28 +158,10 @@
 
     # Additional shell initialization
     initContent = lib.mkMerge [
-      # Must run before oh-my-zsh is sourced (order 800): its tmux plugin decides
-      # whether to autostart while loading. Skip it in VS Code and in the Herdr
-      # desktop app, which keeps terminals running itself. herdr-core sets
-      # HC_TERMINAL_ID in every terminal it runs; TERM_PROGRAM is only "herdr"
-      # for some (others inherit whatever started the core, e.g. "ghostty").
-      (lib.mkOrder 500 ''
-        if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "herdr" && -z "$HC_TERMINAL_ID" ]]; then
-          ZSH_TMUX_AUTOSTART=true
-        else
-          ZSH_TMUX_AUTOSTART=false
-        fi
-      '')
-
       ''
         # Source profile if it exists
         if test -f ~/.profile; then
           source ~/.profile
-        fi
-
-        # Enter Herdr automatically on the laptop, but never from a Herdr pane.
-        if [[ "$HERDR_AUTOSTART" == "true" && -z "$HERDR_ENV" && "$TERM_PROGRAM" != "vscode" ]]; then
-          herdr
         fi
 
         # Additional plugins for tools not managed by nix

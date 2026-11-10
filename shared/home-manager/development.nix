@@ -69,7 +69,7 @@
     PYTHONPATH = "${config.home.homeDirectory}/.local/lib/python3.12/site-packages";
   };
 
-  # tmux-sessionizer script
+  # bazel -> bazelisk
   home.file.".local/bin/bazel" = {
     source = config.lib.file.mkOutOfStoreSymlink "${pkgs.bazelisk}/bin/bazelisk";
     executable = true;

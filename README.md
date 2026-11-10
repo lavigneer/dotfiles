@@ -32,8 +32,6 @@ shared/
 │   │   ├── keymaps.nix       # Key mappings
 │   │   └── plugins.nix       # Plugin configurations
 │   ├── zsh.nix               # Zsh with oh-my-zsh and starship
-│   ├── tmux.nix              # Tmux configuration
-│   ├── herdr.nix             # Herdr terminal multiplexer configuration
 │   ├── herdr-desktop/        # Herdr desktop app: settings, keys, projects/tickets/work mods
 │   ├── claude.nix            # Claude Code, plus the sheltie skills
 │   ├── terminals.nix         # Terminal emulators (ghostty)
@@ -213,20 +211,16 @@ setup-fireconnect
 - **Rofi 2.0.0+** has native Wayland support
 - **Configuration files** are symlinked from dotfiles directory
 
-Herdr is enabled only on `M-DX000XV19K` while it is being evaluated. The Herdr
-module installs and pins the Sessionizer and Auto Title plugins during Home
-Manager activation. After the first install, restart the Herdr server once with
-`herdr server stop`, then run `herdr` to start the plugins.
-
-### Ticket workflow (herdr-desktop, NixOS)
+### Ticket workflow (herdr-desktop)
 
 The tickets popup (Ctrl+B t), Work sidebar, projects picker (Ctrl+B f), the
-Claude skills (`/draft-pr`, `/address-comments`, `/fix-ci`, `/resolve-conflicts`), the `sheltie` layout and `herdr-demo`
-come from [sheltie](https://github.com/lavigneer/sheltie), a
-flake input. `shared/home-manager/herdr-desktop` installs its mods and writes
-their settings (`~/.config/herdr-app/sheltie.json`) from the
-`herdrDesktop.tickets` options; that repo's README documents the workflow.
-`rebuild-nix` fetches the (private) input as you before the root rebuild.
+Claude skills (`/draft-pr`, `/address-comments`, `/fix-ci`,
+`/resolve-conflicts`), the `sheltie` layout and `herdr-demo` come from
+[sheltie](https://github.com/lavigneer/sheltie), a flake input.
+`shared/home-manager/herdr-desktop` installs its mods and writes their settings
+(`~/.config/herdr-app/sheltie.json`) from the `herdrDesktop.tickets` options;
+that repo's README documents the workflow. `rebuild-nix` fetches the (private)
+input as you before the root rebuild.
 
 ## 🤝 Contributing
 
