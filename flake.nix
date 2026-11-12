@@ -112,12 +112,15 @@
       # Overlay to fix pre-commit build on darwin (dotnet-sdk tests require Swift which is broken)
       darwinOverlays = [
         (_final: prev: {
-          pre-commit = prev.pre-commit.overridePythonAttrs (_oldAttrs: {
+          pre-commit = prev.pre-commit.overridePythonAttrs (oldAttrs: {
             doCheck = false;
             dontUsePytestCheck = true;
             nativeCheckInputs = [ ];
             preCheck = null;
             pytestCheckPhase = null;
+            # DOTNET_ROOT references the source-built .NET SDK, which would
+            # otherwise still be pulled in (and built) even with checks disabled.
+            env = removeAttrs (oldAttrs.env or { }) [ "DOTNET_ROOT" ];
           });
           direnv = prev.direnv.overrideAttrs (oldAttrs: {
             env = (oldAttrs.env or { }) // {
