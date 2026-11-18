@@ -39,8 +39,8 @@ in
         automatically-unhide-macos-hidden-apps = false;
 
         mode.main.binding = {
-          # Terminal launcher
-          alt-enter = "exec-and-forget open -a \"Ghostty\" -n";
+          # Terminal launcher: Herdr desktop (herdr-desktop.nix); Ghostty stays installed
+          alt-enter = "exec-and-forget open -a \"Herdr\"";
 
           # Window management
           alt-shift-q = "close --quit-if-last-window";
