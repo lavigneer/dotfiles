@@ -45,11 +45,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Flox
-    flox = {
-      url = "github:flox/flox/latest";
-    };
-
     # Herdr desktop mods: ticket -> worktree -> agent -> PR (private repo, so
     # over SSH; rebuild-nix fetches inputs as you before the sudo rebuild).
     sheltie = {
@@ -70,7 +65,6 @@
       sidekick-nvim,
       nvim-lsp-endhints,
       treefmt-nix,
-      flox,
       ...
     }@inputs:
     let
