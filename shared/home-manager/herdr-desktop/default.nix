@@ -299,6 +299,9 @@ in
   config = {
     home.packages = [
       herdr-desktop
+      # hc, the herdr-core CLI: agents run `hc label "$HC_TERMINAL_ID" pr=ready`
+      # from their shells (the mods use the absolute path in sheltie.json).
+      pkgs.herdr-core
       # Jira Server/Data Center access for the tickets mod. Log in once with
       # `jira init --installation local --auth-type bearer` and a personal access
       # token (kept in JIRA_API_TOKEN, ~/.netrc or the OS keychain).
