@@ -18,9 +18,14 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "plugdev" # ZSA keyboard flashing / Oryx live training
     ];
     shell = pkgs.zsh;
   };
+
+  # udev rules for ZSA keyboards (ErgoDox EZ, Moonlander, Voyager)
+  hardware.keyboard.zsa.enable = true;
+  users.groups.plugdev = { };
 
   # Default Linux services
   services = {
